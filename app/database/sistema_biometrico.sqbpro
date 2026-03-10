@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="sistema_biometrico.db" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="2846"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="3" parent="0"/><expanded_item id="4" parent="0"/><expanded_item id="5" parent="0"/><expanded_item id="6" parent="0"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="usuario_rol" custom_title="0" dock_id="1" table="4,11:mainusuario_rol"/><dock_state state="000000ff00000000fd00000001000000020000043c000002b6fc0100000001fb000000160064006f0063006b00420072006f007700730065003101000000000000043c0000011800ffffff000002580000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="biometria" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="79"/><column index="2" value="69"/><column index="3" value="70"/><column index="4" value="89"/><column index="5" value="46"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="carrera" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="66"/><column index="2" value="422"/><column index="3" value="73"/><column index="4" value="46"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="facultad" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="71"/><column index="2" value="487"/><column index="3" value="69"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="registro_acceso" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="69"/><column index="2" value="69"/><column index="3" value="71"/><column index="4" value="61"/><column index="5" value="62"/><column index="6" value="47"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="usuario" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="67"/><column index="2" value="85"/><column index="3" value="70"/><column index="4" value="78"/><column index="5" value="46"/><column index="6" value="156"/><column index="7" value="118"/><column index="8" value="43"/><column index="9" value="73"/><column index="10" value="67"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table><table schema="main" name="usuario_rol" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="41"/><column index="2" value="51"/><column index="3" value="202"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats/><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">-- ===========================================
+-- FACULTADES 
+-- ===========================================
+
+INSERT OR IGNORE INTO facultad (id_facultad, nombre, estado) VALUES 
+(1, 'Facultad de Ciencias Marinas (FACIMAR)', 1),
+(2, 'Facultad de Contabilidad y Administración (FCAM)', 1),
+(3, 'Escuela de Enfermería', 1),
+(4, 'Facultad de Ingeniería Electromecánica (FIE)', 1);
+
+-- ===========================================
+-- CARRERAS 
+-- ===========================================
+
+-- Ciencias Marinas (FACIMAR) - ID: 1
+INSERT OR IGNORE INTO carrera (nombre, id_facultad, estado) VALUES 
+('Ingeniería Oceánica', 1, 1),
+('Licenciatura en Sustentabilidad Marina', 1, 1);
+
+-- Contabilidad y Administración (FCAM) - ID: 2
+INSERT OR IGNORE INTO carrera (nombre, id_facultad, estado) VALUES 
+('Contador Público', 2, 1),
+('Licenciatura en Administración', 2, 1),
+('Licenciatura en Negocios Digitales', 2, 1);
+
+-- Escuela de Enfermería - ID: 3
+INSERT OR IGNORE INTO carrera (nombre, id_facultad, estado) VALUES 
+('Licenciatura en Enfermería', 3, 1);
+
+-- Ingeniería Electromecánica (FIE) - ID: 4
+INSERT OR IGNORE INTO carrera (nombre, id_facultad, estado) VALUES 
+('Ingeniero Mecánico Electricista (IME)', 4, 1),
+('Ingeniería en Tecnologías Electrónicas (ITE)', 4, 1),
+('Ingeniería en Mecatrónica (IMT)', 4, 1),
+('Ingeniería de Software (IS)', 4, 1);
+
+-- ===========================================
+-- ROL ADMIN 
+-- ===========================================
+
+INSERT OR IGNORE INTO usuario_rol (id_rol, nombre, descripcion) VALUES 
+(1, 'admin', 'Administrador del sistema');
+
+-- ===========================================
+-- TU USUARIO 
+-- ===========================================
+
+INSERT OR IGNORE INTO usuario (nombre, a_paterno, a_materno, fecha_registro, id_rol, id_facultad, id_carrera)
+VALUES ('Juan Pablo', 'Mancilla', 'Rodriguez', datetime('now'), 1, 4, 10);</sql><current_tab id="0"/></tab_sql></sqlb_project>

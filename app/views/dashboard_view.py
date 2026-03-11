@@ -1,6 +1,9 @@
 import customtkinter as ctk
 from app.views.user_management_view import UserManagementView
 from app.views.account_view import AccountView 
+from app.views.facultad_management_view import FacultadManagementView
+from app.views.carrera_management_view import CarreraManagementView
+
 # --- VISTA PRINCIPAL DEL DASHBOARD ---
 class DashboardView(ctk.CTkFrame):
     def __init__(self, master, on_back):
@@ -97,6 +100,16 @@ class DashboardView(ctk.CTkFrame):
         self.actualizar_navegacion(self.btn_users)
         UserManagementView(self.content_container).pack(fill="both", expand=True, padx=40)
 
+    def mostrar_gestion_facultades(self):
+        self.limpiar_derecha()
+        self.actualizar_navegacion(self.btn_facultades)
+        FacultadManagementView(self.content_container).pack(fill="both", expand=True, padx=40)
+
+    def mostrar_gestion_carreras(self):
+        self.limpiar_derecha()
+        self.actualizar_navegacion(self.btn_carreras)
+        CarreraManagementView(self.content_container).pack(fill="both", expand=True, padx=40)
+
     def mostrar_cuenta(self):
         self.limpiar_derecha()
         self.actualizar_navegacion(self.btn_account)
@@ -121,7 +134,7 @@ class DashboardView(ctk.CTkFrame):
             self.es_btn.configure(fg_color="transparent", text_color="#4A4A4A", hover_color="#CBD5E1")
 
     def actualizar_navegacion(self, boton_activo):
-        botones = [self.btn_panel, self.btn_users, self.btn_account]
+        botones = [self.btn_panel, self.btn_users, self.btn_facultades, self.btn_carreras, self.btn_account]
         for btn in botones:
             if btn == boton_activo:
                 btn.configure(fg_color="#0F172A", text_color="white", hover_color="#000000")
@@ -154,6 +167,12 @@ class DashboardView(ctk.CTkFrame):
 
         self.btn_users = ctk.CTkButton(sidebar, text="👥   Gestión de Usuarios", height=45, anchor="w", hover_color="#F1F5F9", command=self.mostrar_gestion_usuarios)
         self.btn_users.pack(pady=5, padx=20, fill="x")
+
+        self.btn_facultades = ctk.CTkButton(sidebar, text="🏛️   Gestión de Facultades", height=45, anchor="w", hover_color="#F1F5F9", command=self.mostrar_gestion_facultades)
+        self.btn_facultades.pack(pady=5, padx=20, fill="x")
+
+        self.btn_carreras = ctk.CTkButton(sidebar, text="📚   Gestión de Carreras", height=45, anchor="w", hover_color="#F1F5F9", command=self.mostrar_gestion_carreras)
+        self.btn_carreras.pack(pady=5, padx=20, fill="x")
 
         self.btn_account = ctk.CTkButton(sidebar, text="⚙️   Cuenta", height=45, anchor="w", hover_color="#F1F5F9", command=self.mostrar_cuenta)
         self.btn_account.pack(pady=5, padx=20, fill="x")

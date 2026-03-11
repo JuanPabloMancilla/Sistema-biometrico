@@ -214,4 +214,4 @@ __marimo__/
 dataset/
 
 # Archivos temporales del sistema
-*.sqlite3
+*.sqlite3.venv/

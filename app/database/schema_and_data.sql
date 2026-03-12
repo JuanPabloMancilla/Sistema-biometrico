@@ -54,6 +54,16 @@ CREATE TABLE IF NOT EXISTS "usuario_rol" (
 	"descripcion"	TEXT,
 	PRIMARY KEY("id_rol" AUTOINCREMENT)
 );
+-- ROLES
+INSERT INTO "usuario_rol" VALUES (1,'admin','Administrador del sistema');
+
+-- FACULTADES
+INSERT INTO "facultad" VALUES (1,'Facultad de Ciencias Marinas (FACIMAR)',1);
+INSERT INTO "facultad" VALUES (2,'Facultad de Contabilidad y Administración (FCAM)',1);
+INSERT INTO "facultad" VALUES (3,'Escuela de Enfermería',1);
+INSERT INTO "facultad" VALUES (4,'Facultad de Ingeniería Electromecánica (FIE)',1);
+
+-- CARRERAS
 INSERT INTO "carrera" VALUES (1,'Ingeniería Oceánica',1,1);
 INSERT INTO "carrera" VALUES (2,'Licenciatura en Sustentabilidad Marina',1,1);
 INSERT INTO "carrera" VALUES (3,'Contador Público',2,1);
@@ -64,10 +74,8 @@ INSERT INTO "carrera" VALUES (7,'Ingeniero Mecánico Electricista (IME)',4,1);
 INSERT INTO "carrera" VALUES (8,'Ingeniería en Tecnologías Electrónicas (ITE)',4,1);
 INSERT INTO "carrera" VALUES (9,'Ingeniería en Mecatrónica (IMT)',4,1);
 INSERT INTO "carrera" VALUES (10,'Ingeniería de Software (IS)',4,1);
-INSERT INTO "facultad" VALUES (1,'Facultad de Ciencias Marinas (FACIMAR)',1);
-INSERT INTO "facultad" VALUES (2,'Facultad de Contabilidad y Administración (FCAM)',1);
-INSERT INTO "facultad" VALUES (3,'Escuela de Enfermería',1);
-INSERT INTO "facultad" VALUES (4,'Facultad de Ingeniería Electromecánica (FIE)',1);
-INSERT INTO "usuario" VALUES (1,'Juan Pablo','Mancilla','Rodriguez',1,'2026-03-08 18:45:43',NULL,1,4,10);
-INSERT INTO "usuario_rol" VALUES (1,'admin','Administrador del sistema');
+
+-- USUARIO ADMIN
+INSERT INTO "usuario"
+VALUES (1,'Juan Pablo','Mancilla','Rodriguez',1,'2026-03-08 18:45:43',NULL,1,4,10);
 COMMIT;

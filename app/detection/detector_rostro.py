@@ -6,7 +6,7 @@ from app.recognition.encoding_manager import verificar_dimension, guardar_encodi
 
 ultimo_encoding = None
 
-def procesar_frame(frae):
+def procesar_frame(frame):
     #Esto convertira el frame de BGR a RGB
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 

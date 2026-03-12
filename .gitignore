@@ -214,4 +214,13 @@ __marimo__/
 dataset/
 
 # Archivos temporales del sistema
-*.sqlite3.venv/
+*.sqlite3
+
+# entornos virtuales
+venv/
+venv311/
+.venv/
+
+# python
+__pycache__/
+*.pyc

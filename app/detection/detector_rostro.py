@@ -4,9 +4,15 @@ import numpy as np
 
 from app.recognition.encoding_manager import verificar_dimension, guardar_encoding
 
+from app.recognition.encoding_manager import (
+    verificar_dimension,
+    guardar_encoding,
+    cargar_encodings
+)
+
 ultimo_encoding = None
 
-def procesar_frame(frae):
+def procesar_frame(frame):
     #Esto convertira el frame de BGR a RGB
     rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
@@ -67,24 +73,29 @@ def procesar_frame(frae):
 
     #Vector numérico de la cara
     face_encoding = face_recognition.face_encodings(rgb, face_locations)[0]
-
-    global ultimo_encoding
-
+    
     if verificar_dimension(face_encoding):
-        print("Encoding correcto: 128 dimensiones")
 
-        if ultimo_encoding is None:
-            guardar_encoding(face_encoding)
-            ultimo_encoding = face_encoding
-            print("Primer encoding guardado")
+        encodings_guardados = cargar_encodings()
+
+        if len(encodings_guardados) > 0:
+
+            distancias = face_recognition.face_distance(
+                encodings_guardados,
+                face_encoding
+            )
+
+            mejor_distancia = min(distancias)
+
+            if mejor_distancia < 0.6:
+                print("Este rostro ya está registrado")
+            else:
+                guardar_encoding(face_encoding)
+                print("Nuevo rostro registrado")
 
         else:
-            distancia = face_recognition.face_distance([ultimo_encoding], face_encoding)[0]
-
-            if distancia > 0.6:
-                guardar_encoding("usuario_1", face_encoding)
-                ultimo_encoding = face_encoding
-                print("Nuevo encoding guardado (rostro diferente)")
+            guardar_encoding(face_encoding)
+            print("Primer rostro registrado")
 
     #Dibujar un rectángulo alrededor de la cara detectada
     top, right, bottom, left = face_locations[0]

@@ -24,6 +24,30 @@ def verificar_dimension(encoding):
 
     return len(encoding) == 128
 
+def cargar_encodings(archivo="encodings.json"):
+
+    if not os.path.exists(archivo):
+        return []
+
+    with open(archivo, "r") as f:
+        datos = json.load(f)
+
+    encodings = []
+
+    for usuario in datos:
+        encodings.append(usuario["encoding"])
+
+    return encodings
+
+def compare_embeddings(embedding1, embedding2):
+
+    distancia = face_recognition.face_distance(
+        [embedding1],
+        embedding2
+    )[0]
+
+    return distancia
+
 def obtener_siguiente_usuario(archivo="encodings.json"):
 
     if not os.path.exists(archivo):

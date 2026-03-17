@@ -1,6 +1,7 @@
 import face_recognition
 import json
 import os
+import numpy as np
 
 
 # Generar encoding facial
@@ -27,17 +28,19 @@ def verificar_dimension(encoding):
 def cargar_encodings(archivo="encodings.json"):
 
     if not os.path.exists(archivo):
-        return []
+        return [], []
 
     with open(archivo, "r") as f:
         datos = json.load(f)
 
     encodings = []
+    usuarios = []
 
     for usuario in datos:
-        encodings.append(usuario["encoding"])
+        encodings.append(np.array(usuario["encoding"]))
+        usuarios.append(usuario["usuario"])
 
-    return encodings
+    return encodings, usuarios
 
 def compare_embeddings(embedding1, embedding2):
 
@@ -47,6 +50,27 @@ def compare_embeddings(embedding1, embedding2):
     )[0]
 
     return distancia
+
+def find_best_match(encoding_actual, encoding_db, threshold=0.6):
+
+    mejor_distancia = float("inf")
+    mejor_index = None
+
+    for i, encoding_guardado in enumerate(encoding_db):
+
+        distancia = compare_embeddings(
+            encoding_guardado,
+            encoding_actual
+        )
+        if distancia < mejor_distancia:
+            mejor_distancia = distancia
+            mejor_index = i
+
+    if mejor_distancia < threshold:
+        return mejor_index, mejor_distancia
+    else:
+        return None, mejor_distancia
+
 
 def obtener_siguiente_usuario(archivo="encodings.json"):
 

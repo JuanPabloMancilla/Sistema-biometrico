@@ -234,7 +234,7 @@ class UserManagementView(ctk.CTkFrame):
 
     def create_header(self, master):
         h = ctk.CTkFrame(master, fg_color="transparent"); h.pack(fill="x", padx=30, pady=(10, 5))
-        ctk.CTkLabel(h, text="Gestión de Usuarios", font=("Inter", 28, "bold"), text_color="#000000").pack(side="left")
+        ctk.CTkLabel(h, text="abababababababab", font=("Inter", 28, "bold"), text_color="#000000").pack(side="left")
         ctk.CTkButton(h, text="+ Agregar Usuario", fg_color="#000000", hover_color="#262626", corner_radius=10, command=self.abrir_formulario).pack(side="right")
 
     def create_search_bar(self, master):

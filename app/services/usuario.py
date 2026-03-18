@@ -53,23 +53,26 @@ def obtener_id_rol_por_nombre(nombre):
         conn.close()
 
 def insertar_usuario(nombre, a_paterno, a_materno, id_rol, id_facultad, id_carrera, cuenta, correo):
-    """Inserta un nuevo usuario manejando errores de cuenta duplicada"""
     conn = get_connection()
     try:
         cursor = conn.cursor()
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
+        # El orden de las columnas debe ser el mismo que el de los VALUES
         cursor.execute("""
-            INSERT INTO usuario (nombre, a_paterno, a_materno, fecha_registro, id_rol, id_facultad, id_carrera, cuenta, correo, estado)
+            INSERT INTO usuario (
+                nombre, a_paterno, a_materno, cuenta, correo, 
+                fecha_registro, id_rol, id_facultad, id_carrera, estado
+            )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-        """, (nombre, a_paterno, a_materno, fecha, id_rol, id_facultad, id_carrera, int(cuenta), correo))
+        """, (nombre, a_paterno, a_materno, str(cuenta), correo, fecha, id_rol, id_facultad, id_carrera))
         
         conn.commit()
         return True, "✅ Usuario guardado exitosamente"
-    except sqlite3.IntegrityError:
-        return False, "⚠️ Error: El número de cuenta ya está registrado."
-    except Exception as e:
-        return False, f"❌ Error al guardar: {e}"
+    except sqlite3.IntegrityError as e:
+        if "cuenta" in str(e).lower():
+            return False, "⚠️ Error: La cuenta debe tener 8 números y ser única."
+        return False, f"⚠️ Error de base de datos: {e}"
     finally:
         conn.close()
 
@@ -79,16 +82,18 @@ def actualizar_usuario(cuenta, nombre, a_paterno, a_materno, id_rol, id_facultad
         cursor = conn.cursor()
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         
-        # IMPORTANTE: Aseguramos que el estado vuelva a 1 al editar
         cursor.execute("""
             UPDATE usuario 
             SET nombre = ?, a_paterno = ?, a_materno = ?, id_rol = ?, 
                 id_facultad = ?, correo = ?, fecha_actualizacion = ?, estado = 1
             WHERE cuenta = ?
-        """, (nombre, a_paterno, a_materno, id_rol, id_facultad, correo, fecha, cuenta))
+        """, (nombre, a_paterno, a_materno, id_rol, id_facultad, correo, fecha, str(cuenta)))
         
         conn.commit()
-        return cursor.rowcount > 0, "✅ Cambios aplicados"
+        if cursor.rowcount > 0:
+            return True, "✅ Cambios aplicados correctamente"
+        else:
+            return False, "⚠️ No se encontró el usuario para actualizar"
     except Exception as e:
         return False, f"Error: {e}"
     finally:

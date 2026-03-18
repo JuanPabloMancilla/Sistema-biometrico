@@ -142,7 +142,7 @@ class LoginView(ctk.CTkFrame):
     def validar_login(self):
         user = self.user_entry.get()
         pw = self.pass_entry.get()
-        if user == "admin@universidad.edu.mx" and pw == "admin2026":
+        if user == "1" and pw == "1":
             self.on_login_success()
         else:
             self.error_label.configure(text="Credenciales incorrectas.")

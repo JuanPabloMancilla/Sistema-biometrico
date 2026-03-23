@@ -58,7 +58,6 @@ class UserManagementView(ctk.CTkFrame):
             self.all_users = []
 
     def validar_ocho_numeros(self, P):
-        """Solo permite números y máximo 8 dígitos en el campo de Cuenta"""
         if P == "": return True
         return P.isdigit() and len(P) <= 8
 
@@ -67,7 +66,6 @@ class UserManagementView(ctk.CTkFrame):
             w.destroy()
 
         ancho_foto, ancho_info, ancho_estado = 140, 400, 150
-
         table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
         table_head.pack(fill="x", padx=20, pady=(10, 5))
 
@@ -77,25 +75,16 @@ class UserManagementView(ctk.CTkFrame):
         ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color="#64748B").pack(side="right", padx=60)
 
         ctk.CTkFrame(self.main_card, fg_color="#E2E8F0", height=1).pack(fill="x", padx=20)
-
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
         scroll.pack(expand=True, fill="both")
         
         for u in user_list:
-            row = ctk.CTkFrame(scroll, fg_color="transparent", height=70)
-            row.pack(fill="x", side="top", pady=1)
-            row.pack_propagate(False)
-
-            # 1. Foto
-            f_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_foto)
-            f_b.pack(side="left"); f_b.pack_propagate(False)
+            row = ctk.CTkFrame(scroll, fg_color="transparent", height=70); row.pack(fill="x", side="top", pady=1); row.pack_propagate(False)
+            f_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_foto); f_b.pack(side="left"); f_b.pack_propagate(False)
             ctk.CTkLabel(f_b, text="👤", font=("Inter", 32)).pack(expand=True)
 
-            # 2. Información
-            i_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_info)
-            i_b.pack(side="left", fill="y"); i_b.pack_propagate(False)
+            i_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_info); i_b.pack(side="left", fill="y"); i_b.pack_propagate(False)
             i_in = ctk.CTkFrame(i_b, fg_color="transparent"); i_in.pack(expand=True, fill="x", anchor="w")
-
             l_n = ctk.CTkFrame(i_in, fg_color="transparent"); l_n.pack(anchor="w")
             ctk.CTkLabel(l_n, text=f"{u['nombre_solo']} {u['ap']} {u['am']}".upper(), font=("Inter", 13, "bold"), text_color="#1E293B").pack(side="left")
             
@@ -104,19 +93,14 @@ class UserManagementView(ctk.CTkFrame):
             ctk.CTkLabel(badge_r, text=u["r"], font=("Inter", 9, "bold"), text_color=col["text"]).pack(padx=6, pady=1)
             ctk.CTkLabel(i_in, text=f"ID: {u['c']}  •  {u['m']}", font=("Inter", 11), text_color="#64748B").pack(anchor="w")
 
-            # 3. Estado
-            e_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado)
-            e_b.pack(side="left", fill="y"); e_b.pack_propagate(False)
+            e_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado); e_b.pack(side="left", fill="y"); e_b.pack_propagate(False)
             es_activo = u.get('estado', 1) == 1
             badge_e = ctk.CTkFrame(e_b, fg_color="#D1FAE5" if es_activo else "#FEE2E2", corner_radius=20); badge_e.pack(expand=True)
             ctk.CTkLabel(badge_e, text="● ACTIVO" if es_activo else "● INACTIVO", font=("Inter", 9, "bold"), text_color="#065F46" if es_activo else "#991B1B").pack(padx=10, pady=3)
 
-            # 4. Acciones
-            a_b = ctk.CTkFrame(row, fg_color="transparent")
-            a_b.pack(side="right", padx=20, fill="y")
-            ctk.CTkButton(a_b, text="✏️", width=32, height=32, fg_color="#F1F5F9", text_color="#1E293B", command=lambda d=u: self.abrir_formulario(d)).pack(side="left", padx=4, pady=18)
-            ctk.CTkButton(a_b, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda i=u['c']: self.ejecutar_eliminacion(i)).pack(side="left", padx=2, pady=18)
-
+            a_b = ctk.CTkFrame(row, fg_color="transparent"); a_b.pack(side="right", padx=20)
+            ctk.CTkButton(a_b, text="✏️", width=32, height=32, fg_color="#F1F5F9", text_color="#1E293B", command=lambda d=u: self.abrir_formulario(d)).pack(side="left", padx=4)
+            ctk.CTkButton(a_b, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda i=u['c']: self.ejecutar_eliminacion(i)).pack(side="left", padx=2)
             ctk.CTkFrame(scroll, fg_color="#F1F5F9", height=1).pack(fill="x", padx=20, side="top")
 
     def abrir_formulario(self, usuario=None):
@@ -138,7 +122,6 @@ class UserManagementView(ctk.CTkFrame):
 
         ctk.CTkLabel(self.form_container, text="✏️ Editar Registro" if usuario else "➕ Nuevo Registro", font=self.font_header, text_color="#000000").pack(anchor="w", padx=60, pady=(30, 10))
 
-        # Card Clasificación
         c_clasi = ctk.CTkFrame(self.form_container, fg_color="white", corner_radius=12, border_width=1, border_color="#E2E8F0"); c_clasi.pack(fill="x", padx=60, pady=10)
         grid = ctk.CTkFrame(c_clasi, fg_color="transparent"); grid.pack(fill="x", padx=20, pady=20)
         ctk.CTkOptionMenu(grid, values=["ESTUDIANTE", "DOCENTE", "AUXILIAR"], variable=self.rol_var, height=40, text_color="black", fg_color="#F1F5F9", button_color="#E2E8F0").pack(side="left", expand=True, fill="x", padx=5)
@@ -150,7 +133,6 @@ class UserManagementView(ctk.CTkFrame):
         self.create_section_card(self.form_container, "👤 Información Personal", [("Nombres", usuario["nombre_solo"] if usuario else ""), ("Apellido Paterno", usuario["ap"] if usuario else ""), ("Apellido Materno", usuario["am"] if usuario else "")])
         self.create_section_card(self.form_container, "🆔 Identificación", [("Cuenta", str(usuario["c"]) if usuario else ""), ("Correo", usuario["m"] if usuario else "")])
 
-        # Registro de validación de 8 dígitos para Cuenta
         vcmd = (self.register(self.validar_ocho_numeros), '%P')
         self.inputs_obligatorios["Cuenta"].configure(validate="key", validatecommand=vcmd)
         if usuario: self.inputs_obligatorios["Cuenta"].configure(state="disabled", fg_color="#E2E8F0")
@@ -172,27 +154,23 @@ class UserManagementView(ctk.CTkFrame):
             else: self.inputs_obligatorios[label] = entry
 
     def validar_y_guardar(self):
-        n = self.inputs_obligatorios.get("Nombres").get().strip()
-        em = self.inputs_obligatorios.get("Correo").get().strip()
-        cta = self.usuario_editando_id if self.usuario_editando_id else self.inputs_obligatorios.get("Cuenta").get().strip()
-        
-        if not n or not cta or not em: return
-        if "@" not in em: 
-            self.inputs_obligatorios["Correo"].configure(border_width=1, border_color="red")
-            return
-        if not self.usuario_editando_id and len(cta) != 8:
-            self.inputs_obligatorios["Cuenta"].configure(border_width=1, border_color="red")
-            return
-
-        id_rol = obtener_id_rol_por_nombre(self.rol_var.get())
-        id_fac = obtener_id_facultad_por_nombre(self.plantel_menu.get())
-        
-        if self.usuario_editando_id:
-            actualizar_usuario(cta, n, self.inputs_apellidos["Apellido Paterno"].get(), self.inputs_apellidos["Apellido Materno"].get(), id_rol, id_fac, em)
-        else:
-            insertar_usuario(n, self.inputs_apellidos["Apellido Paterno"].get(), self.inputs_apellidos["Apellido Materno"].get(), id_rol, id_fac, None, cta, em)
-        
-        self.refresh_data(); self.render_table_content(self.all_users); self.cerrar_formulario()
+        try:
+            n = self.inputs_obligatorios.get("Nombres").get().strip()
+            em = self.inputs_obligatorios.get("Correo").get().strip()
+            cta = self.usuario_editando_id if self.usuario_editando_id else self.inputs_obligatorios.get("Cuenta").get().strip()
+            if not n or not cta or not em: return
+            if "@" not in em: 
+                self.inputs_obligatorios["Correo"].configure(border_width=1, border_color="red")
+                return
+            if not self.usuario_editando_id and len(cta) != 8:
+                self.inputs_obligatorios["Cuenta"].configure(border_width=1, border_color="red")
+                return
+            id_rol, id_fac = obtener_id_rol_por_nombre(self.rol_var.get()), obtener_id_facultad_por_nombre(self.plantel_menu.get())
+            ap, am = self.inputs_apellidos["Apellido Paterno"].get(), self.inputs_apellidos["Apellido Materno"].get()
+            if self.usuario_editando_id: actualizar_usuario(cta, n, ap, am, id_rol, id_fac, em)
+            else: insertar_usuario(n, ap, am, id_rol, id_fac, None, cta, em)
+            self.refresh_data(); self.render_table_content(self.all_users); self.cerrar_formulario()
+        except Exception as e: print(e)
 
     def create_header(self, master):
         h = ctk.CTkFrame(master, fg_color="transparent"); h.pack(fill="x", padx=30, pady=(20, 10))
@@ -224,26 +202,43 @@ class UserManagementView(ctk.CTkFrame):
     def aplicar_filtro_visual(self, v):
         self.filtro_rol_actual = v
         self.draw_tags()
-        # Aquí puedes añadir la lógica de filtrado real sobre self.all_users si lo deseas
 
     def update_carreras_dinamicas(self, fn):
         c = self.carreras_por_plantel.get(fn, ["Sin Carreras"])
         self.carrera_menu.configure(values=c); self.carrera_var.set(c[0])
 
     def ejecutar_eliminacion(self, id_cuenta):
-        self.overlay = ctk.CTkFrame(self, fg_color="#262626"); self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
-        modal = ctk.CTkFrame(self.overlay, fg_color="white", corner_radius=15, width=360, height=200)
-        modal.place(relx=0.5, rely=0.5, anchor="center"); modal.pack_propagate(False)
-        ctk.CTkLabel(modal, text="¿Eliminar usuario?", font=self.font_sub, text_color="#E11D48").pack(pady=30)
-        btns = ctk.CTkFrame(modal, fg_color="transparent"); btns.pack(fill="x", side="bottom", pady=20, padx=20)
-        ctk.CTkButton(btns, text="Cancelar", command=self.cerrar_modal).pack(side="left", expand=True, padx=5)
-        ctk.CTkButton(btns, text="Eliminar", fg_color="#E11D48", command=lambda: self.confirmar_borrado(id_cuenta)).pack(side="left", expand=True, padx=5)
+        # 1. Overlay Transparente (eliminamos el color azul oscuro)
+        self.overlay = ctk.CTkFrame(self, fg_color="transparent") 
+        self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
+        
+        # 2. Caja del Modal (la ventanita blanca)
+        # Añadimos borde más fuerte para que resalte sobre el fondo blanco
+        modal = ctk.CTkFrame(self.overlay, fg_color="white", corner_radius=20, width=420, height=240, border_width=2, border_color="#CBD5E1")
+        modal.place(relx=0.5, rely=0.5, anchor="center")
+        modal.pack_propagate(False)
+
+        ctk.CTkLabel(modal, text="🗑️", font=("Inter", 45)).pack(pady=(25, 5))
+        ctk.CTkLabel(modal, text="¿Está seguro de eliminar al usuario?", font=("Inter", 16, "bold"), text_color="#1E293B").pack()
+        ctk.CTkLabel(modal, text="Esta acción desactivará al usuario permanentemente.", font=("Inter", 12), text_color="#64748B").pack(pady=5)
+        
+        # 3. Botones (Verde para confirmar, Rojo para cancelar)
+        btns = ctk.CTkFrame(modal, fg_color="transparent")
+        btns.pack(fill="x", side="bottom", pady=25, padx=30)
+        
+        # CANCELAR - Rojo
+        ctk.CTkButton(btns, text="Cancelar", fg_color="#EF4444", text_color="white", hover_color="#DC2626", height=40, font=("Inter", 13, "bold"), command=self.cerrar_modal).pack(side="left", expand=True, padx=(0, 10))
+        
+        # CONFIRMAR - Verde
+        ctk.CTkButton(btns, text="Confirmar y Borrar", fg_color="#10B981", text_color="white", hover_color="#059669", height=40, font=("Inter", 13, "bold"), command=lambda: self.confirmar_borrado(id_cuenta)).pack(side="left", expand=True)
 
     def cerrar_modal(self):
         if hasattr(self, 'overlay'): self.overlay.destroy()
 
     def confirmar_borrado(self, id_cuenta):
-        if desactivar_usuario(id_cuenta): self.refresh_data(); self.render_table_content(self.all_users)
+        if desactivar_usuario(id_cuenta): 
+            self.refresh_data()
+            self.render_table_content(self.all_users)
         self.cerrar_modal()
 
     def cerrar_formulario(self):

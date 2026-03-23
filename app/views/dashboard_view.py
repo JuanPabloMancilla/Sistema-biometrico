@@ -135,7 +135,7 @@ class DashboardView(ctk.CTkFrame):
         
         header = ctk.CTkFrame(sidebar, fg_color="transparent")
         header.pack(fill="x", pady=(15, 0), padx=15)
-        ctk.CTkLabel(header, text="☰", font=("Inter", 24), text_color="#000000").pack(side="left")
+        # Se eliminó la línea de las 3 barras (☰)
         ctk.CTkLabel(header, text="K O D A", font=("Times New Roman", 38, "bold"), text_color="#3C054F").pack(side="left", padx=15)
 
         profile = ctk.CTkFrame(sidebar, fg_color="transparent")
@@ -152,8 +152,8 @@ class DashboardView(ctk.CTkFrame):
         self.btn_carreras = self.crear_btn_sidebar(sidebar, "📚   Gestión de Carreras", self.mostrar_gestion_carreras)
         self.btn_account = self.crear_btn_sidebar(sidebar, "⚙️   Configuración Cuenta", self.mostrar_cuenta)
 
-        ctk.CTkButton(sidebar, text="🚪 Volver al Menú", fg_color="transparent", text_color="#EF4444", 
-                     font=("Inter", 14, "bold"), command=self.on_back).pack(side="bottom", pady=30, padx=20, fill="x")
+        ctk.CTkButton(sidebar, text="🚪 Cerrar Sesión", fg_color="transparent", text_color="#EF4444", 
+                      font=("Inter", 14, "bold"), command=self.on_back).pack(side="bottom", pady=30, padx=20, fill="x")
 
     def create_stat_card(self, master, title, value, color):
         card = ctk.CTkFrame(master, height=100, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
@@ -163,7 +163,7 @@ class DashboardView(ctk.CTkFrame):
 
     def crear_btn_sidebar(self, master, texto, comando):
         btn = ctk.CTkButton(master, text=texto, height=45, anchor="w", fg_color="transparent", 
-                           text_color="#000000", hover_color="#F1F5F9", font=("Inter", 13), command=comando)
+                            text_color="#000000", hover_color="#F1F5F9", font=("Inter", 13), command=comando)
         btn.pack(pady=2, padx=20, fill="x")
         return btn
 
@@ -171,13 +171,13 @@ class DashboardView(ctk.CTkFrame):
         wrapper = ctk.CTkFrame(container, fg_color="transparent")
         wrapper.pack(side="right", padx=40, pady=20)
         
-        # Switch de Tema PURO BOTÓN
+        # Switch de Tema
         t_f = ctk.CTkFrame(wrapper, fg_color="#E2E8F0", corner_radius=20, width=100, height=38)
         t_f.pack(side="left", padx=10); t_f.pack_propagate(False)
         ctk.CTkLabel(t_f, text="☀️", font=("Inter", 16)).place(x=20, y=19, anchor="center")
         ctk.CTkSwitch(t_f, text="", width=40, progress_color="#1D1D1F").place(x=65, y=19, anchor="center")
 
-        # Idioma PURO BOTÓN
+        # Idioma
         l_c = ctk.CTkFrame(wrapper, fg_color="#E2E8F0", corner_radius=20, height=38)
         l_c.pack(side="left", padx=10)
         ctk.CTkLabel(l_c, text="🌐", font=("Inter", 16)).pack(side="left", padx=(12, 5))

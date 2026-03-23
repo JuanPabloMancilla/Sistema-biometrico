@@ -99,18 +99,20 @@ def actualizar_usuario(cuenta, nombre, a_paterno, a_materno, id_rol, id_facultad
     finally:
         conn.close()
 
-def desactivar_usuario(id_usuario):
-    """Realiza un borrado lógico del usuario cambiando su estado a 0"""
+def desactivar_usuario(cuenta_usuario):
+    """Realiza un borrado lógico del usuario cambiando su estado a 0 usando la CUENTA"""
     conn = get_connection()
     try:
         cursor = conn.cursor()
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         cursor.execute("""
             UPDATE usuario SET estado = 0, fecha_actualizacion = ? 
-            WHERE id_usuario = ?
-        """, (fecha, id_usuario))
+            WHERE cuenta = ?
+        """, (fecha, str(cuenta_usuario)))
         conn.commit()
         return True
+    except Exception as e:
+        print(f"Error al desactivar: {e}")
+        return False
     finally:
         conn.close()
-        

@@ -11,6 +11,23 @@ class TerminalView(ctk.CTkFrame):
         self.cap = None
         self.loop_id = None
 
+        # --- BOTÓN DE LOGIN / ENTRADA EN LA ESQUINA ---
+        # Usamos un diseño circular o cuadrado redondeado muy discreto
+        self.btn_login = ctk.CTkButton(
+            self, 
+            text="🚪",                # Icono de puerta o entrada
+            width=45, 
+            height=45, 
+            corner_radius=12,
+            fg_color="#2D2D2E",       # Mismo color que el contenedor de video para camuflarse
+            hover_color="#3E3E3F",    # Un gris un poco más claro al pasar el mouse
+            text_color="white", 
+            font=("Inter", 20),
+            command=self.cerrar_y_volver
+        )
+        # Posicionamiento absoluto: 2% desde la derecha, 2% desde arriba
+        self.btn_login.place(relx=0.98, rely=0.02, anchor="ne")
+
         # Título Estilizado
         ctk.CTkLabel(self, text="TERMINAL DE RECONOCIMIENTO", 
                      font=("Inter", 28, "bold"), text_color="white").pack(pady=(40, 10))
@@ -21,34 +38,27 @@ class TerminalView(ctk.CTkFrame):
 
         # Contenedor de Video con bordes redondeados
         self.video_container = ctk.CTkFrame(self, fg_color="#2D2D2E", corner_radius=25)
-        self.video_container.pack(expand=True, fill="both", padx=80, pady=20)
+        self.video_container.pack(expand=True, fill="both", padx=80, pady=(10, 50)) # Ajustado el pady inferior
 
         self.video_display = ctk.CTkLabel(self.video_container, text="")
         self.video_display.pack(expand=True, fill="both", padx=10, pady=10)
-
-        # Botón de cierre con el estilo de tu imagen
-        self.btn_close = ctk.CTkButton(self, text="CERRAR TERMINAL", 
-                                       fg_color="#E15F5F", hover_color="#C04D4D",
-                                       height=45, corner_radius=10, font=("Inter", 13, "bold"),
-                                       command=self.cerrar_y_volver)
-        self.btn_close.pack(pady=(20, 40))
 
         # Iniciar hardware al entrar a la vista
         self.iniciar_sistema()
 
     def iniciar_sistema(self):
-        self.cap = iniciar_camara() # Tu camara.py
+        # Intentar iniciar la cámara
+        self.cap = iniciar_camara() 
         if self.cap:
             self.actualizar_video()
         else:
-            self.status_label.configure(text="Error: No se encontró la cámara", text_color="#EF4444")
+            self.status_label.configure(text="ERROR: NO SE ENCONTRÓ LA CÁMARA", text_color="#EF4444")
 
     def actualizar_video(self):
         if self.cap:
-            frame = obtener_frame(self.cap) # Tu camara.py
+            frame = obtener_frame(self.cap)
             if frame is not None:
-                # PROCESAR FRAME (Usa tu detector_rostro.py)
-                # Dibuja rectángulos, puntos clave y detecta si hay 0, 1 o más caras
+                # PROCESAR FRAME
                 frame_dibujado, encoding, mensaje = procesar_frame(frame)
                 
                 # Actualizar mensaje de estado en la UI
@@ -69,9 +79,11 @@ class TerminalView(ctk.CTkFrame):
             self.loop_id = self.after(15, self.actualizar_video)
 
     def cerrar_y_volver(self):
-        # Detener procesos para que la cámara no se quede prendida
+        # Detener procesos para liberar la cámara antes de cambiar de vista
         if self.loop_id:
             self.after_cancel(self.loop_id)
         if self.cap:
             self.cap.release()
+        
+        # Al ejecutar on_back(), como lo configuramos en main.py, irá al Login
         self.on_back()

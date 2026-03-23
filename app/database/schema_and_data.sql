@@ -29,8 +29,8 @@ CREATE TABLE IF NOT EXISTS "usuario" (
     "nombre"              TEXT NOT NULL,
     "a_paterno"           TEXT NOT NULL,
     "a_materno"           TEXT,
-    "cuenta"              TEXT NOT NULL UNIQUE, -- IMPORTANTE: 8 números
-    "correo"              TEXT NOT NULL,        -- IMPORTANTE: con @
+    "cuenta"              TEXT NOT NULL UNIQUE, 
+    "correo"              TEXT NOT NULL,        
     "estado"              INTEGER DEFAULT 1,
     "fecha_registro"      TEXT NOT NULL,
     "fecha_actualizacion" TEXT,

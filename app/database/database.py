@@ -14,19 +14,15 @@ def get_connection():
     return conn
 
 
-def inicializar_bd():
-    # Si la base ya existe no la recrea
-    if os.path.exists(DB_PATH):
-        print("Base de datos ya existe.")
-        return
 
+def inicializar_bd():
     conn = get_connection()
     try:
         with open(SQL_PATH, "r", encoding="utf-8") as f:
             conn.executescript(f.read())
         conn.commit()
-        print("Base de datos creada con schema_and_data.sql")
+        print("Base de datos verificada/creada correctamente")
     except Exception as e:
         print(f"Error al inicializar la base de datos: {e}")
     finally:
-        conn.close() # Asegura que la conexión se cierre siempre
+        conn.close()

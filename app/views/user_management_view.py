@@ -1,13 +1,18 @@
 import customtkinter as ctk
 from app.services.carrera_service import obtener_todas_carreras, obtener_facultades_para_dropdown
-from app.services.usuario import (
-    insertar_usuario, 
+from app.services.usuario_service import (
+    crear_usuario, 
     actualizar_usuario,
-    obtener_usuarios_formateados, 
+    obtener_todos_usuarios, 
     obtener_id_facultad_por_nombre, 
-    obtener_id_rol_por_nombre,
     desactivar_usuario 
 )
+
+TIPOS_USUARIO = {
+    1: "Estudiante",
+    2: "Docente",
+    3: "Trabajador"
+}
 
 class UserManagementView(ctk.CTkFrame):
     def __init__(self, master, controller=None):
@@ -53,8 +58,22 @@ class UserManagementView(ctk.CTkFrame):
 
     def refresh_data(self):
         try:
-            self.all_users = obtener_usuarios_formateados()
-        except:
+            data = obtener_todos_usuarios()
+
+            self.all_users = []
+            for u in data:
+                self.all_users.append({
+                    "nombre_solo": u["nombre"],
+                    "ap": u["a_paterno"],
+                    "am": u["a_materno"],
+                    "r": TIPOS_USUARIO.get(u.get("tipo_usuario", 1), "N/A"),
+                    "c": u["id"],
+                    "m": "",  # no tienes correo en tu query
+                    "estado": u.get("estado", 1)
+            })
+
+        except Exception as e:
+            print("Error usuarios:", e)
             self.all_users = []
 
     def validar_ocho_numeros(self, P):
@@ -124,7 +143,7 @@ class UserManagementView(ctk.CTkFrame):
 
         c_clasi = ctk.CTkFrame(self.form_container, fg_color="white", corner_radius=12, border_width=1, border_color="#E2E8F0"); c_clasi.pack(fill="x", padx=60, pady=10)
         grid = ctk.CTkFrame(c_clasi, fg_color="transparent"); grid.pack(fill="x", padx=20, pady=20)
-        ctk.CTkOptionMenu(grid, values=["ESTUDIANTE", "DOCENTE", "AUXILIAR"], variable=self.rol_var, height=40, text_color="black", fg_color="#F1F5F9", button_color="#E2E8F0").pack(side="left", expand=True, fill="x", padx=5)
+        ctk.CTkOptionMenu(grid, values=["ESTUDIANTE", "DOCENTE", "TRABAJADOR"], variable=self.rol_var, height=40, text_color="black", fg_color="#F1F5F9", button_color="#E2E8F0").pack(side="left", expand=True, fill="x", padx=5)
         self.plantel_menu = ctk.CTkOptionMenu(grid, values=nombres_f, command=self.update_carreras_dinamicas, height=40, text_color="black", fg_color="#F1F5F9", button_color="#E2E8F0"); self.plantel_menu.pack(side="left", expand=True, fill="x", padx=5)
         self.carrera_menu = ctk.CTkOptionMenu(grid, variable=self.carrera_var, values=[], height=40, text_color="black", fg_color="#F1F5F9", button_color="#E2E8F0"); self.carrera_menu.pack(side="left", expand=True, fill="x", padx=5)
 
@@ -165,10 +184,11 @@ class UserManagementView(ctk.CTkFrame):
             if not self.usuario_editando_id and len(cta) != 8:
                 self.inputs_obligatorios["Cuenta"].configure(border_width=1, border_color="red")
                 return
-            id_rol, id_fac = obtener_id_rol_por_nombre(self.rol_var.get()), obtener_id_facultad_por_nombre(self.plantel_menu.get())
             ap, am = self.inputs_apellidos["Apellido Paterno"].get(), self.inputs_apellidos["Apellido Materno"].get()
-            if self.usuario_editando_id: actualizar_usuario(cta, n, ap, am, id_rol, id_fac, em)
-            else: insertar_usuario(n, ap, am, id_rol, id_fac, None, cta, em)
+            if self.usuario_editando_id: 
+                actualizar_usuario(cta, n, ap, am, tipo_usuario, id_fac, em)
+            else: 
+                crear_usuario(n, ap, am, tipo_usuario, id_fac, None, cta, em)
             self.refresh_data(); self.render_table_content(self.all_users); self.cerrar_formulario()
         except Exception as e: print(e)
 

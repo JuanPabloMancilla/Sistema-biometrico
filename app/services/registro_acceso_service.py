@@ -1,11 +1,9 @@
 from app.database.database import get_connection
 
-
 def obtener_registros_acceso():
+    conn = get_connection()
     try:
-        conn = get_connection()
         cursor = conn.cursor()
-
         cursor.execute("""
             SELECT id_registro, id_usuario, fecha_hora, resultado
             FROM registro_acceso
@@ -23,9 +21,11 @@ def obtener_registros_acceso():
                 "resultado": fila[3]
             })
 
-        conn.close()
         return registros
 
     except Exception as e:
         print(f"Error al obtener registros: {e}")
         return []
+
+    finally:
+        conn.close()

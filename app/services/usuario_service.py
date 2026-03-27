@@ -1,75 +1,223 @@
 from app.database.database import get_connection
 from datetime import datetime
 
-# --- FUNCIÓN PARA BUSCAR EL ID DEL ROL ---
-def obtener_id_rol_por_nombre(nombre_rol):
-    """Busca el ID numérico del rol basado en su nombre (ej. 'ESTUDIANTE')"""
+# ─────────────────────────────────────────────
+#  CONSULTAS
+# ─────────────────────────────────────────────
+
+def obtener_todos_usuarios():
     conn = get_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT id_rol FROM usuario_rol WHERE UPPER(nombre) = UPPER(?)", (nombre_rol.strip(),))
-        res = cursor.fetchone()
-        return res[0] if res else None
+
+        cursor.execute("""
+            SELECT u.id_usuario, u.nombre, u.a_paterno, u.a_materno, u.estado,
+                   u.fecha_registro, u.fecha_actualizacion,
+                   u.tipo_usuario,
+                   f.nombre,
+                   c.nombre
+            FROM usuario u
+            LEFT JOIN facultad f ON u.id_facultad = f.id_facultad
+            LEFT JOIN carrera c ON u.id_carrera = c.id_carrera
+        """)
+
+        filas = cursor.fetchall()
+
+        return [{
+            "id": f[0],
+            "nombre": f[1],
+            "a_paterno": f[2],
+            "a_materno": f[3],
+            "estado": f[4],
+            "fecha_registro": f[5],
+            "fecha_actualizacion": f[6],
+            "tipo_usuario": f[7],
+            "facultad_nombre": f[8],
+            "carrera_nombre": f[9],
+        } for f in filas]
+
+    except Exception as e:
+        print(f"❌ Error: {e}")
+        return []
     finally:
         conn.close()
 
-# --- FUNCIÓN DE INSERCIÓN ACTUALIZADA (AHORA CON 8 PARÁMETROS) ---
-def insertar_usuario(nombre, a_paterno, a_materno, id_rol, id_facultad, id_carrera, cuenta, correo):
-    """
-    Guarda un usuario incluyendo cuenta y correo.
-    Validado para recibir los 8 parámetros desde la View.
-    """
+
+def obtener_usuario_por_id(id_usuario):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT id_usuario, nombre, a_paterno, a_materno,
+                   tipo_usuario, id_facultad, id_carrera
+            FROM usuario
+            WHERE id_usuario = ?
+        """, (id_usuario,))
+
+        f = cursor.fetchone()
+
+        if not f:
+            return None
+
+        return {
+            "id": f[0],
+            "nombre": f[1],
+            "a_paterno": f[2],
+            "a_materno": f[3],
+            "tipo_usuario": f[4],
+            "id_facultad": f[5],
+            "id_carrera": f[6],
+        }
+
+    finally:
+        conn.close()
+
+
+# ─────────────────────────────────────────────
+#  CRUD
+# ─────────────────────────────────────────────
+
+def crear_usuario(nombre, a_paterno, a_materno, tipo_usuario, id_facultad, id_carrera, cuenta, correo):
     conn = get_connection()
     try:
         cursor = conn.cursor()
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
-        # Agregamos 'cuenta' y 'correo' tanto en las columnas como en los VALUES
-        # También forzamos estado = 1 (Activo) por defecto
+
         cursor.execute("""
             INSERT INTO usuario (
-                nombre, 
-                a_paterno, 
-                a_materno, 
-                cuenta, 
-                correo, 
-                fecha_registro, 
-                id_rol, 
-                id_facultad, 
-                id_carrera, 
+                nombre, a_paterno, a_materno,
+                cuenta, correo,
+                tipo_usuario,
+                fecha_registro,
+                id_facultad, id_carrera,
                 estado
             )
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 1)
-        """, (nombre, a_paterno, a_materno, str(cuenta), correo, fecha, id_rol, id_facultad, id_carrera))
-        
-        conn.commit() 
-        print(f"✅ Usuario {nombre} con cuenta {cuenta} guardado exitosamente.")
+        """, (nombre, a_paterno, a_materno, str(cuenta), correo, tipo_usuario, fecha, id_facultad, id_carrera))
+
+        conn.commit()
         return True
+
     except Exception as e:
-        print(f"❌ Error al guardar en usuario_service: {e}")
+        print(f"❌ Error al crear usuario: {e}")
         return False
     finally:
         conn.close()
 
-# --- FUNCIÓN DE ACTUALIZACIÓN ---
-def actualizar_usuario(cuenta, nombre, a_paterno, a_materno, id_rol, id_facultad, correo):
-    """Actualiza los datos de un usuario existente basado en su número de cuenta"""
+
+def actualizar_usuario(cuenta, nombre, a_paterno, a_materno, tipo_usuario, id_facultad):
     conn = get_connection()
     try:
         cursor = conn.cursor()
         fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        
+
         cursor.execute("""
             UPDATE usuario 
-            SET nombre = ?, a_paterno = ?, a_materno = ?, id_rol = ?, 
-                id_facultad = ?, correo = ?, fecha_actualizacion = ?
+            SET nombre = ?, a_paterno = ?, a_materno = ?, 
+                tipo_usuario = ?, id_facultad = ?,  
+                fecha_actualizacion = ?
             WHERE cuenta = ?
-        """, (nombre, a_paterno, a_materno, id_rol, id_facultad, correo, fecha, str(cuenta)))
-        
+        """, (nombre, a_paterno, a_materno, tipo_usuario, id_facultad, fecha, str(cuenta)))
+
         conn.commit()
         return cursor.rowcount > 0
+
     except Exception as e:
         print(f"❌ Error al actualizar: {e}")
         return False
     finally:
         conn.close()
+
+def eliminar_usuario(id_usuario):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("DELETE FROM usuario WHERE id_usuario = ?", (id_usuario,))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+def desactivar_usuario(id_usuario):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE usuario
+            SET estado = 0
+            WHERE id_usuario = ?
+        """, (id_usuario,))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+
+# ─────────────────────────────────────────────
+#  HELPERS
+# ─────────────────────────────────────────────
+
+
+
+
+
+def obtener_facultades_para_dropdown():
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id_facultad, nombre FROM facultad WHERE estado=1")
+        return {f[0]: f[1] for f in cursor.fetchall()}
+    finally:
+        conn.close()
+
+
+def obtener_carreras_por_facultad(id_facultad):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("SELECT id_carrera, nombre FROM carrera WHERE id_facultad=?", (id_facultad,))
+        return {f[0]: f[1] for f in cursor.fetchall()}
+    finally:
+        conn.close()
+
+def obtener_usuario_por_cuenta(cuenta):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT id_usuario, nombre, a_paterno, a_materno,
+                correo, id_rol, id_facultad
+            FROM usuario
+            WHERE cuenta = ?
+        """, (str(cuenta),))
+
+        f = cursor.fetchone()
+
+        if not f:
+            return None
+
+        return {
+            "id": f[0],
+            "nombre": f[1],
+            "a_paterno": f[2],
+            "a_materno": f[3],
+            "correo": f[4],
+            "id_rol": f[5],
+            "id_facultad": f[6],
+        }
+
+    finally:
+        conn.close()
+
+def obtener_id_facultad_por_nombre(nombre):
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("SELECT id_facultad FROM facultad WHERE nombre = ?", (nombre,))
+        resultado = cursor.fetchone()
+
+        conn.close()
+
+        return resultado[0] if resultado else None

@@ -148,7 +148,7 @@ class DashboardView(ctk.CTkFrame):
 
         self.btn_panel = self.crear_btn_sidebar(sidebar, "🏠   Panel de Control", self.mostrar_panel_control)
         self.btn_users = self.crear_btn_sidebar(sidebar, "👥   Gestión de Usuarios", self.mostrar_gestion_usuarios)
-        self.btn_facultades = self.crear_btn_sidebar(sidebar, "🏛️   Gestión de Facultades", self.mostrar_gestion_facultades)
+        self.btn_facultades = self.crear_btn_sidebar(sidebar, "🏫   Gestión de Facultades", self.mostrar_gestion_facultades)
         self.btn_carreras = self.crear_btn_sidebar(sidebar, "📚   Gestión de Carreras", self.mostrar_gestion_carreras)
         self.btn_account = self.crear_btn_sidebar(sidebar, "⚙️   Configuración Cuenta", self.mostrar_cuenta)
 
@@ -163,8 +163,8 @@ class DashboardView(ctk.CTkFrame):
 
     def crear_btn_sidebar(self, master, texto, comando):
         btn = ctk.CTkButton(master, text=texto, height=45, anchor="w", fg_color="transparent", 
-                            text_color="#000000", hover_color="#F1F5F9", font=("Inter", 13), command=comando)
-        btn.pack(pady=2, padx=20, fill="x")
+                            text_color="#000000", hover_color="#F1F5F9", font=("Inter", 16), command=comando)
+        btn.pack(pady=6, padx=20, fill="x")
         return btn
 
     def create_top_controls(self, container):

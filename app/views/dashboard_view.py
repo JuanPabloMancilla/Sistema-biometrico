@@ -34,6 +34,12 @@ class DashboardView(ctk.CTkFrame):
         # Cargar vista inicial
         self.mostrar_panel_control()
 
+    def toggle_theme(self):
+        if self.theme_switch.get() == 1:
+            ctk.set_appearance_mode("dark")
+        else:
+            ctk.set_appearance_mode("light")
+
     def limpiar_derecha(self):
         """Elimina los widgets de la derecha para cargar una nueva vista"""
         for widget in self.content_container.winfo_children():
@@ -175,7 +181,8 @@ class DashboardView(ctk.CTkFrame):
         t_f = ctk.CTkFrame(wrapper, fg_color="#E2E8F0", corner_radius=20, width=100, height=38)
         t_f.pack(side="left", padx=10); t_f.pack_propagate(False)
         ctk.CTkLabel(t_f, text="☀️", font=("Inter", 16)).place(x=20, y=19, anchor="center")
-        ctk.CTkSwitch(t_f, text="", width=40, progress_color="#1D1D1F").place(x=65, y=19, anchor="center")
+        self.theme_switch = ctk.CTkSwitch(t_f, text="", width=40, progress_color="#1D1D1F", command=self.toggle_theme)
+        self.theme_switch.place(x=65, y=19, anchor="center")
 
         # Idioma
         l_c = ctk.CTkFrame(wrapper, fg_color="#E2E8F0", corner_radius=20, height=38)

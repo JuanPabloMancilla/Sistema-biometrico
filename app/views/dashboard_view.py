@@ -34,6 +34,12 @@ class DashboardView(ctk.CTkFrame):
         # Cargar vista inicial
         self.mostrar_panel_control()
 
+    def toggle_theme(self):
+        if self.theme_switch.get() == 1:
+            ctk.set_appearance_mode("dark")
+        else:
+            ctk.set_appearance_mode("light")
+
     def limpiar_derecha(self):
         """Elimina los widgets de la derecha para cargar una nueva vista"""
         for widget in self.content_container.winfo_children():
@@ -148,7 +154,7 @@ class DashboardView(ctk.CTkFrame):
 
         self.btn_panel = self.crear_btn_sidebar(sidebar, "🏠   Panel de Control", self.mostrar_panel_control)
         self.btn_users = self.crear_btn_sidebar(sidebar, "👥   Gestión de Usuarios", self.mostrar_gestion_usuarios)
-        self.btn_facultades = self.crear_btn_sidebar(sidebar, "🏛️   Gestión de Facultades", self.mostrar_gestion_facultades)
+        self.btn_facultades = self.crear_btn_sidebar(sidebar, "🏫   Gestión de Facultades", self.mostrar_gestion_facultades)
         self.btn_carreras = self.crear_btn_sidebar(sidebar, "📚   Gestión de Carreras", self.mostrar_gestion_carreras)
         self.btn_account = self.crear_btn_sidebar(sidebar, "⚙️   Configuración Cuenta", self.mostrar_cuenta)
 
@@ -163,8 +169,8 @@ class DashboardView(ctk.CTkFrame):
 
     def crear_btn_sidebar(self, master, texto, comando):
         btn = ctk.CTkButton(master, text=texto, height=45, anchor="w", fg_color="transparent", 
-                            text_color="#000000", hover_color="#F1F5F9", font=("Inter", 13), command=comando)
-        btn.pack(pady=2, padx=20, fill="x")
+                            text_color="#000000", hover_color="#F1F5F9", font=("Inter", 16), command=comando)
+        btn.pack(pady=6, padx=20, fill="x")
         return btn
 
     def create_top_controls(self, container):
@@ -175,7 +181,8 @@ class DashboardView(ctk.CTkFrame):
         t_f = ctk.CTkFrame(wrapper, fg_color="#E2E8F0", corner_radius=20, width=100, height=38)
         t_f.pack(side="left", padx=10); t_f.pack_propagate(False)
         ctk.CTkLabel(t_f, text="☀️", font=("Inter", 16)).place(x=20, y=19, anchor="center")
-        ctk.CTkSwitch(t_f, text="", width=40, progress_color="#1D1D1F").place(x=65, y=19, anchor="center")
+        self.theme_switch = ctk.CTkSwitch(t_f, text="", width=40, progress_color="#1D1D1F", command=self.toggle_theme)
+        self.theme_switch.place(x=65, y=19, anchor="center")
 
         # Idioma
         l_c = ctk.CTkFrame(wrapper, fg_color="#E2E8F0", corner_radius=20, height=38)

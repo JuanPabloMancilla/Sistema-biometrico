@@ -177,20 +177,49 @@ class UserManagementView(ctk.CTkFrame):
             n = self.inputs_obligatorios.get("Nombres").get().strip()
             em = self.inputs_obligatorios.get("Correo").get().strip()
             cta = self.usuario_editando_id if self.usuario_editando_id else self.inputs_obligatorios.get("Cuenta").get().strip()
-            if not n or not cta or not em: return
+
+            if not n or not cta or not em:
+                return
+
             if "@" not in em: 
                 self.inputs_obligatorios["Correo"].configure(border_width=1, border_color="red")
                 return
+
             if not self.usuario_editando_id and len(cta) != 8:
                 self.inputs_obligatorios["Cuenta"].configure(border_width=1, border_color="red")
                 return
-            ap, am = self.inputs_apellidos["Apellido Paterno"].get(), self.inputs_apellidos["Apellido Materno"].get()
-            if self.usuario_editando_id: 
+
+            ap = self.inputs_apellidos["Apellido Paterno"].get().strip()
+            am = self.inputs_apellidos["Apellido Materno"].get().strip()
+
+            # 🔥 AQUÍ ESTABA EL ERROR
+            tipo_texto = self.rol_var.get()
+
+            TIPOS_USUARIO_INV = {
+            "ESTUDIANTE": 1,
+            "DOCENTE": 2,
+            "TRABAJADOR": 3
+            }
+
+            tipo_usuario = TIPOS_USUARIO_INV.get(tipo_texto.upper())
+
+            id_fac = obtener_id_facultad_por_nombre(self.plantel_menu.get())
+
+            if not tipo_usuario or not id_fac:
+                print("Error: tipo_usuario o id_fac inválido")
+                return
+
+            if self.usuario_editando_id:
                 actualizar_usuario(cta, n, ap, am, tipo_usuario, id_fac, em)
-            else: 
+            else:
                 crear_usuario(n, ap, am, tipo_usuario, id_fac, None, cta, em)
-            self.refresh_data(); self.render_table_content(self.all_users); self.cerrar_formulario()
-        except Exception as e: print(e)
+
+            self.refresh_data()
+            self.render_table_content(self.all_users)
+            self.cerrar_formulario()
+
+        except Exception as e:
+            print("ERROR AL GUARDAR:", e)
 
     def create_header(self, master):
         h = ctk.CTkFrame(master, fg_color="transparent"); h.pack(fill="x", padx=30, pady=(20, 10))

@@ -1,107 +1,61 @@
 import cv2
 import face_recognition
 import numpy as np
-
-
 from app.recognition.encoding_manager import (
     verificar_dimension,
     guardar_encoding,
     cargar_encodings
 )
 
-ultimo_encoding = None
+# --- CACHÉ DE DATOS ---
+encodings_db, usuarios_db = cargar_encodings()
+ultimo_resultado = (None, "ESCANEANDO...")
+frame_count = 0
 
 def procesar_frame(frame):
-    #Esto convertira el frame de BGR a RGB
-    rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    global encodings_db, usuarios_db, ultimo_resultado, frame_count
+    
+    frame_count += 1
+    # OPTIMIZACIÓN: Solo procesar reconocimiento cada 3 frames para evitar lag
+    if frame_count % 3 != 0 and ultimo_resultado[0] is not None:
+        top, right, bottom, left = ultimo_resultado[0]
+        cv2.rectangle(frame, (left, top), (right, bottom), (10, 185, 129), 2)
+        return frame, None, ultimo_resultado[1]
 
-    #Este detectara las caras en el frame
-    face_locations = face_recognition.face_locations(rgb)
+    # 1. Reducir imagen para detección rápida (Escala 1/4)
+    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    rgb_small = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
 
-    num_faces = len(face_locations)
-
-    #Politicas de deteccion
-
-    if num_faces == 0:
+    # 2. Detección con modelo HOG (el más rápido en CPU)
+    face_locations = face_recognition.face_locations(rgb_small, model="hog")
+    
+    if not face_locations:
+        ultimo_resultado = (None, "No se detectó ninguna cara")
         return frame, None, "No se detectó ninguna cara"
-    
-    if num_faces > 1:
+
+    if len(face_locations) > 1:
         return frame, None, "Se detectaron múltiples caras"
+
+    # 3. Reescalar coordenadas al tamaño original
+    top, right, bottom, left = [v * 4 for v in face_locations[0]]
     
-    #Puntos clave para la deteccion de rostro
-    face_landmarks = face_recognition.face_landmarks(rgb, face_locations)
-
-    landmarks = face_landmarks[0]
-
-    #Dibujar landmarks
-    for feature in landmarks.values():
-        for (x, y) in feature:
-            cv2.circle(frame, (x, y), 1, (255, 0, 255), -1)
-
-    left_eye = landmarks['left_eye']
-    right_eye = landmarks['right_eye']
-
-    left_eye_center = np.mean(left_eye, axis=0).astype(int)
-    right_eye_center = np.mean(right_eye, axis=0).astype(int)
-
-    cv2.circle(frame, tuple(left_eye_center), 3, (255,0,0), -1)
-    cv2.circle(frame, tuple(right_eye_center), 3, (255,0,0), -1)
-
-    #Angulo de rotacion
-    dY = right_eye_center[1] - left_eye_center[1]
-    dX = right_eye_center[0] - left_eye_center[0]
-
-    angle = np.degrees(np.arctan2(dY, dX))
-
-    #Centro de ojos
-    eyes_center = (
-        int((left_eye_center[0] + right_eye_center[0]) / 2),
-        int((left_eye_center[1] + right_eye_center[1]) / 2)
-    )
-
-    #rotar imagen
-    M = cv2.getRotationMatrix2D(eyes_center, angle, 1)
-    aligned_frame = cv2.warpAffine(frame, M, (frame.shape[1], frame.shape[0]))
-
-    #Detectar rostro nuevamente
-    rgb_aligned = cv2.cvtColor(aligned_frame, cv2.COLOR_BGR2RGB)
-    face_locations_aligned = face_recognition.face_locations(rgb_aligned)
-
-    if len(face_locations_aligned) == 0:
-        return aligned_frame, None, "No se detectó ninguna cara"
-
-    #Vector numérico de la cara
-    face_encoding = face_recognition.face_encodings(rgb, face_locations)[0]
+    # 4. Extraer encoding (esta es la parte pesada, se hace sobre el frame original)
+    face_encoding = face_recognition.face_encodings(frame, [(top, right, bottom, left)])[0]
     
-    if verificar_dimension(face_encoding):
+    nombre_detectado = "DESCONOCIDO"
+    if verificar_dimension(face_encoding) and len(encodings_db) > 0:
+        distancias = face_recognition.face_distance(encodings_db, face_encoding)
+        mejor_distancia = min(distancias)
 
-        encodings_guardados, usuarios = cargar_encodings()
+        if mejor_distancia < 0.6:
+            idx = np.argmin(distancias)
+            nombre_detectado = usuarios_db[idx]
+        
+    # Guardar resultado para frames intermedios
+    ultimo_resultado = ((top, right, bottom, left), nombre_detectado)
 
-        if len(encodings_guardados) > 0:
+    # 5. Dibujo limpio (Solo el rectángulo)
+    color = (16, 185, 129) if nombre_detectado != "DESCONOCIDO" else (239, 68, 68)
+    cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
 
-            distancias = face_recognition.face_distance(
-                encodings_guardados,
-                face_encoding
-            )
-
-            mejor_distancia = min(distancias)
-
-            if mejor_distancia < 0.6:
-                print("Este rostro ya está registrado")
-            else:
-                guardar_encoding(face_encoding)
-                print("Nuevo rostro registrado")
-
-        else:
-            guardar_encoding(face_encoding)
-            print("Primer rostro registrado")
-
-    #Dibujar un rectángulo alrededor de la cara detectada
-    top, right, bottom, left = face_locations[0]
-    cv2.rectangle(frame, (left, top), (right, bottom), (0, 255, 0), 2)
-
-    #Dibujar puntos clave en la cara
-    for (x,y) in face_landmarks[0]['chin']:
-        cv2.circle(frame, (x,y), 1, (0, 0, 255), -1)
-
-    return frame, face_encoding, "Cara detectada correctamente"
+    return frame, face_encoding, nombre_detectado

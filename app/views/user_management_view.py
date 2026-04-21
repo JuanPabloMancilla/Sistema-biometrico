@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from app.services.theme import COLORS
 from app.services.carrera_service import obtener_todas_carreras, obtener_facultades_para_dropdown
 from app.services.usuario_service import (
     crear_usuario, 
@@ -16,7 +17,7 @@ TIPOS_USUARIO = {
 
 class UserManagementView(ctk.CTkFrame):
     def __init__(self, master, controller=None):
-        super().__init__(master, fg_color="#F8FAFC")
+        super().__init__(master, fg_color=COLORS["bg"])
         self.controller = controller
         self.usuario_editando_id = None 
         
@@ -51,7 +52,7 @@ class UserManagementView(ctk.CTkFrame):
         
         self.filter_container = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
         
-        self.main_card = ctk.CTkFrame(self.vista_tabla, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+        self.main_card = ctk.CTkFrame(self.vista_tabla, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
         self.main_card.pack(expand=True, fill="both", padx=30, pady=(5, 15))
         
         self.render_table_content(self.all_users)
@@ -88,12 +89,12 @@ class UserManagementView(ctk.CTkFrame):
         table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
         table_head.pack(fill="x", padx=20, pady=(10, 5))
 
-        ctk.CTkLabel(table_head, text="👤 FOTOGRAFÍA", font=self.font_small, text_color="#64748B", width=ancho_foto).pack(side="left")
-        ctk.CTkLabel(table_head, text="🆔 INFORMACIÓN", font=self.font_small, text_color="#64748B", width=ancho_info, anchor="w").pack(side="left")
-        ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color="#64748B", width=ancho_estado).pack(side="left")
-        ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color="#64748B").pack(side="right", padx=60)
+        ctk.CTkLabel(table_head, text="👤 FOTOGRAFÍA", font=self.font_small, text_color=COLORS["subtext"], width=ancho_foto).pack(side="left")
+        ctk.CTkLabel(table_head, text="🆔 INFORMACIÓN", font=self.font_small, text_color=COLORS["subtext"], width=ancho_info, anchor="w").pack(side="left")
+        ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color=COLORS["subtext"], width=ancho_estado).pack(side="left")
+        ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color=COLORS["subtext"]).pack(side="right", padx=60)
 
-        ctk.CTkFrame(self.main_card, fg_color="#E2E8F0", height=1).pack(fill="x", padx=20)
+        ctk.CTkFrame(self.main_card, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
         scroll.pack(expand=True, fill="both")
         
@@ -105,12 +106,12 @@ class UserManagementView(ctk.CTkFrame):
             i_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_info); i_b.pack(side="left", fill="y"); i_b.pack_propagate(False)
             i_in = ctk.CTkFrame(i_b, fg_color="transparent"); i_in.pack(expand=True, fill="x", anchor="w")
             l_n = ctk.CTkFrame(i_in, fg_color="transparent"); l_n.pack(anchor="w")
-            ctk.CTkLabel(l_n, text=f"{u['nombre_solo']} {u['ap']} {u['am']}".upper(), font=("Inter", 13, "bold"), text_color="#1E293B").pack(side="left")
+            ctk.CTkLabel(l_n, text=f"{u['nombre_solo']} {u['ap']} {u['am']}".upper(), font=("Inter", 13, "bold"), text_color=COLORS["text"]).pack(side="left")
             
             col = self.colors.get(u["r"].upper(), {"bg": "#E2E8F0", "text": "#475569"})
             badge_r = ctk.CTkFrame(l_n, fg_color=col["bg"], corner_radius=4); badge_r.pack(side="left", padx=8)
             ctk.CTkLabel(badge_r, text=u["r"], font=("Inter", 9, "bold"), text_color=col["text"]).pack(padx=6, pady=1)
-            ctk.CTkLabel(i_in, text=f"ID: {u['c']}  •  {u['m']}", font=("Inter", 11), text_color="#64748B").pack(anchor="w")
+            ctk.CTkLabel(i_in, text=f"ID: {u['c']}  •  {u['m']}", font=("Inter", 11), text_color=COLORS["subtext"]).pack(anchor="w")
 
             e_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado); e_b.pack(side="left", fill="y"); e_b.pack_propagate(False)
             es_activo = u.get('estado', 1) == 1
@@ -118,9 +119,11 @@ class UserManagementView(ctk.CTkFrame):
             ctk.CTkLabel(badge_e, text="● ACTIVO" if es_activo else "● INACTIVO", font=("Inter", 9, "bold"), text_color="#065F46" if es_activo else "#991B1B").pack(padx=10, pady=3)
 
             a_b = ctk.CTkFrame(row, fg_color="transparent"); a_b.pack(side="right", padx=20)
-            ctk.CTkButton(a_b, text="✏️", width=32, height=32, fg_color="#F1F5F9", text_color="#1E293B", command=lambda d=u: self.abrir_formulario(d)).pack(side="left", padx=4)
+            ctk.CTkButton(a_b, text="✏️", width=32, height=32, fg_color=COLORS["hover"]
+, text_color=COLORS["text"], command=lambda d=u: self.abrir_formulario(d)).pack(side="left", padx=4)
             ctk.CTkButton(a_b, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda i=u['c']: self.ejecutar_eliminacion(i)).pack(side="left", padx=2)
-            ctk.CTkFrame(scroll, fg_color="#F1F5F9", height=1).pack(fill="x", padx=20, side="top")
+            ctk.CTkFrame(scroll, fg_color=COLORS["hover"]
+, height=1).pack(fill="x", padx=20, side="top")
 
     def abrir_formulario(self, usuario=None):
         self.vista_tabla.pack_forget()
@@ -139,13 +142,13 @@ class UserManagementView(ctk.CTkFrame):
         self.form_base = ctk.CTkFrame(self, fg_color="#F8FAFC"); self.form_base.pack(fill="both", expand=True)
         self.form_container = ctk.CTkScrollableFrame(self.form_base, fg_color="transparent"); self.form_container.pack(fill="both", expand=True, padx=20, pady=10)
 
-        ctk.CTkLabel(self.form_container, text="✏️ Editar Registro" if usuario else "➕ Nuevo Registro", font=self.font_header, text_color="#000000").pack(anchor="w", padx=60, pady=(30, 10))
+        ctk.CTkLabel(self.form_container, text="✏️ Editar Registro" if usuario else "➕ Nuevo Registro", font=self.font_header, text_color=COLORS["text"]).pack(anchor="w", padx=60, pady=(30, 10))
 
-        c_clasi = ctk.CTkFrame(self.form_container, fg_color="white", corner_radius=12, border_width=1, border_color="#E2E8F0"); c_clasi.pack(fill="x", padx=60, pady=10)
+        c_clasi = ctk.CTkFrame(self.form_container, fg_color=COLORS["card"], corner_radius=12, border_width=1, border_color=COLORS["border"]); c_clasi.pack(fill="x", padx=60, pady=10)
         grid = ctk.CTkFrame(c_clasi, fg_color="transparent"); grid.pack(fill="x", padx=20, pady=20)
-        ctk.CTkOptionMenu(grid, values=["ESTUDIANTE", "DOCENTE", "TRABAJADOR"], variable=self.rol_var, height=40, text_color="black", fg_color="#F1F5F9", button_color="#E2E8F0").pack(side="left", expand=True, fill="x", padx=5)
-        self.plantel_menu = ctk.CTkOptionMenu(grid, values=nombres_f, command=self.update_carreras_dinamicas, height=40, text_color="black", fg_color="#F1F5F9", button_color="#E2E8F0"); self.plantel_menu.pack(side="left", expand=True, fill="x", padx=5)
-        self.carrera_menu = ctk.CTkOptionMenu(grid, variable=self.carrera_var, values=[], height=40, text_color="black", fg_color="#F1F5F9", button_color="#E2E8F0"); self.carrera_menu.pack(side="left", expand=True, fill="x", padx=5)
+        ctk.CTkOptionMenu(grid, values=["ESTUDIANTE", "DOCENTE", "TRABAJADOR"], variable=self.rol_var, height=40, text_color=COLORS["text"], fg_color=COLORS["hover"], button_color=COLORS["border"]).pack(side="left", expand=True, fill="x", padx=5)
+        self.plantel_menu = ctk.CTkOptionMenu(grid, values=nombres_f, command=self.update_carreras_dinamicas, height=40, text_color=COLORS["text"], fg_color=COLORS["hover"], button_color=COLORS["border"]); self.plantel_menu.pack(side="left", expand=True, fill="x", padx=5)
+        self.carrera_menu = ctk.CTkOptionMenu(grid, variable=self.carrera_var, values=[], height=40, text_color=COLORS["text"], fg_color=COLORS["hover"], button_color=COLORS["border"]); self.carrera_menu.pack(side="left", expand=True, fill="x", padx=5)
 
         if nombres_f: self.update_carreras_dinamicas(nombres_f[0])
 
@@ -154,20 +157,21 @@ class UserManagementView(ctk.CTkFrame):
 
         vcmd = (self.register(self.validar_ocho_numeros), '%P')
         self.inputs_obligatorios["Cuenta"].configure(validate="key", validatecommand=vcmd)
-        if usuario: self.inputs_obligatorios["Cuenta"].configure(state="disabled", fg_color="#E2E8F0")
+        if usuario: self.inputs_obligatorios["Cuenta"].configure(state="disabled", fg_color=COLORS["border"])
 
         btns = ctk.CTkFrame(self.form_container, fg_color="transparent"); btns.pack(fill="x", padx=60, pady=(20, 50))
-        ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color="#000000", height=50, command=self.cerrar_formulario).pack(side="left", expand=True, fill="x", padx=(0, 10))
-        ctk.CTkButton(btns, text="💾 Guardar", font=self.font_sub, fg_color="#D1FAE5", text_color="#000000", height=50, command=self.validar_y_guardar).pack(side="left", expand=True, fill="x", padx=(10, 0))
+        ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=50, command=self.cerrar_formulario).pack(side="left", expand=True, fill="x", padx=(0, 10))
+        ctk.CTkButton(btns, text="💾 Guardar", font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=50, command=self.validar_y_guardar).pack(side="left", expand=True, fill="x", padx=(10, 0))
 
     def create_section_card(self, master, title, fields):
-        card = ctk.CTkFrame(master, fg_color="white", corner_radius=12, border_width=1, border_color="#E2E8F0"); card.pack(fill="x", padx=60, pady=10)
-        ctk.CTkLabel(card, text=title, font=self.font_sub, text_color="#000000").pack(anchor="w", padx=20, pady=(15, 5))
+        card = ctk.CTkFrame(master, fg_color=COLORS["card"], corner_radius=12, border_width=1, border_color=COLORS["border"]); card.pack(fill="x", padx=60, pady=10)
+        ctk.CTkLabel(card, text=title, font=self.font_sub, text_color=COLORS["text"]).pack(anchor="w", padx=20, pady=(15, 5))
         grid = ctk.CTkFrame(card, fg_color="transparent"); grid.pack(fill="x", padx=20, pady=(0, 20))
         for label, val in fields:
             f = ctk.CTkFrame(grid, fg_color="transparent"); f.pack(side="left", expand=True, fill="x", padx=5)
-            ctk.CTkLabel(f, text=label, font=self.font_small, text_color="#64748B").pack(anchor="w")
-            entry = ctk.CTkEntry(f, height=40, font=self.font_normal, fg_color="#F1F5F9", border_width=0, text_color="black")
+            ctk.CTkLabel(f, text=label, font=self.font_small, text_color=COLORS["subtext"]).pack(anchor="w")
+            entry = ctk.CTkEntry(f, height=40, font=self.font_normal, fg_color=COLORS["hover"]
+, border_width=0, text_color=COLORS["text"])
             entry.insert(0, val); entry.pack(fill="x", pady=5)
             if "Apellido" in label: self.inputs_apellidos[label] = entry
             else: self.inputs_obligatorios[label] = entry
@@ -182,11 +186,11 @@ class UserManagementView(ctk.CTkFrame):
                 return
 
             if "@" not in em: 
-                self.inputs_obligatorios["Correo"].configure(border_width=1, border_color="red")
+                self.inputs_obligatorios["Correo"].configure(border_color=COLORS["border"])
                 return
 
             if not self.usuario_editando_id and len(cta) != 8:
-                self.inputs_obligatorios["Cuenta"].configure(border_width=1, border_color="red")
+                self.inputs_obligatorios["Cuenta"].configure(border_color=COLORS["border"])
                 return
 
             ap = self.inputs_apellidos["Apellido Paterno"].get().strip()
@@ -223,14 +227,15 @@ class UserManagementView(ctk.CTkFrame):
 
     def create_header(self, master):
         h = ctk.CTkFrame(master, fg_color="transparent"); h.pack(fill="x", padx=30, pady=(20, 10))
-        ctk.CTkLabel(h, text="👥 Gestión de Usuarios", font=self.font_header, text_color="#000000").pack(side="left")
+        ctk.CTkLabel(h, text="👥 Gestión de Usuarios", font=self.font_header, text_color=COLORS["text"]).pack(side="left")
         ctk.CTkButton(h, text="➕ Agregar Usuario", font=self.font_sub, fg_color="#000000", height=45, corner_radius=10, command=self.abrir_formulario).pack(side="right")
 
     def create_search_bar(self, master):
         bar = ctk.CTkFrame(master, fg_color="transparent"); bar.pack(fill="x", padx=30, pady=10)
-        self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 Buscar usuario...", height=42, corner_radius=10, fg_color="#F1F5F9", border_width=1, text_color="black")
+        self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 Buscar usuario...", height=42, corner_radius=10, fg_color=COLORS["hover"]
+, border_color=COLORS["border"], text_color=COLORS["text"])
         self.entry_busqueda.pack(side="left", fill="x", expand=True, padx=(0, 15))
-        self.btn_filter = ctk.CTkButton(bar, text="⚙️ Filtrar ⌵", width=110, height=42, corner_radius=10, fg_color="white", text_color="black", border_width=1, command=self.toggle_filter)
+        self.btn_filter = ctk.CTkButton(bar, text="⚙️ Filtrar ⌵", width=110, height=42, corner_radius=10, fg_color=COLORS["card"], text_color=COLORS["text"], border_color=COLORS["border"], command=self.toggle_filter)
         self.btn_filter.pack(side="left")
 
     def toggle_filter(self):
@@ -243,10 +248,11 @@ class UserManagementView(ctk.CTkFrame):
     def draw_tags(self):
         for w in self.filter_container.winfo_children(): w.destroy()
         r1 = ctk.CTkFrame(self.filter_container, fg_color="transparent"); r1.pack(fill="x", padx=20)
-        ctk.CTkLabel(r1, text="👤 Rol:", font=self.font_small, text_color="#000000", width=80).pack(side="left")
+        ctk.CTkLabel(r1, text="👤 Rol:", font=self.font_small, text_color=COLORS["text"], width=80).pack(side="left")
         for t in ["Todos", "ESTUDIANTE", "DOCENTE", "AUXILIAR"]:
             act = self.filtro_rol_actual == t
-            ctk.CTkButton(r1, text=t, height=28, corner_radius=10, fg_color="#F1F5F9" if act else "white", text_color="black", border_width=1, command=lambda v=t: self.aplicar_filtro_visual(v)).pack(side="left", padx=3)
+            ctk.CTkButton(r1, text=t, height=28, corner_radius=10, fg_color=COLORS["hover"]
+ if act else "white", text_color=COLORS["text"], border_color=COLORS["border"], command=lambda v=t: self.aplicar_filtro_visual(v)).pack(side="left", padx=3)
 
     def aplicar_filtro_visual(self, v):
         self.filtro_rol_actual = v
@@ -263,13 +269,13 @@ class UserManagementView(ctk.CTkFrame):
         
         # 2. Caja del Modal (la ventanita blanca)
         # Añadimos borde más fuerte para que resalte sobre el fondo blanco
-        modal = ctk.CTkFrame(self.overlay, fg_color="white", corner_radius=20, width=420, height=240, border_width=2, border_color="#CBD5E1")
+        modal = ctk.CTkFrame(self.overlay, fg_color=COLORS["card"], corner_radius=20, width=420, height=240, border_width=2, border_color="#CBD5E1")
         modal.place(relx=0.5, rely=0.5, anchor="center")
         modal.pack_propagate(False)
 
         ctk.CTkLabel(modal, text="🗑️", font=("Inter", 45)).pack(pady=(25, 5))
-        ctk.CTkLabel(modal, text="¿Está seguro de eliminar al usuario?", font=("Inter", 16, "bold"), text_color="#1E293B").pack()
-        ctk.CTkLabel(modal, text="Esta acción desactivará al usuario permanentemente.", font=("Inter", 12), text_color="#64748B").pack(pady=5)
+        ctk.CTkLabel(modal, text="¿Está seguro de eliminar al usuario?", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text="Esta acción desactivará al usuario permanentemente.", font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
         
         # 3. Botones (Verde para confirmar, Rojo para cancelar)
         btns = ctk.CTkFrame(modal, fg_color="transparent")

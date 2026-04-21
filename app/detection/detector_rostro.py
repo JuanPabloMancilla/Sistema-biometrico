@@ -1,16 +1,56 @@
 import cv2
 import face_recognition
 import numpy as np
+import time
+from datetime import datetime
+import json
+import os
 from app.recognition.encoding_manager import (
     verificar_dimension,
     guardar_encoding,
     cargar_encodings
 )
 
+def guardar_logs():
+    with open("logs_accesos.json", "w") as f:
+        json.dump(logs_accesos, f)
+
+def cargar_logs():
+    global logs_accesos
+
+    if os.path.exists("logs_accesos.json"):
+        with open("logs_accesos.json", "r") as f:
+            logs_accesos = json.load(f)
+    else:
+        logs_accesos = []
+
 # --- CACHÉ DE DATOS ---
 encodings_db, usuarios_db = cargar_encodings()
 ultimo_resultado = (None, "ESCANEANDO...")
 frame_count = 0
+
+logs_accesos = []
+cargar_logs()
+
+ultimo_registro = 0
+TIEMPO_ESPERA = 10  # segundos
+
+def registrar_acceso():
+    global ultimo_registro
+
+    ahora = time.time()
+
+    if ahora - ultimo_registro < TIEMPO_ESPERA:
+        return
+
+    ultimo_registro = ahora
+
+    logs_accesos.append({
+        "fecha": datetime.now().strftime("%Y-%m-%d"),
+        "hora": datetime.now().strftime("%H")
+    })
+
+    guardar_logs()
 
 def procesar_frame(frame):
     global encodings_db, usuarios_db, ultimo_resultado, frame_count
@@ -50,7 +90,9 @@ def procesar_frame(frame):
         if mejor_distancia < 0.6:
             idx = np.argmin(distancias)
             nombre_detectado = usuarios_db[idx]
-        
+
+            registrar_acceso()  # ✅ acceso válido
+
     # Guardar resultado para frames intermedios
     ultimo_resultado = ((top, right, bottom, left), nombre_detectado)
 

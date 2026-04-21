@@ -1,9 +1,18 @@
 import customtkinter as ctk
+from matplotlib.figure import Figure
+from matplotlib.ticker import MaxNLocator
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from app.views.user_management_view import UserManagementView
 from app.views.account_view import AccountView 
 from app.views.facultad_management_view import FacultadManagementView
 from app.views.carrera_management_view import CarreraManagementView
+
 from app.services.theme import COLORS
+
+from datetime import datetime
+from tkcalendar import DateEntry
+from app.detection.detector_rostro import logs_accesos
+
 
 class DashboardView(ctk.CTkFrame):
     def __init__(self, master, on_back):
@@ -106,6 +115,7 @@ class DashboardView(ctk.CTkFrame):
         graph_box = ctk.CTkFrame(main_scroll, fg_color=COLORS["card"], corner_radius=20, border_width=1, border_color=COLORS["border"], height=280)
         graph_box.pack(fill="x", padx=40, pady=20)
         graph_box.pack_propagate(False)
+
         ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=30, pady=20)
         ctk.CTkLabel(graph_box, text="[ Gráfica de Actividad ]", font=("Inter", 18), text_color="#CBD5E1").place(relx=0.5, rely=0.5, anchor="center")
 
@@ -113,8 +123,139 @@ class DashboardView(ctk.CTkFrame):
         ctk.CTkLabel(main_scroll, text="🧾 Últimos Accesos Realizados", font=("Inter", 18, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=45, pady=(20, 10))
         
         self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
+
+        ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 16, "bold"), text_color="#000000").pack(anchor="w", padx=30, pady=20)
+        # -------- FILTRO DE FECHA --------
+        self.fecha_var = ctk.StringVar(value=datetime.now().strftime("%Y-%m-%d"))
+
+        filtro_frame = ctk.CTkFrame(graph_box, fg_color="transparent")
+        filtro_frame.pack(anchor="w", padx=30, pady=(0,10))
+
+        ctk.CTkLabel(filtro_frame, text="Fecha:").pack(side="left", padx=5)
+
+        self.calendario = DateEntry(
+            filtro_frame,
+            width=12,
+            background="#3B82F6",
+            foreground="white",
+            borderwidth=2,
+            date_pattern="yyyy-mm-dd"  # 👈 importante para que coincida con tus logs
+        )
+        self.calendario.pack(side="left", padx=5)
+        self.calendario.bind("<<DateEntrySelected>>", lambda e: self.filtrar_por_fecha())
+
+        self.calendario.configure(
+            font=("Inter", 10),
+            justify="center"
+        )
+
+        # contenedor solo para la gráfica
+        self.graph_container = ctk.CTkFrame(graph_box, fg_color="transparent")
+        self.graph_container.pack(fill="both", expand=True, padx=20, pady=10)
+
+        self.filtrar_por_fecha()
+
+        # Render inicial
+        self.actualizar_grafica()
+
+        # Sección de Últimos Accesos (Tabla)
+        ctk.CTkLabel(main_scroll, text="🧾 Últimos Accesos Realizados", font=("Inter", 18, "bold"), text_color="#000000").pack(anchor="w", padx=45, pady=(20, 10))
+
+        self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+
         self.contenedor_tabla.pack(fill="x", padx=40, pady=(0, 40))
         self.render_mini_tabla_accesos_data()
+
+    def filtrar_por_fecha(self):
+        fecha = self.calendario.get_date().strftime("%Y-%m-%d")
+        self.fecha_var.set(fecha)  # sincroniza con tu variable
+        self.actualizar_grafica()
+
+    def render_grafica_accesos(self, container):
+        from app.detection.detector_rostro import logs_accesos
+        from datetime import datetime
+
+        hoy = datetime.now().strftime("%Y-%m-%d")
+
+        horas = list(range(24))
+        conteo = [0] * 24
+
+        for log in logs_accesos:
+            if log["fecha"] == hoy:
+                h = int(log["hora"])
+                conteo[h] += 1
+
+        fig = Figure(figsize=(6, 3), dpi=100)
+        ax = fig.add_subplot(111)
+
+        # Fondo limpio
+        fig.patch.set_facecolor("#FFFFFF")
+        ax.set_facecolor("#FFFFFF")
+
+        # Barras modernas
+        ax.bar(horas, conteo, color="#3B82F6", width=0.6)
+
+        # Quitar bordes
+        for spine in ["top", "right", "left", "bottom"]:
+            ax.spines[spine].set_visible(False)
+
+        # Grid suave
+        ax.grid(axis='y', linestyle='--', alpha=0.2)
+
+        # Ejes
+        ax.set_xticks(horas)
+        ax.set_xticklabels([f"{h:02d}" for h in horas], rotation=45, fontsize=8)
+
+        ax.set_title("Accesos por hora", fontsize=12)
+        ax.set_xlabel("")
+        ax.set_ylabel("")
+
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+
+        canvas = FigureCanvasTkAgg(fig, master=container)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+
+    def actualizar_grafica(self):
+        # limpiar SOLO la gráfica
+        for widget in self.graph_container.winfo_children():
+            widget.destroy()
+
+        fecha = self.fecha_var.get()
+
+        horas = list(range(24))
+        conteo = [0] * 24
+
+        for log in logs_accesos:
+            if log["fecha"] == fecha:
+                h = int(log["hora"])
+                conteo[h] += 1
+
+        fig = Figure(figsize=(6, 3), dpi=100)
+        ax = fig.add_subplot(111)
+
+        fig.patch.set_facecolor("#FFFFFF")
+        ax.set_facecolor("#FFFFFF")
+
+        ax.bar(horas, conteo, color="#3B82F6", width=0.6)
+
+        for spine in ["top", "right", "left", "bottom"]:
+            ax.spines[spine].set_visible(False)
+
+        ax.grid(axis='y', linestyle='--', alpha=0.2)
+
+        from matplotlib.ticker import MaxNLocator
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.set_yticks(range(0, max(conteo) + 2))
+
+        ax.set_xticks(range(0, 24, 3))
+        ax.set_xticklabels([f"{h}:00" for h in range(0, 24, 3)], fontsize=9)
+
+        ax.set_title(f"Accesos del día {fecha}", fontsize=12)
+
+        canvas = FigureCanvasTkAgg(fig, master=self.graph_container)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
 
     def render_mini_tabla_accesos_data(self):
         logs = [

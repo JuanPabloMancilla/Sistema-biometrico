@@ -116,9 +116,6 @@ class DashboardView(ctk.CTkFrame):
         graph_box.pack(fill="x", padx=40, pady=20)
         graph_box.pack_propagate(False)
 
-        ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=30, pady=20)
-        ctk.CTkLabel(graph_box, text="[ Gráfica de Actividad ]", font=("Inter", 18), text_color="#CBD5E1").place(relx=0.5, rely=0.5, anchor="center")
-
         # Sección de Últimos Accesos (Tabla)
         ctk.CTkLabel(main_scroll, text="🧾 Últimos Accesos Realizados", font=("Inter", 18, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=45, pady=(20, 10))
         

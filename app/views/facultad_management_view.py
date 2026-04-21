@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from app.services.theme import COLORS
 from app.services.facultad_service import (
     obtener_todas_facultades,
     crear_facultad,
@@ -9,7 +10,7 @@ from app.services.facultad_service import (
 
 class FacultadManagementView(ctk.CTkFrame):
     def __init__(self, master):
-        super().__init__(master, fg_color="#F8FAFC")
+        super().__init__(master, fg_color=COLORS["bg"])
         
         self.modo_edicion = False
         self.facultad_actual_id = None
@@ -29,14 +30,14 @@ class FacultadManagementView(ctk.CTkFrame):
         
         title_cont = ctk.CTkFrame(header, fg_color="transparent")
         title_cont.pack(side="left")
-        ctk.CTkLabel(title_cont, text="🏫 Gestión de Facultades", font=self.font_header, text_color="#000000").pack(anchor="w")
-        ctk.CTkLabel(title_cont, text="Administra las unidades académicas del sistema", font=self.font_normal, text_color="#64748B").pack(anchor="w")
+        ctk.CTkLabel(title_cont, text="🏫 Gestión de Facultades", font=self.font_header, text_color=COLORS["text"]).pack(anchor="w")
+        ctk.CTkLabel(title_cont, text="Administra las unidades académicas del sistema", font=self.font_normal, text_color=COLORS["subtext"]).pack(anchor="w")
         
-        ctk.CTkButton(header, text="➕ Agregar Facultad", fg_color="#000000", hover_color="#262626",
+        ctk.CTkButton(header, text="➕ Agregar Facultad", fg_color=COLORS["text"], hover_color=COLORS["hover"], text_color=COLORS["bg"],
                      font=self.font_sub, height=50, corner_radius=12, command=self.abrir_formulario).pack(side="right", anchor="n")
         
         # 2. Card Principal
-        self.main_card = ctk.CTkFrame(self, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+        self.main_card = ctk.CTkFrame(self, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
         self.main_card.pack(fill="both", expand=True, padx=40, pady=(0, 40))
         
         self.render_table_content()
@@ -53,12 +54,12 @@ class FacultadManagementView(ctk.CTkFrame):
         table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
         table_head.pack(fill="x", padx=20, pady=(10, 5))
 
-        ctk.CTkLabel(table_head, text="🆔 ID", font=self.font_small, text_color="#000000", width=ancho_id, anchor="center").pack(side="left")
-        ctk.CTkLabel(table_head, text="🏛️ NOMBRE DE FACULTAD", font=self.font_small, text_color="#000000", width=ancho_nombre, anchor="w").pack(side="left")
-        ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color="#000000", width=ancho_estado, anchor="center").pack(side="left")
-        ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color="#000000").pack(side="right", padx=60)
+        ctk.CTkLabel(table_head, text="🆔 ID", font=self.font_small, text_color=COLORS["text"], width=ancho_id, anchor="center").pack(side="left")
+        ctk.CTkLabel(table_head, text="🏛️ NOMBRE DE FACULTAD", font=self.font_small, text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
+        ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color=COLORS["text"], width=ancho_estado, anchor="center").pack(side="left")
+        ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color=COLORS["text"]).pack(side="right", padx=60)
 
-        ctk.CTkFrame(self.main_card, fg_color="#E2E8F0", height=1).pack(fill="x", padx=20)
+        ctk.CTkFrame(self.main_card, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
 
         facultades = obtener_todas_facultades()
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
@@ -73,8 +74,8 @@ class FacultadManagementView(ctk.CTkFrame):
             row.pack(fill="x", side="top", pady=1)
             row.pack_propagate(False)
 
-            ctk.CTkLabel(row, text=f"#{f['id']}", font=self.font_normal, text_color="#000000", width=ancho_id).pack(side="left")
-            ctk.CTkLabel(row, text=f["nombre"].upper(), font=("Inter", 12, "bold"), text_color="#000000", width=ancho_nombre, anchor="w").pack(side="left")
+            ctk.CTkLabel(row, text=f"#{f['id']}", font=self.font_normal, text_color=COLORS["text"], width=ancho_id).pack(side="left")
+            ctk.CTkLabel(row, text=f["nombre"].upper(), font=("Inter", 12, "bold"), text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
 
             es_activa = f.get('estado', 1) == 1
             badge_est = ctk.CTkFrame(row, fg_color="#D1FAE5" if es_activa else "#FEE2E2", corner_radius=20, width=110, height=26)
@@ -84,10 +85,10 @@ class FacultadManagementView(ctk.CTkFrame):
 
             act_block = ctk.CTkFrame(row, fg_color="transparent")
             act_block.pack(side="right", padx=20)
-            ctk.CTkButton(act_block, text="✏️", width=32, height=32, fg_color="#F1F5F9", text_color="#000000", command=lambda id_f=f["id"]: self.abrir_formulario(id_f)).pack(side="left", padx=4)
+            ctk.CTkButton(act_block, text="✏️", width=32, height=32, fg_color=COLORS["hover"], text_color=COLORS["text"], command=lambda id_f=f["id"]: self.abrir_formulario(id_f)).pack(side="left", padx=4)
             ctk.CTkButton(act_block, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_eliminar_modal(id_f, n)).pack(side="left", padx=2)
 
-            ctk.CTkFrame(scroll, fg_color="#F1F5F9", height=1).pack(fill="x", padx=20)
+            ctk.CTkFrame(scroll, fg_color=COLORS["hover"], height=1).pack(fill="x", padx=20)
 
     def abrir_formulario(self, id_facultad=None):
         self.main_card.pack_forget()
@@ -105,29 +106,29 @@ class FacultadManagementView(ctk.CTkFrame):
             nombre_ini = ""
             estado_ini = "Activa"
 
-        self.form_base = ctk.CTkFrame(self, fg_color="#F8FAFC")
+        self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
         
-        ctk.CTkLabel(self.form_base, text=titulo, font=self.font_header, text_color="#000000").pack(anchor="w", padx=60, pady=(40, 20))
+        ctk.CTkLabel(self.form_base, text=titulo, font=self.font_header, text_color=COLORS["text"]).pack(anchor="w", padx=60, pady=(40, 20))
 
-        form_card = ctk.CTkFrame(self.form_base, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+        form_card = ctk.CTkFrame(self.form_base, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
         form_card.pack(fill="x", padx=60, pady=10)
 
-        ctk.CTkLabel(form_card, text="🏛️ Nombre de la Facultad", font=self.font_small, text_color="#000000").pack(anchor="w", padx=25, pady=(25, 5))
-        self.input_nombre = ctk.CTkEntry(form_card, height=45, font=self.font_normal, fg_color="#F1F5F9", border_width=0, text_color="#000000")
+        ctk.CTkLabel(form_card, text="🏛️ Nombre de la Facultad", font=self.font_small, text_color=COLORS["text"]).pack(anchor="w", padx=25, pady=(25, 5))
+        self.input_nombre = ctk.CTkEntry(form_card, height=45, font=self.font_normal, fg_color=COLORS["hover"], border_width=0, text_color=COLORS["text"])
         self.input_nombre.insert(0, nombre_ini)
         self.input_nombre.pack(fill="x", padx=25, pady=(0, 20))
 
-        ctk.CTkLabel(form_card, text="⚙️ Estado", font=self.font_small, text_color="#000000").pack(anchor="w", padx=25, pady=(0, 5))
-        self.combo_estado = ctk.CTkOptionMenu(form_card, values=["Activa", "Inactiva"], height=45, font=self.font_normal, fg_color="#F1F5F9", button_color="#E2E8F0", text_color="#000000")
+        ctk.CTkLabel(form_card, text="⚙️ Estado", font=self.font_small, text_color=COLORS["text"]).pack(anchor="w", padx=25, pady=(0, 5))
+        self.combo_estado = ctk.CTkOptionMenu(form_card, values=["Activa", "Inactiva"], height=45, font=self.font_normal, fg_color=COLORS["hover"], button_color=COLORS["border"], text_color=COLORS["text"])
         self.combo_estado.set(estado_ini)
         self.combo_estado.pack(fill="x", padx=25, pady=(0, 30))
 
         btns = ctk.CTkFrame(self.form_base, fg_color="transparent")
         btns.pack(fill="x", padx=60, pady=30)
         
-        ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color="#000000", height=55, command=self.volver_a_tabla).pack(side="left", expand=True, fill="x", padx=(0, 10))
-        ctk.CTkButton(btns, text="💾 Guardar Facultad", font=self.font_sub, fg_color="#D1FAE5", text_color="#000000", height=55, command=self.guardar_facultad).pack(side="left", expand=True, fill="x", padx=(10, 0))
+        ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=55, command=self.volver_a_tabla).pack(side="left", expand=True, fill="x", padx=(0, 10))
+        ctk.CTkButton(btns, text="💾 Guardar Facultad", font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=55, command=self.guardar_facultad).pack(side="left", expand=True, fill="x", padx=(10, 0))
 
     def guardar_facultad(self):
         nombre = self.input_nombre.get().strip()
@@ -143,13 +144,13 @@ class FacultadManagementView(ctk.CTkFrame):
         self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
         
         # 2. Ventana Modal
-        modal = ctk.CTkFrame(self.overlay, fg_color="white", corner_radius=20, width=420, height=240, border_width=2, border_color="#CBD5E1")
+        modal = ctk.CTkFrame(self.overlay, fg_color=COLORS["card"], corner_radius=20, width=420, height=240, border_width=2, border_color=COLORS["border"])
         modal.place(relx=0.5, rely=0.5, anchor="center")
         modal.pack_propagate(False)
 
         ctk.CTkLabel(modal, text="🏛️", font=("Inter", 45)).pack(pady=(25, 5))
-        ctk.CTkLabel(modal, text="¿Está seguro de eliminar esta facultad?", font=("Inter", 16, "bold"), text_color="#1E293B").pack()
-        ctk.CTkLabel(modal, text=f"Se eliminará: {nombre.upper()}", font=("Inter", 12), text_color="#64748B").pack(pady=5)
+        ctk.CTkLabel(modal, text="¿Está seguro de eliminar esta facultad?", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text=f"Se eliminará: {nombre.upper()}", font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
         
         # 3. Botones (Verde Confirmar / Rojo Cancelar)
         btns = ctk.CTkFrame(modal, fg_color="transparent")

@@ -1,10 +1,11 @@
 import customtkinter as ctk
 import os
+from app.services.theme import COLORS
 from PIL import Image, ImageOps, ImageDraw # Necesitamos estas tres de PIL
 
 class LoginView(ctk.CTkFrame):
     def __init__(self, master, on_login_success):
-        super().__init__(master, fg_color="#F8F9FA") 
+        super().__init__(master, fg_color=COLORS["bg"]) 
         self.master = master 
         self.on_login_success = on_login_success
         self.password_visible = False 
@@ -16,7 +17,7 @@ class LoginView(ctk.CTkFrame):
         # K O D A - Esquina superior izquierda
         self.koda_label_top = ctk.CTkLabel(
             self.top_bar, text="K O D A", 
-            font=("Times New Roman", 42, "bold"), text_color="#3C054F"
+            font=("Times New Roman", 42, "bold"), text_color=COLORS["text"]
         )
         self.koda_label_top.pack(side="left", padx=15, pady=15)
 
@@ -52,7 +53,7 @@ class LoginView(ctk.CTkFrame):
         self.btn_regresar_terminal.pack(side="left", padx=8)
 
         # --- TARJETA DE LOGIN CENTRAL ---
-        self.card = ctk.CTkFrame(self, fg_color="white", width=440, height=640, corner_radius=25, border_width=1, border_color="#E2E8F0")
+        self.card = ctk.CTkFrame(self, fg_color=COLORS["card"], width=440, height=640, corner_radius=25, border_width=1, border_color=COLORS["border"])
         self.card.place(relx=0.5, rely=0.55, anchor="center")
         self.card.pack_propagate(False) 
         self.create_form()
@@ -118,7 +119,7 @@ class LoginView(ctk.CTkFrame):
 
         # --- RESTO DEL DISEÑO ---
         ctk.CTkLabel(self.card, text="Sistema de Reconocimiento\nFacial", 
-                     font=("Inter", 26, "bold"), text_color="#000000", justify="center").pack(pady=(15, 10))
+                     font=("Inter", 26, "bold"), text_color=COLORS["text"], justify="center").pack(pady=(15, 10))
         
         ctk.CTkLabel(self.card, text="Ingresa tus credenciales para continuar", 
                      font=("Inter", 14), text_color="#8E8E93").pack(pady=(0, 25))
@@ -152,8 +153,15 @@ class LoginView(ctk.CTkFrame):
         self.master.mostrar_terminal()
 
     def actualizar_icono_tema(self):
-        if self.theme_switch.get() == 1: self.theme_icon.configure(text="🌙")
-        else: self.theme_icon.configure(text="☀️")
+        if self.theme_switch.get() == 1:
+            self.theme_icon.configure(text="🌙")
+            ctk.set_appearance_mode("dark")
+        else:
+            self.theme_icon.configure(text="☀️")
+            ctk.set_appearance_mode("light")
+
+        # 🔥 refrescar vista
+        self.recargar_vista()
 
     def toggle_password_visibility(self):
         if self.pass_entry.cget("show") == "*":
@@ -166,12 +174,12 @@ class LoginView(ctk.CTkFrame):
     def create_input_group(self, label_text, placeholder, is_password=False):
         group_frame = ctk.CTkFrame(self.card, fg_color="transparent")
         group_frame.pack(fill="x", padx=45, pady=10)
-        lbl = ctk.CTkLabel(group_frame, text=label_text, font=("Inter", 12, "bold"), text_color="#1D1D1F")
+        lbl = ctk.CTkLabel(group_frame, text=label_text, font=("Inter", 12, "bold"), text_color=COLORS["text"])
         lbl.pack(side="top", anchor="w")
-        input_container = ctk.CTkFrame(group_frame, fg_color="#F1F5F9", height=50, corner_radius=10)
+        input_container = ctk.CTkFrame(group_frame, fg_color=COLORS["hover"], height=50, corner_radius=10)
         input_container.pack(fill="x", pady=(5, 0))
         input_container.pack_propagate(False)
-        entry = ctk.CTkEntry(input_container, placeholder_text=placeholder, fg_color="transparent", border_width=0, font=("Inter", 14), text_color="black")
+        entry = ctk.CTkEntry(input_container, placeholder_text=placeholder, fg_color="transparent", border_width=0, font=("Inter", 14), text_color=("black", "white"))
         if is_password:
             entry.configure(show="*")
             entry.pack(side="left", fill="both", expand=True, padx=(15, 0))

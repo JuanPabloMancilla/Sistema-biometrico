@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from app.services.theme import COLORS
 from app.services.carrera_service import (
     obtener_todas_carreras,
     crear_carrera,
@@ -10,7 +11,7 @@ from app.services.carrera_service import (
 
 class CarreraManagementView(ctk.CTkFrame):
     def __init__(self, master, controller=None):
-        super().__init__(master, fg_color="#F8FAFC")
+        super().__init__(master, fg_color=COLORS["bg"])
         self.controller = controller
         self.usuario_editando_id = None 
         
@@ -30,7 +31,7 @@ class CarreraManagementView(ctk.CTkFrame):
         self.create_header(self.vista_tabla)
         self.create_search_bar(self.vista_tabla)
         
-        self.main_card = ctk.CTkFrame(self.vista_tabla, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+        self.main_card = ctk.CTkFrame(self.vista_tabla, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
         self.main_card.pack(expand=True, fill="both", padx=30, pady=(5, 15))
         
         self.render_table_content()
@@ -50,13 +51,13 @@ class CarreraManagementView(ctk.CTkFrame):
         table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
         table_head.pack(fill="x", padx=20, pady=(10, 5))
 
-        ctk.CTkLabel(table_head, text="🆔 ID", font=self.font_small, text_color="#64748B", width=ancho_id, anchor="center").pack(side="left")
-        ctk.CTkLabel(table_head, text="📖 NOMBRE", font=self.font_small, text_color="#64748B", width=ancho_nombre, anchor="w").pack(side="left")
-        ctk.CTkLabel(table_head, text="🏫 FACULTAD", font=self.font_small, text_color="#64748B", width=ancho_facultad, anchor="w").pack(side="left")
-        ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color="#64748B", width=ancho_estado, anchor="center").pack(side="left")
-        ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color="#64748B").pack(side="right", padx=50)
+        ctk.CTkLabel(table_head, text="🆔 ID", font=self.font_small, text_color=COLORS["subtext"], width=ancho_id, anchor="center").pack(side="left")
+        ctk.CTkLabel(table_head, text="📖 NOMBRE", font=self.font_small, text_color=COLORS["subtext"], width=ancho_nombre, anchor="w").pack(side="left")
+        ctk.CTkLabel(table_head, text="🏫 FACULTAD", font=self.font_small, text_color=COLORS["subtext"], width=ancho_facultad, anchor="w").pack(side="left")
+        ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color=COLORS["subtext"], width=ancho_estado, anchor="center").pack(side="left")
+        ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color=COLORS["subtext"]).pack(side="right", padx=50)
 
-        ctk.CTkFrame(self.main_card, fg_color="#E2E8F0", height=1).pack(fill="x", padx=20)
+        ctk.CTkFrame(self.main_card, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
 
         # --- CUERPO SCROLLABLE ---
         carreras = obtener_todas_carreras()
@@ -64,7 +65,7 @@ class CarreraManagementView(ctk.CTkFrame):
         scroll.pack(expand=True, fill="both")
         
         if not carreras:
-            ctk.CTkLabel(scroll, text="No hay carreras registradas", font=self.font_normal, text_color="#94A3B8").pack(pady=40)
+            ctk.CTkLabel(scroll, text="No hay carreras registradas", font=self.font_normal, text_color=COLORS["subtext"]).pack(pady=40)
             return
 
         for c in carreras:
@@ -75,20 +76,20 @@ class CarreraManagementView(ctk.CTkFrame):
             # 1. ID
             id_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_id)
             id_block.pack(side="left")
-            ctk.CTkLabel(id_block, text=f"#{c['id']}", font=self.font_normal, text_color="#64748B").pack(expand=True)
+            ctk.CTkLabel(id_block, text=f"#{c['id']}", font=self.font_normal, text_color=COLORS["subtext"]).pack(expand=True)
 
             # 2. NOMBRE
             nombre_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_nombre)
             nombre_block.pack(side="left", fill="y")
             ctk.CTkLabel(nombre_block, text=c["nombre"].upper(), font=("Inter", 12, "bold"), 
-                         text_color="#1E293B", anchor="w").pack(expand=True, fill="x", padx=5)
+                         text_color=COLORS["text"], anchor="w").pack(expand=True, fill="x", padx=5)
 
             # 3. FACULTAD
             fac_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_facultad)
             fac_block.pack(side="left", fill="y")
             fac_txt = c["facultad_nombre"] if c["facultad_nombre"] else "S/F"
             ctk.CTkLabel(fac_block, text=fac_txt, font=self.font_normal, 
-                         text_color="#64748B", anchor="w").pack(expand=True, fill="x", padx=5)
+                         text_color=COLORS["subtext"], anchor="w").pack(expand=True, fill="x", padx=5)
 
             # 4. ESTADO
             estado_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado)
@@ -105,13 +106,13 @@ class CarreraManagementView(ctk.CTkFrame):
             act_block = ctk.CTkFrame(row, fg_color="transparent")
             act_block.pack(side="right", padx=20, fill="y")
             ctk.CTkButton(act_block, text="✏️", width=32, height=32, font=("Inter", 14), 
-                         fg_color="#F1F5F9", hover_color="#E2E8F0", text_color="#1E293B", 
+                         fg_color=COLORS["hover"], hover_color=COLORS["border"], text_color=COLORS["text"], 
                          command=lambda cid=c["id"]: self.abrir_formulario(cid)).pack(side="left", padx=4, pady=14)
             ctk.CTkButton(act_block, text="🗑️", width=32, height=32, font=("Inter", 14), 
                          fg_color="#FFF1F2", hover_color="#FEE2E2", text_color="#E11D48", 
                          command=lambda cid=c["id"], n=c["nombre"]: self.confirmar_eliminar_modal(cid, n)).pack(side="left", padx=2, pady=14)
 
-            ctk.CTkFrame(scroll, fg_color="#F1F5F9", height=1).pack(fill="x", padx=20, side="top")
+            ctk.CTkFrame(scroll, fg_color=COLORS["hover"], height=1).pack(fill="x", padx=20, side="top")
 
     def abrir_formulario(self, id_carrera=None):
         self.vista_tabla.pack_forget()
@@ -134,27 +135,27 @@ class CarreraManagementView(ctk.CTkFrame):
             estado_ini = "Activa"
             fac_nombre_ini = facultades_lista[0] if facultades_lista else "Seleccionar facultad"
 
-        self.form_base = ctk.CTkFrame(self, fg_color="#F8FAFC")
+        self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
         
-        ctk.CTkLabel(self.form_base, text=titulo, font=self.font_header, text_color="#000000").pack(anchor="w", padx=60, pady=(40, 20))
+        ctk.CTkLabel(self.form_base, text=titulo, font=self.font_header, text_color=COLORS["text"]).pack(anchor="w", padx=60, pady=(40, 20))
 
-        form_card = ctk.CTkFrame(self.form_base, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+        form_card = ctk.CTkFrame(self.form_base, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
         form_card.pack(fill="x", padx=60, pady=10)
 
         # Inputs con letras negras (#000000)
-        ctk.CTkLabel(form_card, text="📖 Nombre de la Carrera", font=self.font_small, text_color="#64748B").pack(anchor="w", padx=25, pady=(25, 5))
-        self.input_nombre = ctk.CTkEntry(form_card, height=45, font=self.font_normal, fg_color="#F1F5F9", border_width=0, text_color="#000000")
+        ctk.CTkLabel(form_card, text="📖 Nombre de la Carrera", font=self.font_small, text_color=COLORS["subtext"]).pack(anchor="w", padx=25, pady=(25, 5))
+        self.input_nombre = ctk.CTkEntry(form_card, height=45, font=self.font_normal, fg_color=COLORS["hover"], border_width=0, text_color=COLORS["text"])
         self.input_nombre.insert(0, nombre_ini)
         self.input_nombre.pack(fill="x", padx=25, pady=(0, 20))
 
-        ctk.CTkLabel(form_card, text="🏫 Facultad", font=self.font_small, text_color="#64748B").pack(anchor="w", padx=25, pady=(0, 5))
-        self.combo_facultad = ctk.CTkOptionMenu(form_card, values=facultades_lista, height=45, font=self.font_normal, fg_color="#F1F5F9", button_color="#E2E8F0", text_color="#000000")
+        ctk.CTkLabel(form_card, text="🏫 Facultad", font=self.font_small, text_color=COLORS["subtext"]).pack(anchor="w", padx=25, pady=(0, 5))
+        self.combo_facultad = ctk.CTkOptionMenu(form_card, values=facultades_lista, height=45, font=self.font_normal, fg_color=COLORS["hover"], button_color=COLORS["border"], text_color=COLORS["text"])
         self.combo_facultad.set(fac_nombre_ini)
         self.combo_facultad.pack(fill="x", padx=25, pady=(0, 20))
 
-        ctk.CTkLabel(form_card, text="⚙️ Estado", font=self.font_small, text_color="#64748B").pack(anchor="w", padx=25, pady=(0, 5))
-        self.combo_estado = ctk.CTkOptionMenu(form_card, values=["Activa", "Inactiva"], height=45, font=self.font_normal, fg_color="#F1F5F9", button_color="#E2E8F0", text_color="#000000")
+        ctk.CTkLabel(form_card, text="⚙️ Estado", font=self.font_small, text_color=COLORS["subtext"]).pack(anchor="w", padx=25, pady=(0, 5))
+        self.combo_estado = ctk.CTkOptionMenu(form_card, values=["Activa", "Inactiva"], height=45, font=self.font_normal, fg_color=COLORS["hover"], button_color=COLORS["border"], text_color=COLORS["text"])
         self.combo_estado.set(estado_ini)
         self.combo_estado.pack(fill="x", padx=25, pady=(0, 30))
 
@@ -173,8 +174,8 @@ class CarreraManagementView(ctk.CTkFrame):
         modal.pack_propagate(False)
 
         ctk.CTkLabel(modal, text="🗑️", font=("Inter", 45)).pack(pady=(25, 5))
-        ctk.CTkLabel(modal, text="¿Está seguro que desea borrar la carrera?", font=("Inter", 16, "bold"), text_color="#1E293B").pack()
-        ctk.CTkLabel(modal, text=f"Se eliminará: {nombre.upper()}", font=("Inter", 12), text_color="#64748B").pack(pady=5)
+        ctk.CTkLabel(modal, text="¿Está seguro que desea borrar la carrera?", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text=f"Se eliminará: {nombre.upper()}", font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
         
         btns = ctk.CTkFrame(modal, fg_color="transparent")
         btns.pack(fill="x", side="bottom", pady=25, padx=30)
@@ -211,11 +212,11 @@ class CarreraManagementView(ctk.CTkFrame):
     def create_header(self, master):
         h = ctk.CTkFrame(master, fg_color="transparent")
         h.pack(fill="x", padx=30, pady=(20, 10))
-        ctk.CTkLabel(h, text="🎓 Gestión de Carreras", font=self.font_header, text_color="#000000").pack(side="left")
+        ctk.CTkLabel(h, text="🎓 Gestión de Carreras", font=self.font_header, text_color=COLORS["text"]).pack(side="left")
         ctk.CTkButton(h, text="➕ Agregar Carrera", font=self.font_sub, fg_color="#000000", height=50, corner_radius=12, command=self.abrir_formulario).pack(side="right")
 
     def create_search_bar(self, master):
         bar = ctk.CTkFrame(master, fg_color="transparent")
         bar.pack(fill="x", padx=30, pady=10)
-        self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 Buscar carrera por nombre...", height=42, corner_radius=10, fg_color="#F1F5F9", border_width=1, text_color="#000000")
+        self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 Buscar carrera por nombre...", height=42, corner_radius=10, fg_color=COLORS["hover"], border_width=1, text_color=COLORS["text"])
         self.entry_busqueda.pack(side="left", fill="x", expand=True)

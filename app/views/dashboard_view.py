@@ -6,14 +6,18 @@ from app.views.user_management_view import UserManagementView
 from app.views.account_view import AccountView 
 from app.views.facultad_management_view import FacultadManagementView
 from app.views.carrera_management_view import CarreraManagementView
+
+from app.services.theme import COLORS
+
 from datetime import datetime
 from tkcalendar import DateEntry
 from app.detection.detector_rostro import logs_accesos
 
+
 class DashboardView(ctk.CTkFrame):
     def __init__(self, master, on_back):
         # Fondo general en gris muy claro
-        super().__init__(master, fg_color="#F8FAFC")
+        super().__init__(master, fg_color=COLORS["bg"])
         self.on_back = on_back
 
         # Configuración de pesos de la cuadrícula
@@ -57,10 +61,10 @@ class DashboardView(ctk.CTkFrame):
         for b in btns:
             if b == btn_act:
                 # Botón Seleccionado: Azul muy oscuro con texto blanco
-                b.configure(fg_color="#1E293B", text_color="#FFFFFF", hover_color="#1E293B")
+                b.configure(fg_color=COLORS["selected"], text_color=("white", "black"), hover_color=COLORS["selected"])
             else:
                 # Botones Inactivos: Transparentes con texto negro
-                b.configure(fg_color="transparent", text_color="#000000", hover_color="#F1F5F9")
+                b.configure(fg_color="transparent", text_color=COLORS["text"], hover_color="#F1F5F9")
 
     # --- MÉTODOS DE NAVEGACIÓN ---
     def mostrar_panel_control(self):
@@ -96,8 +100,8 @@ class DashboardView(ctk.CTkFrame):
         # Header del Dashboard
         header = ctk.CTkFrame(main_scroll, fg_color="transparent")
         header.pack(fill="x", padx=40, pady=(10, 20))
-        ctk.CTkLabel(header, text="🏠 Panel de Control", font=("Inter", 28, "bold"), text_color="#000000").pack(anchor="w")
-        ctk.CTkLabel(header, text="Resumen general y actividad reciente", font=("Inter", 16), text_color="#64748B").pack(anchor="w")
+        ctk.CTkLabel(header, text="🏠 Panel de Control", font=("Inter", 28, "bold"), text_color=COLORS["text"]).pack(anchor="w")
+        ctk.CTkLabel(header, text="Resumen general y actividad reciente", font=("Inter", 16), text_color=COLORS["subtext"]).pack(anchor="w")
 
         # Tarjetas de Estadísticas (Stats)
         stats_frame = ctk.CTkFrame(main_scroll, fg_color="transparent")
@@ -108,9 +112,18 @@ class DashboardView(ctk.CTkFrame):
         self.create_stat_card(stats_frame, "🚫 Denegados", "1", "#EF4444")
 
         # Contenedor de la Gráfica
-        graph_box = ctk.CTkFrame(main_scroll, fg_color="white", corner_radius=20, border_width=1, border_color="#E2E8F0", height=280)
+        graph_box = ctk.CTkFrame(main_scroll, fg_color=COLORS["card"], corner_radius=20, border_width=1, border_color=COLORS["border"], height=280)
         graph_box.pack(fill="x", padx=40, pady=20)
         graph_box.pack_propagate(False)
+
+        ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=30, pady=20)
+        ctk.CTkLabel(graph_box, text="[ Gráfica de Actividad ]", font=("Inter", 18), text_color="#CBD5E1").place(relx=0.5, rely=0.5, anchor="center")
+
+        # Sección de Últimos Accesos (Tabla)
+        ctk.CTkLabel(main_scroll, text="🧾 Últimos Accesos Realizados", font=("Inter", 18, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=45, pady=(20, 10))
+        
+        self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
+
         ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 16, "bold"), text_color="#000000").pack(anchor="w", padx=30, pady=20)
         # -------- FILTRO DE FECHA --------
         self.fecha_var = ctk.StringVar(value=datetime.now().strftime("%Y-%m-%d"))
@@ -149,6 +162,7 @@ class DashboardView(ctk.CTkFrame):
         ctk.CTkLabel(main_scroll, text="🧾 Últimos Accesos Realizados", font=("Inter", 18, "bold"), text_color="#000000").pack(anchor="w", padx=45, pady=(20, 10))
 
         self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+
         self.contenedor_tabla.pack(fill="x", padx=40, pady=(0, 40))
         self.render_mini_tabla_accesos_data()
 
@@ -255,15 +269,15 @@ class DashboardView(ctk.CTkFrame):
             ctk.CTkLabel(row, text="👤", font=("Inter", 20)).pack(side="left", padx=20)
             mid = ctk.CTkFrame(row, fg_color="transparent")
             mid.pack(side="left", fill="both", expand=True)
-            ctk.CTkLabel(mid, text=log["u"], font=("Inter", 13, "bold"), text_color="#000000").pack(anchor="w", pady=(15,0))
+            ctk.CTkLabel(mid, text=log["u"], font=("Inter", 13, "bold"), text_color=COLORS["text"]).pack(anchor="w", pady=(15,0))
             det = f"ID: {log['id_c']} • {log['m']}"
             if not log["ok"]: det += f"  {log.get('motivo', '')}"
-            ctk.CTkLabel(mid, text=det, font=("Inter", 11), text_color="#64748B").pack(anchor="w")
-            ctk.CTkFrame(self.contenedor_tabla, fg_color="#F1F5F9", height=1).pack(fill="x", padx=20)
+            ctk.CTkLabel(mid, text=det, font=("Inter", 11), text_color=COLORS["subtext"]).pack(anchor="w")
+            ctk.CTkFrame(self.contenedor_tabla, fg_color=COLORS["hover"], height=1).pack(fill="x", padx=20)
 
     # --- SIDEBAR ---
     def create_sidebar(self):
-        sidebar = ctk.CTkFrame(self, width=280, corner_radius=0, fg_color="white", border_width=1, border_color="#E2E8F0")
+        sidebar = ctk.CTkFrame(self, width=280, corner_radius=0, fg_color=COLORS["sidebar"], border_width=1, border_color=COLORS["border"])
         sidebar.grid(row=0, column=0, sticky="nsew")
         sidebar.grid_propagate(False)
         
@@ -277,8 +291,8 @@ class DashboardView(ctk.CTkFrame):
         ctk.CTkLabel(profile, text="👤", font=("Arial", 35)).pack(side="left")
         txt_info = ctk.CTkFrame(profile, fg_color="transparent")
         txt_info.pack(side="left", padx=10)
-        ctk.CTkLabel(txt_info, text="ADMINISTRADOR", font=("Inter", 14, "bold"), text_color="#000000").pack(anchor="w")
-        ctk.CTkLabel(txt_info, text="Control Biométrico", font=("Inter", 11), text_color="#64748B").pack(anchor="w")
+        ctk.CTkLabel(txt_info, text="ADMINISTRADOR", font=("Inter", 14, "bold"), text_color=COLORS["text"]).pack(anchor="w")
+        ctk.CTkLabel(txt_info, text="Control Biométrico", font=("Inter", 11), text_color=COLORS["subtext"]).pack(anchor="w")
 
         self.btn_panel = self.crear_btn_sidebar(sidebar, "🏠   Panel de Control", self.mostrar_panel_control)
         self.btn_users = self.crear_btn_sidebar(sidebar, "👥   Gestión de Usuarios", self.mostrar_gestion_usuarios)
@@ -290,14 +304,14 @@ class DashboardView(ctk.CTkFrame):
                       font=("Inter", 14, "bold"), command=self.on_back).pack(side="bottom", pady=30, padx=20, fill="x")
 
     def create_stat_card(self, master, title, value, color):
-        card = ctk.CTkFrame(master, height=100, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+        card = ctk.CTkFrame(master, height=100, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
         card.pack(side="left", padx=(0, 20), expand=True, fill="both")
-        ctk.CTkLabel(card, text=title, font=("Inter", 12, "bold"), text_color="#000000").pack(anchor="w", padx=20, pady=(15, 0))
+        ctk.CTkLabel(card, text=title, font=("Inter", 12, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=20, pady=(15, 0))
         ctk.CTkLabel(card, text=value, font=("Inter", 28, "bold"), text_color=color).pack(anchor="w", padx=20)
 
     def crear_btn_sidebar(self, master, texto, comando):
         btn = ctk.CTkButton(master, text=texto, height=45, anchor="w", fg_color="transparent", 
-                            text_color="#000000", hover_color="#F1F5F9", font=("Inter", 16), command=comando)
+                            text_color=COLORS["text"], hover_color=COLORS["hover"], font=("Inter", 16), command=comando)
         btn.pack(pady=6, padx=20, fill="x")
         return btn
 
@@ -317,4 +331,4 @@ class DashboardView(ctk.CTkFrame):
         l_c.pack(side="left", padx=10)
         ctk.CTkLabel(l_c, text="🌐", font=("Inter", 16)).pack(side="left", padx=(12, 5))
         ctk.CTkButton(l_c, text="ES", width=38, height=28, corner_radius=14, fg_color="#1D1D1F", text_color="white").pack(side="left", padx=2, pady=5)
-        ctk.CTkButton(l_c, text="EN", width=38, height=28, corner_radius=14, fg_color="transparent", text_color="#000000").pack(side="left", padx=(2, 10), pady=5)
+        ctk.CTkButton(l_c, text="EN", width=38, height=28, corner_radius=14, fg_color="transparent", text_color=COLORS["text"]).pack(side="left", padx=(2, 10), pady=5)

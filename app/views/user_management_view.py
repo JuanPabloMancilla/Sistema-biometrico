@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from app.views.terminal_view import TerminalView
 from app.services.theme import COLORS
 from app.services.carrera_service import obtener_todas_carreras, obtener_facultades_para_dropdown
 from app.services.usuario_service import (
@@ -158,10 +159,14 @@ class UserManagementView(ctk.CTkFrame):
         vcmd = (self.register(self.validar_ocho_numeros), '%P')
         self.inputs_obligatorios["Cuenta"].configure(validate="key", validatecommand=vcmd)
         if usuario: self.inputs_obligatorios["Cuenta"].configure(state="disabled", fg_color=COLORS["border"])
-
+        
+        # Botón biométrico
+        self.btn_biometria = ctk.CTkButton(self.form_container, text="📷 Registrar Biometría", height=50, fg_color="#0EA5E9", text_color="white", font=self.font_sub, command=self.abrir_terminal_biometrica) 
+        self.btn_biometria.pack(fill="x", padx=60, pady=(20, 10))
         btns = ctk.CTkFrame(self.form_container, fg_color="transparent"); btns.pack(fill="x", padx=60, pady=(20, 50))
         ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=50, command=self.cerrar_formulario).pack(side="left", expand=True, fill="x", padx=(0, 10))
         ctk.CTkButton(btns, text="💾 Guardar", font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=50, command=self.validar_y_guardar).pack(side="left", expand=True, fill="x", padx=(10, 0))
+        
 
     def create_section_card(self, master, title, fields):
         card = ctk.CTkFrame(master, fg_color=COLORS["card"], corner_radius=12, border_width=1, border_color=COLORS["border"]); card.pack(fill="x", padx=60, pady=10)
@@ -252,7 +257,7 @@ class UserManagementView(ctk.CTkFrame):
         for t in ["Todos", "ESTUDIANTE", "DOCENTE", "AUXILIAR"]:
             act = self.filtro_rol_actual == t
             ctk.CTkButton(r1, text=t, height=28, corner_radius=10, fg_color=COLORS["hover"]
- if act else "white", text_color=COLORS["text"], border_color=COLORS["border"], command=lambda v=t: self.aplicar_filtro_visual(v)).pack(side="left", padx=3)
+        if act else "white", text_color=COLORS["text"], border_color=COLORS["border"], command=lambda v=t: self.aplicar_filtro_visual(v)).pack(side="left", padx=3)
 
     def aplicar_filtro_visual(self, v):
         self.filtro_rol_actual = v
@@ -300,3 +305,44 @@ class UserManagementView(ctk.CTkFrame):
         if hasattr(self, 'form_base'): self.form_base.destroy()
         self.vista_tabla.pack(fill="both", expand=True)
         self.render_table_content(self.all_users)
+
+    def abrir_terminal_biometrica(self):
+    # NO validar ID aquí ❌
+
+        self.form_base.pack_forget()
+
+        self.terminal_container = ctk.CTkFrame(self, fg_color="black")
+        self.terminal_container.pack(fill="both", expand=True)
+
+        self.terminal_view = TerminalView(
+        self.terminal_container,
+        user_id=None,  # 🔥 aún no existe
+        on_back=self.cerrar_terminal_biometrica,
+        on_capture=self.recibir_biometria,
+        modo="registro"   # 👈 ESTO ES CLAVE
+        )
+    
+        self.terminal_view.pack(fill="both", expand=True)
+
+
+    def cerrar_terminal_biometrica(self):
+        if hasattr(self, "terminal_container"):
+            self.terminal_container.destroy()
+
+            self.form_base.pack(fill="both", expand=True)
+
+    def recibir_biometria(self, encoding):
+        self.biometria_temp = encoding
+
+        print("✔ Biometría guardada temporalmente")
+
+    # 🔥 CAMBIO VISUAL DEL BOTÓN
+        if hasattr(self, "btn_biometria"):
+            self.btn_biometria.configure(
+                text="✔ Biometría registrada",
+                fg_color="#10B981",   # verde
+                hover_color="#059669"
+            )
+            self.btn_biometria.configure(state="disabled")
+
+        self.cerrar_terminal_biometrica()

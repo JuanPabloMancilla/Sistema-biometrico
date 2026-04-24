@@ -32,7 +32,7 @@ class CarreraManagementView(ctk.CTkFrame):
         self.create_search_bar(self.vista_tabla)
         
         self.main_card = ctk.CTkFrame(self.vista_tabla, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
-        self.main_card.pack(expand=True, fill="both", padx=30, pady=(5, 15))
+        self.main_card.pack(fill="both", expand=True, padx=40, pady=(0, 40))
         
         self.render_table_content()
 
@@ -42,16 +42,16 @@ class CarreraManagementView(ctk.CTkFrame):
             w.destroy()
 
         # --- CONFIGURACIÓN DE ANCHOS ---
-        ancho_id = 70
-        ancho_nombre = 320
-        ancho_facultad = 280
-        ancho_estado = 130
+        ancho_id = 90
+        ancho_nombre = 350
+        ancho_facultad = 350
+        ancho_estado = 150
 
         # --- ENCABEZADO FIJO ---
         table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
         table_head.pack(fill="x", padx=20, pady=(10, 5))
 
-        ctk.CTkLabel(table_head, text="🆔 ID", font=self.font_small, text_color=COLORS["subtext"], width=ancho_id, anchor="center").pack(side="left")
+        
         ctk.CTkLabel(table_head, text="📖 NOMBRE", font=self.font_small, text_color=COLORS["subtext"], width=ancho_nombre, anchor="w").pack(side="left")
         ctk.CTkLabel(table_head, text="🏫 FACULTAD", font=self.font_small, text_color=COLORS["subtext"], width=ancho_facultad, anchor="w").pack(side="left")
         ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color=COLORS["subtext"], width=ancho_estado, anchor="center").pack(side="left")
@@ -89,7 +89,7 @@ class CarreraManagementView(ctk.CTkFrame):
             fac_block.pack(side="left", fill="y")
             fac_txt = c["facultad_nombre"] if c["facultad_nombre"] else "S/F"
             ctk.CTkLabel(fac_block, text=fac_txt, font=self.font_normal, 
-                         text_color=COLORS["subtext"], anchor="w").pack(expand=True, fill="x", padx=5)
+                         text_color=COLORS["text"], anchor="w").pack(expand=True, fill="x", padx=5)
 
             # 4. ESTADO
             estado_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado)
@@ -104,7 +104,7 @@ class CarreraManagementView(ctk.CTkFrame):
 
             # 5. ACCIONES
             act_block = ctk.CTkFrame(row, fg_color="transparent")
-            act_block.pack(side="right", padx=20, fill="y")
+            act_block.pack(side="right", padx=20)
             ctk.CTkButton(act_block, text="✏️", width=32, height=32, font=("Inter", 14), 
                          fg_color=COLORS["hover"], hover_color=COLORS["border"], text_color=COLORS["text"], 
                          command=lambda cid=c["id"]: self.abrir_formulario(cid)).pack(side="left", padx=4, pady=14)
@@ -220,3 +220,5 @@ class CarreraManagementView(ctk.CTkFrame):
         bar.pack(fill="x", padx=30, pady=10)
         self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 Buscar carrera por nombre...", height=42, corner_radius=10, fg_color=COLORS["hover"], border_width=1, text_color=COLORS["text"])
         self.entry_busqueda.pack(side="left", fill="x", expand=True)
+
+    

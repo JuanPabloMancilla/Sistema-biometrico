@@ -116,9 +116,12 @@ TEMAS = {
 
 
 class TerminalView(ctk.CTkFrame):
-    def __init__(self, master, on_back):
+    def __init__(self, master, user_id=None, on_back=None, on_capture=None, modo="acceso"):
         super().__init__(master, fg_color=BG_DEEP)
         self.on_back = on_back
+        self.on_capture = on_capture  # 🔥 ESTE ES EL NUEVO
+        self.modo = modo
+        self.user_id = user_id
         self.cap = None
         self.loop_id = None
         self.estado_actual = None
@@ -151,25 +154,32 @@ class TerminalView(ctk.CTkFrame):
 
         hdr = ctk.CTkFrame(self, fg_color="transparent")
         hdr.pack(pady=(20, 4))
+        # 🔥 SOLO mostrar botón salir en modo normal
+        if self.modo != "registro":
+            self.btn_salir = ctk.CTkButton(
+                self, text="🚪", width=42, height=42,
+                corner_radius=8,
+                fg_color=BG_PANEL, hover_color="#1e1860",
+                text_color=TEXT_SECONDARY,
+                font=("Segoe UI Emoji", 18),
+                border_width=1, border_color=BORDER_IDLE,
+                command=self.cerrar_y_volver,
+            )
+            self.btn_salir.place(relx=0.974, rely=0.046, anchor="ne")
         ctk.CTkLabel(
             hdr, text="K O D A",
-            font=("Courier New", 43, "bold"), text_color=TEXT_PRIMARY,
+            font=("Courier New", 43, "bold"),
+            text_color=TEXT_PRIMARY,
         ).pack()
+
         ctk.CTkLabel(
-            hdr, text="▸  RECONOCIMIENTO FACIAL  ◂",
-            font=("Courier New", 23), text_color=TEXT_MUTED,
+            hdr,
+            text="▸  RECONOCIMIENTO FACIAL  ◂" if self.modo == "registro" else "▸  RECONOCIMIENTO FACIAL  ◂",
+            font=("Courier New", 23),
+            text_color=TEXT_MUTED,
         ).pack(pady=(4, 0))
 
-        self.btn_salir = ctk.CTkButton(
-            self, text="🚪", width=42, height=42,
-            corner_radius=8,
-            fg_color=BG_PANEL, hover_color="#1e1860",
-            text_color=TEXT_SECONDARY,
-            font=("Segoe UI Emoji", 18),
-            border_width=1, border_color=BORDER_IDLE,
-            command=self.cerrar_y_volver,
-        )
-        self.btn_salir.place(relx=0.974, rely=0.046, anchor="ne")
+        
 
         main = ctk.CTkFrame(self, fg_color="transparent")
         main.pack(expand=True, fill="both", padx=44, pady=(8, 28))
@@ -288,6 +298,10 @@ class TerminalView(ctk.CTkFrame):
         self.status_label.configure(text=t["status"], text_color=t["st_color"])
         self.lbl_nombre.configure(text=nombre, text_color=t["b_color"])
         self.badge_label.configure(text=t["badge"], text_color=t["b_color"])
+        # 🔥 MODO REGISTRO (sobrescribe textos)
+        if self.modo == "registro":
+            self.status_label.configure(text="REGISTRANDO BIOMETRÍA")
+            self.lbl_nombre.configure(text="COLOQUE SU ROSTRO FRENTE A LA CÁMARA")
 
     # ══════════════════════════════════════════════════════════════════════════
     # Detección de rostros
@@ -454,13 +468,25 @@ class TerminalView(ctk.CTkFrame):
                     self.pos_linea = 0
                     self.esperando_reset = True
                     self.inicio_espera_reset = ahora
+
+                    if self.modo == "registro":
+                        # 🔥 SOLO CAPTURA BIOMETRÍA
+                        if face_encoding is not None and self.on_capture:
+                            self.on_capture(face_encoding)
+
+                        self.aplicar_estilo_visual("escaneando")  # o crea uno tipo "registrado"
+                    else:
+                    
                     # Si nunca se resolvió un nombre, usar el último mensaje disponible
-                    if not self.usuario_detectado:
-                        self.usuario_detectado = msg_actual
+                        if not self.usuario_detectado:
+                            self.usuario_detectado = msg_actual
                     if any(p in self.usuario_detectado for p in ("DESCONOCIDO", "ERROR", "NO REGISTRADO")):
                         self.aplicar_estilo_visual("negado")
                     else:
                         self.aplicar_estilo_visual("autorizado", usuario=self.usuario_detectado)
+
+                    if face_encoding is not None and self.on_capture:
+                        self.on_capture(face_encoding)
 
             if self.face_box is not None:
                 fx, fy, fw, fh = self.face_box
@@ -524,8 +550,8 @@ class TerminalView(ctk.CTkFrame):
             self._flush_pending_style()
             self.video_display.configure(
                 text="⚠  ERROR: no se pudo acceder a la cámara\n\n"
-                     "Verifique que el dispositivo esté conectado\n"
-                     "y no esté en uso por otra aplicación.",
+                    "Verifique que el dispositivo esté conectado\n"
+                    "y no esté en uso por otra aplicación.",
                 text_color=ACCENT_RED,
             )
 

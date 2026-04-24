@@ -54,7 +54,7 @@ class FacultadManagementView(ctk.CTkFrame):
         table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
         table_head.pack(fill="x", padx=20, pady=(10, 5))
 
-        ctk.CTkLabel(table_head, text="🆔 ID", font=self.font_small, text_color=COLORS["text"], width=ancho_id, anchor="center").pack(side="left")
+        
         ctk.CTkLabel(table_head, text="🏛️ NOMBRE DE FACULTAD", font=self.font_small, text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
         ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color=COLORS["text"], width=ancho_estado, anchor="center").pack(side="left")
         ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color=COLORS["text"]).pack(side="right", padx=60)

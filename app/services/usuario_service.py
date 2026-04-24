@@ -14,6 +14,8 @@ def obtener_todos_usuarios():
             SELECT u.id_usuario, u.nombre, u.a_paterno, u.a_materno, u.estado,
                    u.fecha_registro, u.fecha_actualizacion,
                    u.tipo_usuario,
+                   u.cuenta,
+                   u.correo,
                    f.nombre,
                    c.nombre
             FROM usuario u
@@ -24,7 +26,7 @@ def obtener_todos_usuarios():
         filas = cursor.fetchall()
 
         return [{
-            "id": f[0],
+            "id_usuario": f[0],
             "nombre": f[1],
             "a_paterno": f[2],
             "a_materno": f[3],
@@ -32,8 +34,10 @@ def obtener_todos_usuarios():
             "fecha_registro": f[5],
             "fecha_actualizacion": f[6],
             "tipo_usuario": f[7],
-            "facultad_nombre": f[8],
-            "carrera_nombre": f[9],
+            "cuenta": f[8],
+            "correo": f[9],
+            "facultad_nombre": f[10],
+            "carrera_nombre": f[11],
         } for f in filas]
 
     except Exception as e:
@@ -106,25 +110,29 @@ def crear_usuario(nombre, a_paterno, a_materno, tipo_usuario, id_facultad, id_ca
         conn.close()
 
 
-def actualizar_usuario(cuenta, nombre, a_paterno, a_materno, tipo_usuario, id_facultad):
+def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo):
     conn = get_connection()
     try:
         cursor = conn.cursor()
-        fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
         cursor.execute("""
-            UPDATE usuario 
-            SET nombre = ?, a_paterno = ?, a_materno = ?, 
-                tipo_usuario = ?, id_facultad = ?,  
-                fecha_actualizacion = ?
-            WHERE cuenta = ?
-        """, (nombre, a_paterno, a_materno, tipo_usuario, id_facultad, fecha, str(cuenta)))
+            UPDATE usuario
+            SET nombre = ?, 
+                a_paterno = ?, 
+                a_materno = ?,
+                cuenta = ?,
+                tipo_usuario = ?, 
+                id_facultad = ?, 
+                correo = ?, 
+                fecha_actualizacion = datetime('now')
+            WHERE id_usuario = ?
+        """, (nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo, id_usuario))
 
         conn.commit()
         return cursor.rowcount > 0
 
     except Exception as e:
-        print(f"❌ Error al actualizar: {e}")
+        print("❌ Error al actualizar:", e)
         return False
     finally:
         conn.close()

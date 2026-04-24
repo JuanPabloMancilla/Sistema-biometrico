@@ -69,8 +69,9 @@ class UserManagementView(ctk.CTkFrame):
                     "ap": u["a_paterno"],
                     "am": u["a_materno"],
                     "r": TIPOS_USUARIO.get(u.get("tipo_usuario", 1), "N/A"),
-                    "c": u["id"],
-                    "m": "",  # no tienes correo en tu query
+                    "cuenta": u.get("cuenta", ""),
+                    "id": u["id_usuario"],
+                    "correo": u.get("correo", ""), # no tienes correo en tu query
                     "estado": u.get("estado", 1)
             })
 
@@ -112,7 +113,7 @@ class UserManagementView(ctk.CTkFrame):
             col = self.colors.get(u["r"].upper(), {"bg": "#E2E8F0", "text": "#475569"})
             badge_r = ctk.CTkFrame(l_n, fg_color=col["bg"], corner_radius=4); badge_r.pack(side="left", padx=8)
             ctk.CTkLabel(badge_r, text=u["r"], font=("Inter", 9, "bold"), text_color=col["text"]).pack(padx=6, pady=1)
-            ctk.CTkLabel(i_in, text=f"ID: {u['c']}  •  {u['m']}", font=("Inter", 11), text_color=COLORS["subtext"]).pack(anchor="w")
+            ctk.CTkLabel(i_in, text=f"ID: {u['cuenta']}  •  {u['correo']}", font=("Inter", 11), text_color=COLORS["subtext"]).pack(anchor="w")
 
             e_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado); e_b.pack(side="left", fill="y"); e_b.pack_propagate(False)
             es_activo = u.get('estado', 1) == 1
@@ -122,14 +123,14 @@ class UserManagementView(ctk.CTkFrame):
             a_b = ctk.CTkFrame(row, fg_color="transparent"); a_b.pack(side="right", padx=20)
             ctk.CTkButton(a_b, text="✏️", width=32, height=32, fg_color=COLORS["hover"]
 , text_color=COLORS["text"], command=lambda d=u: self.abrir_formulario(d)).pack(side="left", padx=4)
-            ctk.CTkButton(a_b, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda i=u['c']: self.ejecutar_eliminacion(i)).pack(side="left", padx=2)
+            ctk.CTkButton(a_b, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda i=u['id']: self.ejecutar_eliminacion(i)).pack(side="left", padx=2)
             ctk.CTkFrame(scroll, fg_color=COLORS["hover"]
 , height=1).pack(fill="x", padx=20, side="top")
 
     def abrir_formulario(self, usuario=None):
         self.vista_tabla.pack_forget()
         self.inputs_obligatorios, self.inputs_apellidos = {}, {}
-        self.usuario_editando_id = usuario["c"] if usuario else None 
+        self.usuario_editando_id = usuario["id"] if usuario else None 
         self.rol_var.set(usuario["r"] if usuario else "ESTUDIANTE")
         
         self.dict_facultades = obtener_facultades_para_dropdown()
@@ -154,12 +155,12 @@ class UserManagementView(ctk.CTkFrame):
         if nombres_f: self.update_carreras_dinamicas(nombres_f[0])
 
         self.create_section_card(self.form_container, "👤 Información Personal", [("Nombres", usuario["nombre_solo"] if usuario else ""), ("Apellido Paterno", usuario["ap"] if usuario else ""), ("Apellido Materno", usuario["am"] if usuario else "")])
-        self.create_section_card(self.form_container, "🆔 Identificación", [("Cuenta", str(usuario["c"]) if usuario else ""), ("Correo", usuario["m"] if usuario else "")])
+        self.create_section_card(self.form_container, "🆔 Identificación", [("cuenta", str(usuario["cuenta"]) if usuario and usuario["cuenta"] else ""), ("correo", str(usuario["correo"]) if usuario and usuario["correo"] else "")])
 
         vcmd = (self.register(self.validar_ocho_numeros), '%P')
-        self.inputs_obligatorios["Cuenta"].configure(validate="key", validatecommand=vcmd)
-        if usuario: self.inputs_obligatorios["Cuenta"].configure(state="disabled", fg_color=COLORS["border"])
-        
+        entrada = self.inputs_obligatorios.get("cuenta") 
+        if entrada: 
+                entrada.configure(validate="key", validatecommand=vcmd)
         # Botón biométrico
         self.btn_biometria = ctk.CTkButton(self.form_container, text="📷 Registrar Biometría", height=50, fg_color="#0EA5E9", text_color="white", font=self.font_sub, command=self.abrir_terminal_biometrica) 
         self.btn_biometria.pack(fill="x", padx=60, pady=(20, 10))
@@ -184,18 +185,20 @@ class UserManagementView(ctk.CTkFrame):
     def validar_y_guardar(self):
         try:
             n = self.inputs_obligatorios.get("Nombres").get().strip()
-            em = self.inputs_obligatorios.get("Correo").get().strip()
-            cta = self.usuario_editando_id if self.usuario_editando_id else self.inputs_obligatorios.get("Cuenta").get().strip()
-
-            if not n or not cta or not em:
+            em = self.inputs_obligatorios.get("correo").get().strip()
+            id_usuario = self.usuario_editando_id
+            cta = self.inputs_obligatorios.get("cuenta").get().strip()
+            if not n or not cta:
+                print("❌ Faltan datos:", n, cta, em)
                 return
 
-            if "@" not in em: 
-                self.inputs_obligatorios["Correo"].configure(border_color=COLORS["border"])
+            if em and "@" not in em: 
+                self.inputs_obligatorios["correo"].configure(border_color=COLORS["border"])
+                print("❌ Correo inválido:", em)
                 return
 
             if not self.usuario_editando_id and len(cta) != 8:
-                self.inputs_obligatorios["Cuenta"].configure(border_color=COLORS["border"])
+                self.inputs_obligatorios["cuenta"].configure(border_color=COLORS["border"])
                 return
 
             ap = self.inputs_apellidos["Apellido Paterno"].get().strip()
@@ -215,11 +218,11 @@ class UserManagementView(ctk.CTkFrame):
             id_fac = obtener_id_facultad_por_nombre(self.plantel_menu.get())
 
             if not tipo_usuario or not id_fac:
-                print("Error: tipo_usuario o id_fac inválido")
+                print("Error: tipo_usuario o id_fac inválido", tipo_usuario, id_fac)
                 return
 
             if self.usuario_editando_id:
-                actualizar_usuario(cta, n, ap, am, tipo_usuario, id_fac, em)
+                actualizar_usuario(id_usuario, n, ap, am, cta,  tipo_usuario, id_fac, em)
             else:
                 crear_usuario(n, ap, am, tipo_usuario, id_fac, None, cta, em)
 

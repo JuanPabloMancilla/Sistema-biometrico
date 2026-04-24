@@ -1,4 +1,6 @@
 import customtkinter as ctk
+import numpy as np
+from scipy.interpolate import make_interp_spline
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -6,9 +8,7 @@ from app.views.user_management_view import UserManagementView
 from app.views.account_view import AccountView 
 from app.views.facultad_management_view import FacultadManagementView
 from app.views.carrera_management_view import CarreraManagementView
-
 from app.services.theme import COLORS
-
 from datetime import datetime
 from tkcalendar import DateEntry
 from app.detection.detector_rostro import logs_accesos
@@ -156,8 +156,6 @@ class DashboardView(ctk.CTkFrame):
         self.actualizar_grafica()
 
         # Sección de Últimos Accesos (Tabla)
-        ctk.CTkLabel(main_scroll, text="🧾 Últimos Accesos Realizados", font=("Inter", 18, "bold"), text_color="#000000").pack(anchor="w", padx=45, pady=(20, 10))
-
         self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
 
         self.contenedor_tabla.pack(fill="x", padx=40, pady=(0, 40))
@@ -234,17 +232,39 @@ class DashboardView(ctk.CTkFrame):
         fig.patch.set_facecolor("#FFFFFF")
         ax.set_facecolor("#FFFFFF")
 
-        ax.bar(horas, conteo, color="#3B82F6", width=0.6)
+        x = np.array(horas)
+        y = np.array(conteo)
+
+        if sum(y) == 0:
+             y[0] = 1
+
+       # Suavizar curva
+        x_smooth = np.linspace(x.min(), x.max(), 300)
+        spl = make_interp_spline(x, y, k=3)
+        y_smooth = spl(x_smooth)
+
+      # Área principal (oscura)
+        ax.fill_between(x_smooth, y_smooth, color="#1E3A8A", alpha=0.9)
+
+      # Segunda capa (más clara, estilo glow)
+        ax.fill_between(x_smooth, y_smooth * 0.6, color="#3B82F6", alpha=0.6)
+
+      # Línea superior (opcional)
+        ax.plot(x_smooth, y_smooth, color="#1E40AF", linewidth=2)
 
         for spine in ["top", "right", "left", "bottom"]:
             ax.spines[spine].set_visible(False)
 
         ax.grid(axis='y', linestyle='--', alpha=0.2)
 
-        from matplotlib.ticker import MaxNLocator
-        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_yticks(range(0, max(conteo) + 2))
+        ax.yaxis.set_major_locator(MaxNLocator(nbins=5, integer=True))
 
+        ax.tick_params(axis='y', labelsize=9)
+        ax.tick_params(axis='x', labelsize=9)
+
+        max_y = max(y_smooth) if len(y_smooth) > 0 else 1
+        ax.set_ylim(0, max_y * 1.2)
+        
         ax.set_xticks(range(0, 24, 3))
         ax.set_xticklabels([f"{h}:00" for h in range(0, 24, 3)], fontsize=9)
 

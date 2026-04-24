@@ -116,8 +116,7 @@ class DashboardView(ctk.CTkFrame):
         graph_box.pack(fill="x", padx=40, pady=20)
         graph_box.pack_propagate(False)
 
-        # Sección de Últimos Accesos (Tabla)
-        ctk.CTkLabel(main_scroll, text="🧾 Últimos Accesos Realizados", font=("Inter", 18, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=45, pady=(20, 10))
+        
         
         self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
 

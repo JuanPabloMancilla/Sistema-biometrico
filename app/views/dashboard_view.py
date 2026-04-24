@@ -1,4 +1,6 @@
 import customtkinter as ctk
+import numpy as np
+from scipy.interpolate import make_interp_spline
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -6,9 +8,7 @@ from app.views.user_management_view import UserManagementView
 from app.views.account_view import AccountView 
 from app.views.facultad_management_view import FacultadManagementView
 from app.views.carrera_management_view import CarreraManagementView
-
 from app.services.theme import COLORS
-
 from datetime import datetime
 from tkcalendar import DateEntry
 from app.detection.detector_rostro import logs_accesos
@@ -49,6 +49,9 @@ class DashboardView(ctk.CTkFrame):
             ctk.set_appearance_mode("dark")
         else:
             ctk.set_appearance_mode("light")
+        
+        self.actualizar_grafica()
+        self.render_mini_tabla_accesos_data()
 
     def limpiar_derecha(self):
         """Elimina los widgets de la derecha para cargar una nueva vista"""
@@ -121,7 +124,7 @@ class DashboardView(ctk.CTkFrame):
         
         self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
 
-        ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 16, "bold"), text_color="#000000").pack(anchor="w", padx=30, pady=20)
+        ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=30, pady=20)
         # -------- FILTRO DE FECHA --------
         self.fecha_var = ctk.StringVar(value=datetime.now().strftime("%Y-%m-%d"))
 
@@ -156,8 +159,6 @@ class DashboardView(ctk.CTkFrame):
         self.actualizar_grafica()
 
         # Sección de Últimos Accesos (Tabla)
-        ctk.CTkLabel(main_scroll, text="🧾 Últimos Accesos Realizados", font=("Inter", 18, "bold"), text_color="#000000").pack(anchor="w", padx=45, pady=(20, 10))
-
         self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
 
         self.contenedor_tabla.pack(fill="x", padx=40, pady=(0, 40))
@@ -214,12 +215,16 @@ class DashboardView(ctk.CTkFrame):
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
     def actualizar_grafica(self):
-        # limpiar SOLO la gráfica
         for widget in self.graph_container.winfo_children():
             widget.destroy()
 
-        fecha = self.fecha_var.get()
+        # Detectar el color de fondo y texto según el modo
+        mode = ctk.get_appearance_mode()
+        bg_color = "#1E293B" if mode == "Dark" else "#FFFFFF"
+        text_color = "#F8FAFC" if mode == "Dark" else "#000000"
+        grid_color = "#334155" if mode == "Dark" else "#E2E8F0"
 
+        fecha = self.fecha_var.get()
         horas = list(range(24))
         conteo = [0] * 24
 
@@ -231,47 +236,74 @@ class DashboardView(ctk.CTkFrame):
         fig = Figure(figsize=(6, 3), dpi=100)
         ax = fig.add_subplot(111)
 
-        fig.patch.set_facecolor("#FFFFFF")
-        ax.set_facecolor("#FFFFFF")
+        # Aplicar colores dinámicos a la figura
+        fig.patch.set_facecolor(bg_color)
+        ax.set_facecolor(bg_color)
 
-        ax.bar(horas, conteo, color="#3B82F6", width=0.6)
+        x = np.array(horas)
+        y = np.array(conteo)
+        
+        # Evitar error si no hay datos
+        if sum(y) == 0: y = np.zeros(24)
 
-        for spine in ["top", "right", "left", "bottom"]:
-            ax.spines[spine].set_visible(False)
+        x_smooth = np.linspace(x.min(), x.max(), 300)
+        spl = make_interp_spline(x, y, k=3)
+        y_smooth = spl(x_smooth)
+        y_smooth = np.clip(y_smooth, 0, None) # No valores negativos
 
-        ax.grid(axis='y', linestyle='--', alpha=0.2)
+        ax.fill_between(x_smooth, y_smooth, color="#3B82F6", alpha=0.4)
+        ax.plot(x_smooth, y_smooth, color="#3B82F6", linewidth=2)
 
-        from matplotlib.ticker import MaxNLocator
-        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
-        ax.set_yticks(range(0, max(conteo) + 2))
+        # Ajustar colores de ejes y etiquetas
+        ax.tick_params(colors=text_color, labelsize=9)
+        ax.xaxis.label.set_color(text_color)
+        ax.yaxis.label.set_color(text_color)
+        ax.title.set_color(text_color)
+        ax.grid(axis='y', linestyle='--', alpha=0.3, color=grid_color)
 
-        ax.set_xticks(range(0, 24, 3))
-        ax.set_xticklabels([f"{h}:00" for h in range(0, 24, 3)], fontsize=9)
+        for spine in ax.spines.values():
+            spine.set_visible(False)
 
-        ax.set_title(f"Accesos del día {fecha}", fontsize=12)
-
+        #ax.set_title(f"Accesos del día {fecha}", fontsize=11, pad=10)
+        
         canvas = FigureCanvasTkAgg(fig, master=self.graph_container)
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
-
+        
     def render_mini_tabla_accesos_data(self):
+        # Limpiar filas anteriores antes de redibujar
+        for widget in self.contenedor_tabla.winfo_children():
+            widget.destroy()
+
         logs = [
             {"u": "MARÍA ELENA RODRÍGUEZ HERNÁNDEZ", "id_c": "31702938", "m": "MARIA.ROD@UNIV.MX", "ok": True},
             {"u": "JOSÉ LUIS PÉREZ RAMÍREZ", "id_c": "31702969", "m": "JOSE.PEREZ@UNIV.MX", "ok": False, "motivo": "⚠️ Rostro no reconocido"},
             {"u": "CARLOS ALBERTO MARTÍNEZ GARCÍA", "id_c": "31702945", "m": "CARLOS.M@UNIV.MX", "ok": True}
         ]
+
         for log in logs:
             row = ctk.CTkFrame(self.contenedor_tabla, fg_color="transparent", height=85)
-            row.pack(fill="x", side="top"); row.pack_propagate(False)
+            row.pack(fill="x", side="top")
+            row.pack_propagate(False)
+
+            # Icono
             ctk.CTkLabel(row, text="👤", font=("Inter", 20)).pack(side="left", padx=20)
+            
             mid = ctk.CTkFrame(row, fg_color="transparent")
             mid.pack(side="left", fill="both", expand=True)
-            ctk.CTkLabel(mid, text=log["u"], font=("Inter", 13, "bold"), text_color=COLORS["text"]).pack(anchor="w", pady=(15,0))
+            
+            # Nombre (usa COLORS["text"] que es una tupla, CTK elige el color solo)
+            ctk.CTkLabel(mid, text=log["u"], font=("Inter", 13, "bold"), 
+                         text_color=COLORS["text"]).pack(anchor="w", pady=(15,0))
+            
             det = f"ID: {log['id_c']} • {log['m']}"
             if not log["ok"]: det += f"  {log.get('motivo', '')}"
-            ctk.CTkLabel(mid, text=det, font=("Inter", 11), text_color=COLORS["subtext"]).pack(anchor="w")
-            ctk.CTkFrame(self.contenedor_tabla, fg_color=COLORS["hover"], height=1).pack(fill="x", padx=20)
+            
+            ctk.CTkLabel(mid, text=det, font=("Inter", 11), 
+                         text_color=COLORS["subtext"]).pack(anchor="w")
 
+            # Separador dinámico
+            ctk.CTkFrame(self.contenedor_tabla, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
     # --- SIDEBAR ---
     def create_sidebar(self):
         sidebar = ctk.CTkFrame(self, width=280, corner_radius=0, fg_color=COLORS["sidebar"], border_width=1, border_color=COLORS["border"])

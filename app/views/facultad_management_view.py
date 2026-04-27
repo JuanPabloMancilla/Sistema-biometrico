@@ -78,10 +78,25 @@ class FacultadManagementView(ctk.CTkFrame):
             ctk.CTkLabel(row, text=f["nombre"].upper(), font=("Inter", 12, "bold"), text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
 
             es_activa = f.get('estado', 1) == 1
-            badge_est = ctk.CTkFrame(row, fg_color="#D1FAE5" if es_activa else "#FEE2E2", corner_radius=20, width=110, height=26)
-            badge_est.pack(side="left", padx=(20,0))
-            badge_est.pack_propagate(False)
-            ctk.CTkLabel(badge_est, text="● ACTIVA" if es_activa else "● INACTIVA", font=("Inter", 9, "bold"), text_color="#065F46" if es_activa else "#991B1B").pack(expand=True)
+
+# 🔥 contenedor fijo (como usuarios)
+            estado_box = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado)
+            estado_box.pack(side="left", fill="y")
+            estado_box.pack_propagate(False)
+
+            badge_est = ctk.CTkFrame(
+            estado_box,
+            fg_color="#D1FAE5" if es_activa else "#FEE2E2",
+            corner_radius=20
+            )
+            badge_est.pack(expand=True)
+
+            ctk.CTkLabel(
+            badge_est,
+            text="● ACTIVA" if es_activa else "● INACTIVA",
+            font=("Inter", 9, "bold"),
+            text_color="#065F46" if es_activa else "#991B1B"
+            ).pack(padx=10, pady=3)
 
             act_block = ctk.CTkFrame(row, fg_color="transparent")
             act_block.pack(side="right", padx=20)

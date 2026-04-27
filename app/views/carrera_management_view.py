@@ -42,9 +42,9 @@ class CarreraManagementView(ctk.CTkFrame):
             w.destroy()
 
         # --- CONFIGURACIÓN DE ANCHOS ---
-        ancho_id = 90
-        ancho_nombre = 350
-        ancho_facultad = 350
+        ancho_id = 100
+        ancho_nombre = 300
+        ancho_facultad = 150
         ancho_estado = 150
 
         # --- ENCABEZADO FIJO ---
@@ -77,23 +77,40 @@ class CarreraManagementView(ctk.CTkFrame):
             id_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_id)
             id_block.pack(side="left")
             ctk.CTkLabel(id_block, text=f"#{c['id']}", font=self.font_normal, text_color=COLORS["subtext"]).pack(expand=True)
+            id_block.pack_propagate(False)
+
 
             # 2. NOMBRE
             nombre_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_nombre)
             nombre_block.pack(side="left", fill="y")
             ctk.CTkLabel(nombre_block, text=c["nombre"].upper(), font=("Inter", 12, "bold"), 
-                         text_color=COLORS["text"], anchor="w").pack(expand=True, fill="x", padx=5)
+            text_color=COLORS["text"], anchor="w").pack(expand=True, fill="x", padx=5)
+            nombre_block.pack_propagate(False)
 
             # 3. FACULTAD
             fac_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_facultad)
             fac_block.pack(side="left", fill="y")
+
             fac_txt = c["facultad_nombre"] if c["facultad_nombre"] else "S/F"
-            ctk.CTkLabel(fac_block, text=fac_txt, font=self.font_normal, 
-                         text_color=COLORS["text"], anchor="w").pack(expand=True, fill="x", padx=5)
+
+# 🔥 generar abreviatura
+            fac_abrev = "".join([p[0] for p in fac_txt.split() if p[0].isalpha()]).upper()
+
+            ctk.CTkLabel(
+            fac_block,
+            text=fac_abrev,   # 👈 SOLO UNO
+            font=self.font_normal,
+            text_color=COLORS["text"],
+            anchor="w"
+            ).pack(expand=True, fill="x", padx=5)
+
+            fac_block.pack_propagate(False)
 
             # 4. ESTADO
             estado_block = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado)
             estado_block.pack(side="left", fill="y")
+            estado_block.pack_propagate(False)
+
             es_activa = c.get('estado', 1) == 1
             est_bg = "#D1FAE5" if es_activa else "#FEE2E2"
             est_txt = "#065F46" if es_activa else "#991B1B"

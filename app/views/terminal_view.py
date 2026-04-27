@@ -125,6 +125,7 @@ class TerminalView(ctk.CTkFrame):
         self.cap = None
         self.loop_id = None
         self.estado_actual = None
+        self.running = True
 
         self.escaneando = False
         self.inicio_escaneo = 0.0
@@ -166,6 +167,25 @@ class TerminalView(ctk.CTkFrame):
                 command=self.cerrar_y_volver,
             )
             self.btn_salir.place(relx=0.974, rely=0.046, anchor="ne")
+            # 🔥 BOTÓN CERRAR SOLO PARA MODO REGISTRO
+        if self.modo == "registro":
+            self.btn_cerrar = ctk.CTkButton(
+                self,
+                text="✖",
+                width=40,
+                height=40,
+                corner_radius=10,
+                fg_color="#1e1e3f",
+                hover_color="#ff4d5e",
+                text_color="white",
+                font=("Segoe UI", 16, "bold"),
+                border_width=1,
+                border_color=BORDER_IDLE,
+                command=self.cerrar_y_volver
+            )
+
+            self.btn_cerrar.place(relx=0.974, rely=0.046, anchor="ne")
+
         ctk.CTkLabel(
             hdr, text="K O D A",
             font=("Courier New", 43, "bold"),
@@ -382,7 +402,22 @@ class TerminalView(ctk.CTkFrame):
         return cw, ch
 
     def actualizar_video(self):
+
+        # 🔴 Evitar errores si la vista ya fue destruida
+        if not self.winfo_exists():
+            return
+
+        if not hasattr(self, "video_container"):
+            return
+
+        if not self.video_container.winfo_exists():
+            return
+
+
         if not self.cap:
+            return
+        
+        if not self.running:
             return
 
         self._flush_pending_style()
@@ -509,8 +544,13 @@ class TerminalView(ctk.CTkFrame):
         # ── Vignette ─────────────────────────────────────────────────────────
         frame_dibujado = self._aplicar_vignette(frame_dibujado)
 
+
+        try:
+            cw, ch = self._get_video_area()
+        except:
+            return
         # ── Renderizado ──────────────────────────────────────────────────────
-        cw, ch = self._get_video_area()
+        
         img_ratio  = fw_orig / fh_orig
         cont_ratio = cw / ch
 
@@ -533,7 +573,8 @@ class TerminalView(ctk.CTkFrame):
         self.video_display.configure(image=ctk_image, text="")
         self.video_display.image = ctk_image
 
-        self.loop_id = self.after(16, self.actualizar_video)
+        if self.running:
+            self.loop_id = self.after(16, self.actualizar_video)
 
     # ══════════════════════════════════════════════════════════════════════════
     # Ciclo de vida

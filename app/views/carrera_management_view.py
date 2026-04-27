@@ -93,7 +93,8 @@ class CarreraManagementView(ctk.CTkFrame):
 
             fac_txt = c["facultad_nombre"] if c["facultad_nombre"] else "S/F"
 
-# 🔥 generar abreviatura
+            # 🔥 generar abreviatura
+            #abreviar la facultad en el catalogo 
             fac_abrev = "".join([p[0] for p in fac_txt.split() if p[0].isalpha()]).upper()
 
             ctk.CTkLabel(

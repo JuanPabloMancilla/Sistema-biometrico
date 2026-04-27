@@ -120,10 +120,7 @@ class DashboardView(ctk.CTkFrame):
         graph_box.pack_propagate(False)
 
         
-        
-        self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
-
-        ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=30, pady=20)
+        ctk.CTkLabel(graph_box, text="📈 Tendencia de Accesos por Hora", font=("Inter", 18, "bold"), text_color=COLORS["text"]).pack(anchor="w", padx=30, pady=20)
         # -------- FILTRO DE FECHA --------
         self.fecha_var = ctk.StringVar(value=datetime.now().strftime("%Y-%m-%d"))
 
@@ -155,11 +152,30 @@ class DashboardView(ctk.CTkFrame):
         self.filtrar_por_fecha()
 
         # Render inicial
-        self.actualizar_grafica()
+        
 
         # Sección de Últimos Accesos (Tabla)
-        self.contenedor_tabla = ctk.CTkFrame(main_scroll, fg_color="white", corner_radius=15, border_width=1, border_color="#E2E8F0")
+        # Sección de Últimos Accesos (Tabla)
 
+        header_tabla = ctk.CTkFrame(main_scroll, fg_color="transparent")
+        header_tabla.pack(fill="x", padx=75, pady=(20, 10))
+
+        ctk.CTkLabel(
+            header_tabla,
+            text="Registro de últimos accesos",
+            font=("Inter", 18, "bold"),
+            text_color=COLORS["text"]
+        ).pack(anchor="w")
+
+        self.contenedor_tabla = ctk.CTkFrame(
+                main_scroll,
+                fg_color="white",
+                corner_radius=15,
+                border_width=1,
+                border_color="#E2E8F0"
+        )
+
+        
         self.contenedor_tabla.pack(fill="x", padx=40, pady=(0, 40))
         self.render_mini_tabla_accesos_data()
 
@@ -214,6 +230,18 @@ class DashboardView(ctk.CTkFrame):
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
     def actualizar_grafica(self):
+
+        if not self.winfo_exists():
+            return
+
+        if not hasattr(self, "graph_container"):
+            return
+
+        if not self.graph_container.winfo_exists():
+            return
+
+
+
         for widget in self.graph_container.winfo_children():
             widget.destroy()
 

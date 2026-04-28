@@ -35,15 +35,30 @@ class FacultadManagementView(ctk.CTkFrame):
         
         ctk.CTkButton(header, text="➕ Agregar Facultad", fg_color=COLORS["text"], hover_color=COLORS["hover"], text_color=COLORS["bg"],
                      font=self.font_sub, height=50, corner_radius=12, command=self.abrir_formulario).pack(side="right", anchor="n")
+
+        # 2. Barra de búsqueda
+        bar = ctk.CTkFrame(self, fg_color="transparent")
+        bar.pack(fill="x", padx=40, pady=(0, 10))
+        self.entry_busqueda = ctk.CTkEntry(
+            bar, placeholder_text="🔍 Buscar facultad por nombre...",
+            height=42, corner_radius=10,
+            fg_color=COLORS["hover"], border_width=1, border_color=COLORS["border"],
+            text_color=COLORS["text"]
+        )
+        self.entry_busqueda.pack(fill="x", expand=True)
+        self.entry_busqueda.bind("<KeyRelease>", self._on_search)
         
-        # 2. Card Principal
+        # 3. Card Principal
         self.main_card = ctk.CTkFrame(self, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
         self.main_card.pack(fill="both", expand=True, padx=40, pady=(0, 40))
         
         self.render_table_content()
 
+    def _on_search(self, event=None):
+        self.render_table_content()
+
     def render_table_content(self):
-        """Renderiza la tabla de facultades"""
+        """Renderiza la tabla de facultades, filtrando por búsqueda"""
         for w in self.main_card.winfo_children(): 
             w.destroy()
 
@@ -54,19 +69,22 @@ class FacultadManagementView(ctk.CTkFrame):
         table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
         table_head.pack(fill="x", padx=20, pady=(10, 5))
 
-        
         ctk.CTkLabel(table_head, text="🏛️ NOMBRE DE FACULTAD", font=self.font_small, text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
         ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color=COLORS["text"], width=ancho_estado, anchor="center").pack(side="left")
         ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color=COLORS["text"]).pack(side="right", padx=60)
 
         ctk.CTkFrame(self.main_card, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
 
-        facultades = obtener_todas_facultades()
+        todas = obtener_todas_facultades()
+        query = self.entry_busqueda.get().strip().lower() if hasattr(self, "entry_busqueda") else ""
+        facultades = [f for f in todas if query in f["nombre"].lower()] if query else todas
+
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
         scroll.pack(expand=True, fill="both")
 
         if not facultades:
-            ctk.CTkLabel(scroll, text="No hay facultades registradas", font=self.font_normal, text_color="#94A3B8").pack(pady=40)
+            msg = f"No se encontraron facultades para \"{query}\"" if query else "No hay facultades registradas"
+            ctk.CTkLabel(scroll, text=msg, font=self.font_normal, text_color="#94A3B8").pack(pady=40)
             return
 
         for f in facultades:

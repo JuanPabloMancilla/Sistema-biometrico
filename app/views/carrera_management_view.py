@@ -60,12 +60,15 @@ class CarreraManagementView(ctk.CTkFrame):
         ctk.CTkFrame(self.main_card, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
 
         # --- CUERPO SCROLLABLE ---
-        carreras = obtener_todas_carreras()
+        todas = obtener_todas_carreras()
+        query = self.entry_busqueda.get().strip().lower() if hasattr(self, "entry_busqueda") else ""
+        carreras = [c for c in todas if query in c["nombre"].lower() or query in (c.get("facultad_nombre") or "").lower()] if query else todas
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
         scroll.pack(expand=True, fill="both")
         
         if not carreras:
-            ctk.CTkLabel(scroll, text="No hay carreras registradas", font=self.font_normal, text_color=COLORS["subtext"]).pack(pady=40)
+            msg = f"No se encontraron carreras para \"{query}\"" if query else "No hay carreras registradas"
+            ctk.CTkLabel(scroll, text=msg, font=self.font_normal, text_color=COLORS["subtext"]).pack(pady=40)
             return
 
         for c in carreras:
@@ -238,5 +241,6 @@ class CarreraManagementView(ctk.CTkFrame):
         bar.pack(fill="x", padx=30, pady=10)
         self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 Buscar carrera por nombre...", height=42, corner_radius=10, fg_color=COLORS["hover"], border_width=1, text_color=COLORS["text"])
         self.entry_busqueda.pack(side="left", fill="x", expand=True)
+        self.entry_busqueda.bind("<KeyRelease>", lambda e: self.render_table_content())
 
     

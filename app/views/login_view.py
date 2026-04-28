@@ -84,7 +84,7 @@ class LoginView(ctk.CTkFrame):
         # --- BUSCADOR DE IMAGEN ROBUSTO ---
         # Intentamos encontrar la carpeta 'app/assets' desde la raíz del proyecto
         base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        assets_path = os.path.join(base_path, "app", "views", "assets", "logo_koda.png")
+        assets_path = os.path.join(base_path, "app", "views", "assets", "imgg.png")
 
         # DIAGNÓSTICO EN CONSOLA (Revisa esto en tu terminal si no sale la imagen)
         print(f"DEBUG: Buscando logo circular en: {assets_path}")
@@ -112,7 +112,7 @@ class LoginView(ctk.CTkFrame):
             # Si falla la ruta anterior, intentamos una ruta directa por si acaso
             print("ERROR: No se encontró. Intentando ruta alternativa...")
             # Intento 2: carpeta assets en el mismo nivel que views
-            alt_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "logo_koda.png")
+            alt_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "assets", "imgg.png")
             if os.path.exists(alt_path):
                  # ... (repetir lógica de carga si existe)
                  pass

@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import time
+from app.views.app_context import AppContext
 from app.camara.camara import iniciar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
 
@@ -194,7 +195,7 @@ class TerminalView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             hdr,
-            text="▸  RECONOCIMIENTO FACIAL  ◂" if self.modo == "registro" else "▸  RECONOCIMIENTO FACIAL  ◂",
+            text=AppContext.t("▸  RECONOCIMIENTO FACIAL  ◂") if self.modo == "registro" else AppContext.t("▸  RECONOCIMIENTO FACIAL  ◂"),
             font=("Courier New", 23),
             text_color=TEXT_MUTED,
         ).pack(pady=(4, 0))
@@ -238,7 +239,7 @@ class TerminalView(ctk.CTkFrame):
 
         self.status_label = ctk.CTkLabel(
             row,
-            text="SISTEMA ACTIVO",
+            text=AppContext.t("SISTEMA ACTIVO"),
             font=("Courier New", 25, "bold"),
             text_color=TEXT_PRIMARY,
         )
@@ -250,7 +251,7 @@ class TerminalView(ctk.CTkFrame):
 
         self.lbl_nombre = ctk.CTkLabel(
             center,
-            text="ESPERANDO DETECCIÓN...",
+            text=AppContext.t("ESPERANDO DETECCIÓN..."),
             font=("Courier New", 20),
             text_color=TEXT_SECONDARY,
             anchor="w",
@@ -265,7 +266,7 @@ class TerminalView(ctk.CTkFrame):
         # ── Badge esquina superior-derecha, sin cuadro de fondo ──────────────
         self.badge_label = ctk.CTkLabel(
             self.data_banner,
-            text="LISTO",
+            text=AppContext.t("LISTO"),
             font=("Courier New", 19, "bold"),
             text_color=ACCENT_PURPLE,
             fg_color="transparent",   # sin cuadro
@@ -275,7 +276,7 @@ class TerminalView(ctk.CTkFrame):
         # ── Área de video ────────────────────────────────────────────────────
         self.video_display = ctk.CTkLabel(
             self.video_container,
-            text="Iniciando cámara...",
+            text=AppContext.t("Iniciando cámara..."),
             text_color=TEXT_MUTED,
             font=("Courier New", 13),
         )
@@ -284,7 +285,7 @@ class TerminalView(ctk.CTkFrame):
         # Footer
         ctk.CTkLabel(
             self,
-            text="Sistema Biométrico v2.0  //  Acceso Seguro  //  Cifrado AES-256",
+            text=AppContext.t("Sistema Biométrico v2.0") + "  //  " + AppContext.t("Acceso Seguro") + "  //  " + AppContext.t("Cifrado AES-256"),
             font=("Courier New", 9),
             text_color=TEXT_MUTED,
         ).pack(side="bottom", pady=(0, 10))
@@ -320,8 +321,8 @@ class TerminalView(ctk.CTkFrame):
         self.badge_label.configure(text=t["badge"], text_color=t["b_color"])
         # 🔥 MODO REGISTRO (sobrescribe textos)
         if self.modo == "registro":
-            self.status_label.configure(text="REGISTRANDO BIOMETRÍA")
-            self.lbl_nombre.configure(text="COLOQUE SU ROSTRO FRENTE A LA CÁMARA")
+            self.status_label.configure(text=AppContext.t("REGISTRANDO BIOMETRÍA"))
+            self.lbl_nombre.configure(text=AppContext.t("COLOQUE SU ROSTRO FRENTE A LA CÁMARA"))
 
     # ══════════════════════════════════════════════════════════════════════════
     # Detección de rostros

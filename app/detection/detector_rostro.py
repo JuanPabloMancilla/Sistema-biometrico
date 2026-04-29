@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 import json
 import os
+from app.services.usuario_service import obtener_nombre_usuario_por_id
 from app.recognition.encoding_manager import (
     verificar_dimension,
     guardar_encoding,
@@ -89,9 +90,11 @@ def procesar_frame(frame):
 
         if mejor_distancia < 0.6:
             idx = np.argmin(distancias)
-            nombre_detectado = usuarios_db[idx]
 
-            registrar_acceso()  # ✅ acceso válido
+            usuario_id = usuarios_db[idx]  # 🔥 este es el ID
+            nombre_detectado = obtener_nombre_usuario_por_id(usuario_id)  # 🔥 aquí lo conviertes a nombre
+
+            registrar_acceso()
 
     # Guardar resultado para frames intermedios
     ultimo_resultado = ((top, right, bottom, left), nombre_detectado)

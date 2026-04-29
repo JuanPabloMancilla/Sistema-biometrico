@@ -299,6 +299,12 @@ class DashboardView(ctk.CTkFrame):
         
     def render_mini_tabla_accesos_data(self):
         # Limpiar filas anteriores antes de redibujar
+        if not hasattr(self, "contenedor_tabla"):
+            return
+
+        if not self.contenedor_tabla.winfo_exists():
+            return
+
         for widget in self.contenedor_tabla.winfo_children():
             widget.destroy()
 

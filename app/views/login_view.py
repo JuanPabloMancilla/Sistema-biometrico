@@ -1,6 +1,7 @@
 import customtkinter as ctk
 import os
 from app.services.theme import COLORS
+from app.views.app_context import AppContext
 from PIL import Image, ImageOps, ImageDraw # Necesitamos estas tres de PIL
 
 class LoginView(ctk.CTkFrame):
@@ -118,22 +119,22 @@ class LoginView(ctk.CTkFrame):
                  pass
 
         # --- RESTO DEL DISEÑO ---
-        ctk.CTkLabel(self.card, text="Sistema de Reconocimiento\nFacial", 
+        ctk.CTkLabel(self.card, text=AppContext.t("Sistema de Reconocimiento\nFacial"), 
                      font=("Inter", 26, "bold"), text_color=COLORS["text"], justify="center").pack(pady=(15, 10))
         
-        ctk.CTkLabel(self.card, text="Ingresa tus credenciales para continuar", 
+        ctk.CTkLabel(self.card, text=AppContext.t("Ingresa tus credenciales para continuar"), 
                      font=("Inter", 14), text_color="#8E8E93").pack(pady=(0, 25))
         
-        self.create_input_group("CORREO ELECTRÓNICO", "Escribe tu correo")
+        self.create_input_group(AppContext.t("CORREO ELECTRÓNICO"), AppContext.t("Escribe tu correo"))
         self.user_entry = self.last_entry
-        self.create_input_group("CONTRASEÑA", "Escribe tu contraseña", is_password=True)
+        self.create_input_group(AppContext.t("CONTRASEÑA"), AppContext.t("Escribe tu contraseña"), is_password=True)
         self.pass_entry = self.last_entry
 
         self.error_label = ctk.CTkLabel(self.card, text="", text_color="#EF4444", font=("Inter", 13))
         self.error_label.pack(pady=(5, 0))
 
         self.login_btn = ctk.CTkButton(
-            self.card, text="→   INICIAR SESIÓN", 
+            self.card, text="→   " + AppContext.t("INICIAR SESIÓN"), 
             fg_color="#000000", hover_color="#262626", 
             width=350, height=55, corner_radius=12, 
             font=("Inter", 15, "bold"), command=self.validar_login
@@ -190,4 +191,4 @@ class LoginView(ctk.CTkFrame):
 
     def validar_login(self):
         if self.user_entry.get() == "1" and self.pass_entry.get() == "1": self.on_login_success()
-        else: self.error_label.configure(text="Credenciales incorrectas.")
+        else: self.error_label.configure(text=AppContext.t("Credenciales incorrectas."))

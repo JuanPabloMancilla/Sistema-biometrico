@@ -604,3 +604,22 @@ class TerminalView(ctk.CTkFrame):
             self.cap.release()
             self.cap = None
         self.on_back()
+
+    def on_close(self):
+        print("🛑 Cerrando terminal biométrica")
+
+        self.running = False
+
+        if self.loop_id:
+            try:
+                self.after_cancel(self.loop_id)
+            except:
+                pass
+            self.loop_id = None
+
+        if hasattr(self, "cap") and self.cap is not None:
+             if self.cap.isOpened():
+                self.cap.release()
+                print("📷 Cámara liberada")
+
+        self.cap = None

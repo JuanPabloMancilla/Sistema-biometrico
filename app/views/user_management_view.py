@@ -1,6 +1,9 @@
 import customtkinter as ctk
+from app.recognition.encoding_manager import cargar_encodings, eliminar_encoding, guardar_encoding
 from app.views.terminal_view import TerminalView
 from app.services.theme import COLORS
+from app.detection.detector_rostro import encodings_db, usuarios_db
+from app.recognition.encoding_manager import cargar_encodings
 from app.services.carrera_service import obtener_todas_carreras, obtener_facultades_para_dropdown
 from app.services.usuario_service import (
     crear_usuario, 
@@ -183,6 +186,17 @@ class UserManagementView(ctk.CTkFrame):
             else: self.inputs_obligatorios[label] = entry
 
     def validar_y_guardar(self):
+        if not self.usuario_editando_id:
+            if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
+                print("❌ Debes registrar biometría primero")
+
+                self.btn_biometria.configure(
+                    text="❌ Biometría requerida",
+                    fg_color="#EF4444",
+                    hover_color="#DC2626"
+                )
+                return
+
         try:
             n = self.inputs_obligatorios.get("Nombres").get().strip()
             em = self.inputs_obligatorios.get("correo").get().strip()
@@ -222,9 +236,42 @@ class UserManagementView(ctk.CTkFrame):
                 return
 
             if self.usuario_editando_id:
-                actualizar_usuario(id_usuario, n, ap, am, cta,  tipo_usuario, id_fac, em)
+
+               actualizar_usuario(id_usuario, n, ap, am, cta, tipo_usuario, id_fac, em)
+
+             # 🔥 SI TOMÓ NUEVA BIOMETRÍA → reemplazar
+               if hasattr(self, "biometria_temp") and self.biometria_temp is not None:
+
+                  print("♻️ Reemplazando biometría...")
+
+                  eliminar_encoding(id_usuario)  # borrar viejo
+                  guardar_encoding(id_usuario, self.biometria_temp)  # guardar nuevo
+
+                  encodings_db[:], usuarios_db[:] = cargar_encodings()
+
+                  self.biometria_temp = None
+                  
             else:
-                crear_usuario(n, ap, am, tipo_usuario, id_fac, None, cta, em)
+                usuario_id = crear_usuario(n, ap, am, tipo_usuario, id_fac, None, cta, em)
+
+                print("DEBUG usuario_id:", usuario_id)
+                print("DEBUG biometria:", self.biometria_temp)
+
+                try:
+                    guardado = guardar_encoding(usuario_id, encoding=self.biometria_temp)
+
+                    if not guardado:
+                        print("❌ No se guardó porque es duplicado")
+                        return
+
+                    print("✔ Encoding guardado en BD")
+                
+                except Exception as e:
+                    print("ERROR al guardar encoding:", e)
+
+                encodings_db[:], usuarios_db[:] = cargar_encodings()
+
+                self.biometria_temp = None
 
             self.refresh_data()
             self.render_table_content(self.all_users)
@@ -329,15 +376,22 @@ class UserManagementView(ctk.CTkFrame):
 
 
     def cerrar_terminal_biometrica(self):
-        if hasattr(self, "terminal_container"):
-            self.terminal_container.destroy()
+        if hasattr(self, "terminal_view"):
+            try:
+                self.terminal_view.on_close()
+            except:
+                pass
 
+            if hasattr(self, "terminal_container"):
+                self.terminal_container.destroy()
+               
             self.form_base.pack(fill="both", expand=True)
 
     def recibir_biometria(self, encoding):
-        self.biometria_temp = encoding
+    
+        print("✔ Captura recibida")
 
-        print("✔ Biometría guardada temporalmente")
+        self.biometria_temp = encoding
 
     # 🔥 CAMBIO VISUAL DEL BOTÓN
         if hasattr(self, "btn_biometria"):
@@ -346,6 +400,4 @@ class UserManagementView(ctk.CTkFrame):
                 fg_color="#10B981",   # verde
                 hover_color="#059669"
             )
-            self.btn_biometria.configure(state="disabled")
-
         self.cerrar_terminal_biometrica()

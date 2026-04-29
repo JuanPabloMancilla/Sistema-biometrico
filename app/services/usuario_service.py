@@ -101,14 +101,15 @@ def crear_usuario(nombre, a_paterno, a_materno, tipo_usuario, id_facultad, id_ca
         """, (nombre, a_paterno, a_materno, str(cuenta), correo, tipo_usuario, fecha, id_facultad, id_carrera))
 
         conn.commit()
-        return True
+
+        # 🔥 ESTO ES LO IMPORTANTE
+        return cursor.lastrowid
 
     except Exception as e:
         print(f"❌ Error al crear usuario: {e}")
-        return False
+        return None
     finally:
         conn.close()
-
 
 def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo):
     conn = get_connection()
@@ -165,10 +166,6 @@ def desactivar_usuario(id_usuario):
 # ─────────────────────────────────────────────
 #  HELPERS
 # ─────────────────────────────────────────────
-
-
-
-
 
 def obtener_facultades_para_dropdown():
     conn = get_connection()
@@ -229,3 +226,20 @@ def obtener_id_facultad_por_nombre(nombre):
         conn.close()
 
         return resultado[0] if resultado else None
+
+def obtener_nombre_usuario_por_id(usuario_id):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT nombre, a_paterno, a_materno
+        FROM usuario
+        WHERE id_usuario = ?
+    """, (usuario_id,))
+
+    result = cursor.fetchone()
+    conn.close()
+
+    if result:
+        return f"{result[0]} {result[1]} {result[2]}"
+    return "DESCONOCIDO"

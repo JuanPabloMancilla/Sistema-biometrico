@@ -71,26 +71,11 @@ def find_best_match(encoding_actual, encoding_db, threshold=0.6):
     else:
         return None, mejor_distancia
 
-
-def obtener_siguiente_usuario(archivo="encodings.json"):
-
-    if not os.path.exists(archivo):
-        return "usuario_1"
-
-    with open(archivo, "r") as f:
-        datos = json.load(f)
-
-    numero = len(datos) + 1
-
-    return f"usuario_{numero}"
-
 # Guardar encoding en JSON
-def guardar_encoding(encoding, archivo="encodings.json"):
-
-    usuario_id = obtener_siguiente_usuario(archivo)
+def guardar_encoding(usuario, encoding, archivo="encodings.json"):
 
     datos_usuario = {
-        "usuario": usuario_id,
+        "usuario": usuario,
         "encoding": encoding.tolist()
     }
 
@@ -102,12 +87,25 @@ def guardar_encoding(encoding, archivo="encodings.json"):
     else:
         datos = []
 
+    for existente in datos:
+        encoding_existente = np.array(existente["encoding"])
+
+        distancia = face_recognition.face_distance(
+            [encoding_existente],
+            encoding
+        )[0]
+
+        if distancia < 0.6:  # mismo rostro
+            print("❌ Este rostro ya está registrado")
+            return False
+
     datos.append(datos_usuario)
 
     with open(archivo, "w") as f:
         json.dump(datos, f, indent=4)
 
-    print(f"Encoding guardado como {usuario_id}")
+    print(f"Encoding guardado como {usuario}")
+    return True
 
 
 # Comparar distancia entre rostros
@@ -119,3 +117,15 @@ def comparar_encodings(encoding_guardado, encoding_actual):
     )[0]
 
     return distancia
+
+def eliminar_encoding(usuario_id, archivo="encodings.json"):
+    if not os.path.exists(archivo):
+        return
+
+    with open(archivo, "r") as f:
+        datos = json.load(f)
+
+    datos = [u for u in datos if str(u["usuario"]) != str(usuario_id)]
+
+    with open(archivo, "w") as f:
+        json.dump(datos, f, indent=4)

@@ -302,13 +302,15 @@ class DashboardView(ctk.CTkFrame):
         canvas.get_tk_widget().pack(fill="both", expand=True)
         
     def render_mini_tabla_accesos_data(self):
-        # Verificamos que el contenedor exista y sea válido antes de intentar vaciarlo
-        if hasattr(self, 'contenedor_tabla') and self.contenedor_tabla.winfo_exists():
-            for widget in list(self.contenedor_tabla.winfo_children()):
-                try:
-                    widget.destroy()
-                except Exception:
-                    pass
+        # Limpiar filas anteriores antes de redibujar
+        if not hasattr(self, "contenedor_tabla"):
+            return
+
+        if not self.contenedor_tabla.winfo_exists():
+            return
+
+        for widget in self.contenedor_tabla.winfo_children():
+            widget.destroy()
 
         logs = [
             {"u": "MARÍA ELENA RODRÍGUEZ HERNÁNDEZ", "id_c": "31702938", "m": "MARIA.ROD@UNIV.MX", "ok": True},

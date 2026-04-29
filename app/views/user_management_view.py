@@ -2,6 +2,7 @@ import customtkinter as ctk
 from app.recognition.encoding_manager import cargar_encodings, eliminar_encoding, guardar_encoding
 from app.views.terminal_view import TerminalView
 from app.services.theme import COLORS
+from app.views.app_context import AppContext
 from app.detection.detector_rostro import encodings_db, usuarios_db
 from app.recognition.encoding_manager import cargar_encodings
 from app.services.carrera_service import obtener_todas_carreras, obtener_facultades_para_dropdown
@@ -157,19 +158,18 @@ class UserManagementView(ctk.CTkFrame):
 
         if nombres_f: self.update_carreras_dinamicas(nombres_f[0])
 
-        self.create_section_card(self.form_container, "👤 Información Personal", [("Nombres", usuario["nombre_solo"] if usuario else ""), ("Apellido Paterno", usuario["ap"] if usuario else ""), ("Apellido Materno", usuario["am"] if usuario else "")])
-        self.create_section_card(self.form_container, "🆔 Identificación", [("cuenta", str(usuario["cuenta"]) if usuario and usuario["cuenta"] else ""), ("correo", str(usuario["correo"]) if usuario and usuario["correo"] else "")])
-
+        self.create_section_card(self.form_container, AppContext.t("👤 Información Personal"), [(AppContext.t("Nombres"), usuario["nombre_solo"] if usuario else ""), (AppContext.t("Apellido Paterno"), usuario["ap"] if usuario else ""), (AppContext.t("Apellido Materno"), usuario["am"] if usuario else "")])
+        self.create_section_card(self.form_container, AppContext.t("🆔 Identificación"), [(AppContext.t("cuenta"), str(usuario["cuenta"]) if usuario and usuario["cuenta"] else ""), (AppContext.t("correo"), str(usuario["correo"]) if usuario and usuario["correo"] else "")])
         vcmd = (self.register(self.validar_ocho_numeros), '%P')
         entrada = self.inputs_obligatorios.get("cuenta") 
         if entrada: 
                 entrada.configure(validate="key", validatecommand=vcmd)
         # Botón biométrico
-        self.btn_biometria = ctk.CTkButton(self.form_container, text="📷 Registrar Biometría", height=50, fg_color="#0EA5E9", text_color="white", font=self.font_sub, command=self.abrir_terminal_biometrica) 
+        self.btn_biometria = ctk.CTkButton(self.form_container, text=AppContext.t("📷 Registrar Biometría"), height=50, fg_color="#0EA5E9", text_color="white", font=self.font_sub, command=self.abrir_terminal_biometrica) 
         self.btn_biometria.pack(fill="x", padx=60, pady=(20, 10))
         btns = ctk.CTkFrame(self.form_container, fg_color="transparent"); btns.pack(fill="x", padx=60, pady=(20, 50))
-        ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=50, command=self.cerrar_formulario).pack(side="left", expand=True, fill="x", padx=(0, 10))
-        ctk.CTkButton(btns, text="💾 Guardar", font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=50, command=self.validar_y_guardar).pack(side="left", expand=True, fill="x", padx=(10, 0))
+        ctk.CTkButton(btns, text=AppContext.t("❌ Cancelar"), font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=50, command=self.cerrar_formulario).pack(side="left", expand=True, fill="x", padx=(0, 10))
+        ctk.CTkButton(btns, text=AppContext.t("💾 Guardar"), font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=50, command=self.validar_y_guardar).pack(side="left", expand=True, fill="x", padx=(10, 0))
         
 
     def create_section_card(self, master, title, fields):
@@ -282,15 +282,15 @@ class UserManagementView(ctk.CTkFrame):
 
     def create_header(self, master):
         h = ctk.CTkFrame(master, fg_color="transparent"); h.pack(fill="x", padx=30, pady=(20, 10))
-        ctk.CTkLabel(h, text="👥 Gestión de Usuarios", font=self.font_header, text_color=COLORS["text"]).pack(side="left")
-        ctk.CTkButton(h, text="➕ Agregar Usuario", font=self.font_sub, fg_color="#000000", height=45, corner_radius=10, command=self.abrir_formulario).pack(side="right")
+        ctk.CTkLabel(h, text=AppContext.t("👥 Gestión de Usuarios"), font=self.font_header, text_color=COLORS["text"]).pack(side="left")
+        ctk.CTkButton(h, text=AppContext.t("➕ Agregar Usuario"), font=self.font_sub, fg_color="#000000", height=45, corner_radius=10, command=self.abrir_formulario).pack(side="right")
 
     def create_search_bar(self, master):
         bar = ctk.CTkFrame(master, fg_color="transparent"); bar.pack(fill="x", padx=30, pady=10)
-        self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 Buscar usuario...", height=42, corner_radius=10, fg_color=COLORS["hover"]
+        self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text=AppContext.t("🔍 Buscar usuario..."), height=42, corner_radius=10, fg_color=COLORS["hover"]
 , border_color=COLORS["border"], text_color=COLORS["text"])
         self.entry_busqueda.pack(side="left", fill="x", expand=True, padx=(0, 15))
-        self.btn_filter = ctk.CTkButton(bar, text="⚙️ Filtrar ⌵", width=110, height=42, corner_radius=10, fg_color=COLORS["card"], text_color=COLORS["text"], border_color=COLORS["border"], command=self.toggle_filter)
+        self.btn_filter = ctk.CTkButton(bar, text=AppContext.t("⚙️ Filtrar ⌵"), width=110, height=42, corner_radius=10, fg_color=COLORS["card"], text_color=COLORS["text"], border_color=COLORS["border"], command=self.toggle_filter)
         self.btn_filter.pack(side="left")
 
     def toggle_filter(self):
@@ -329,18 +329,18 @@ class UserManagementView(ctk.CTkFrame):
         modal.pack_propagate(False)
 
         ctk.CTkLabel(modal, text="🗑️", font=("Inter", 45)).pack(pady=(25, 5))
-        ctk.CTkLabel(modal, text="¿Está seguro de eliminar al usuario?", font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
-        ctk.CTkLabel(modal, text="Esta acción desactivará al usuario permanentemente.", font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
+        ctk.CTkLabel(modal, text=AppContext.t("¿Está seguro de eliminar al usuario?"), font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text=AppContext.t("Esta acción desactivará al usuario permanentemente."), font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
         
         # 3. Botones (Verde para confirmar, Rojo para cancelar)
         btns = ctk.CTkFrame(modal, fg_color="transparent")
         btns.pack(fill="x", side="bottom", pady=25, padx=30)
         
         # CANCELAR - Rojo
-        ctk.CTkButton(btns, text="Cancelar", fg_color="#EF4444", text_color="white", hover_color="#DC2626", height=40, font=("Inter", 13, "bold"), command=self.cerrar_modal).pack(side="left", expand=True, padx=(0, 10))
+        ctk.CTkButton(btns, text=AppContext.t("Cancelar"), fg_color="#EF4444", text_color="white", hover_color="#DC2626", height=40, font=("Inter", 13, "bold"), command=self.cerrar_modal).pack(side="left", expand=True, padx=(0, 10))
         
         # CONFIRMAR - Verde
-        ctk.CTkButton(btns, text="Confirmar y Borrar", fg_color="#10B981", text_color="white", hover_color="#059669", height=40, font=("Inter", 13, "bold"), command=lambda: self.confirmar_borrado(id_cuenta)).pack(side="left", expand=True)
+        ctk.CTkButton(btns, text=AppContext.t("Confirmar y Borrar"), fg_color="#10B981", text_color="white", hover_color="#059669", height=40, font=("Inter", 13, "bold"), command=lambda: self.confirmar_borrado(id_cuenta)).pack(side="left", expand=True)
 
     def cerrar_modal(self):
         if hasattr(self, 'overlay'): self.overlay.destroy()
@@ -393,10 +393,12 @@ class UserManagementView(ctk.CTkFrame):
 
         self.biometria_temp = encoding
 
+        print(AppContext.t("✔ Biometría guardada temporalmente"))
+
     # 🔥 CAMBIO VISUAL DEL BOTÓN
         if hasattr(self, "btn_biometria"):
             self.btn_biometria.configure(
-                text="✔ Biometría registrada",
+                text=AppContext.t("✔ Biometría registrada"),
                 fg_color="#10B981",   # verde
                 hover_color="#059669"
             )

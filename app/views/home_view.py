@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from app.views.app_context import AppContext
 
 class HomeView(ctk.CTkFrame):
     def __init__(self, master, on_logout=None):
@@ -10,14 +11,14 @@ class HomeView(ctk.CTkFrame):
         self.sidebar = ctk.CTkFrame(self, width=240, corner_radius=0, fg_color="#ffffff")
         self.sidebar.pack(side="left", fill="y")
         
-        self.title_label = ctk.CTkLabel(self.sidebar, text="MENÚ", 
+        self.title_label = ctk.CTkLabel(self.sidebar, text=AppContext.t("MENÚ"), 
                                         font=("Inter", 18, "bold"), text_color="#4388b9")
         self.title_label.pack(pady=30)
 
         # Botón de Regreso (Estilo azul suave)
         self.btn_regresar = ctk.CTkButton(
             self.sidebar, 
-            text="← CERRAR SESIÓN", 
+            text="← " + AppContext.t("CERRAR SESIÓN"), 
             fg_color="transparent", 
             text_color="#e74c3c",
             hover_color="#fdecea",
@@ -34,13 +35,13 @@ class HomeView(ctk.CTkFrame):
         self.card = ctk.CTkFrame(self.main_content, fg_color="white", corner_radius=20)
         self.card.pack(expand=True, fill="both", padx=20, pady=20)
 
-        self.welcome_label = ctk.CTkLabel(self.card, text="Panel de Control Biométrico", 
+        self.welcome_label = ctk.CTkLabel(self.card, text=AppContext.t("Panel de Control Biométrico"), 
                                           font=("Inter", 24, "bold"), text_color="black")
         self.welcome_label.pack(pady=(40, 20))
 
         self.btn_camara = ctk.CTkButton(
             self.card, 
-            text="ACTIVAR CÁMARA", 
+            text=AppContext.t("ACTIVAR CÁMARA"), 
             fg_color="#4388b9", 
             hover_color="#366d94",
             font=("Inter", 14, "bold"), 

@@ -12,35 +12,55 @@ class AppPrincipal(ctk.CTk):
         self.geometry("1100x800")
         self.configure(fg_color="white")
 
+        # Inicializar base de datos al arrancar
         inicializar_bd()
 
         self.contenedor_vista = None
+        
+        # --- NUEVO: Control de estado ---
+        # Guardamos qué vista está activa para poder refrescarla
+        self.vista_actual = "terminal" 
         
         # Iniciar directamente en la Terminal
         self.mostrar_terminal()
 
     def limpiar_pantalla(self):
+        """Elimina la vista actual para liberar memoria y espacio"""
         if self.contenedor_vista is not None:
             self.contenedor_vista.destroy()
             self.contenedor_vista = None
 
+    # --- MÉTODO CLAVE: REFRESCAR TODO EL SISTEMA ---
+    def refrescar_idioma_completo(self):
+        """
+        Este método destruye y vuelve a crear la vista activa.
+        Al reconstruirse, las llamadas a AppContext.t() obtendrán el nuevo idioma.
+        """
+        if self.vista_actual == "terminal":
+            self.mostrar_terminal()
+        elif self.vista_actual == "login":
+            self.mostrar_login()
+        elif self.vista_actual == "dashboard":
+            self.mostrar_dashboard()
+
     def mostrar_terminal(self):
-        """Muestra la terminal. Al 'regresar' o 'cerrar', manda al Login"""
+        """Muestra la terminal de reconocimiento facial"""
+        self.vista_actual = "terminal"
         self.limpiar_pantalla()
-        # --- CAMBIO CLAVE ---
-        # Ahora, cuando se active el callback de la terminal, vamos al Login
+        # Pasamos self como controller para que la vista pueda pedir refrescos si es necesario
         self.contenedor_vista = TerminalView(self, on_back=self.mostrar_login)
         self.contenedor_vista.pack(expand=True, fill="both")
 
     def mostrar_login(self):
+        """Muestra la pantalla de acceso"""
+        self.vista_actual = "login"
         self.limpiar_pantalla()
-        # CAMBIO AQUÍ: Antes decía self.mostrar_landing, ahora directo a dashboard
         self.contenedor_vista = LoginView(self, on_login_success=self.mostrar_dashboard)
         self.contenedor_vista.pack(expand=True, fill="both")
 
     def mostrar_dashboard(self):
+        self.vista_actual = "dashboard"
         self.limpiar_pantalla()
-        # Al darle "Atrás" en el Dashboard, regresa a la cámara
         self.contenedor_vista = DashboardView(self, on_back=self.mostrar_terminal)
         self.contenedor_vista.pack(expand=True, fill="both")
 

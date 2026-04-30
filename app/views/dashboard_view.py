@@ -245,6 +245,11 @@ class DashboardView(ctk.CTkFrame):
             return
 
 
+        if hasattr(self, "canvas"):
+            try:
+                self.canvas.get_tk_widget().destroy()
+            except:
+                pass
 
         for widget in self.graph_container.winfo_children():
             widget.destroy()
@@ -297,9 +302,9 @@ class DashboardView(ctk.CTkFrame):
 
         #ax.set_title(f"Accesos del día {fecha}", fontsize=11, pad=10)
         
-        canvas = FigureCanvasTkAgg(fig, master=self.graph_container)
-        canvas.draw()
-        canvas.get_tk_widget().pack(fill="both", expand=True)
+        self.canvas = FigureCanvasTkAgg(fig, master=self.graph_container)
+        self.canvas.draw()
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
         
     def render_mini_tabla_accesos_data(self):
         # Limpiar filas anteriores antes de redibujar

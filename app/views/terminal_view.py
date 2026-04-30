@@ -3,6 +3,8 @@ import cv2
 import numpy as np
 from PIL import Image
 import time
+from app.recognition.encoding_manager import cargar_encodings
+from app.detection.detector_rostro import find_best_match
 from app.views.app_context import AppContext
 from app.camara.camara import iniciar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
@@ -291,10 +293,6 @@ class TerminalView(ctk.CTkFrame):
         ).pack(side="bottom", pady=(0, 10))
         ctk.CTkFrame(self, fg_color=BORDER_IDLE, height=1).pack(fill="x", side="bottom")
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Estilo por estado
-    # ══════════════════════════════════════════════════════════════════════════
-
     def aplicar_estilo_visual(self, estado: str, usuario: str = ""):
         self._pending_style = (estado, usuario)
 
@@ -320,13 +318,15 @@ class TerminalView(ctk.CTkFrame):
         self.lbl_nombre.configure(text=nombre, text_color=t["b_color"])
         self.badge_label.configure(text=t["badge"], text_color=t["b_color"])
         # 🔥 MODO REGISTRO (sobrescribe textos)
-        if self.modo == "registro":
-            self.status_label.configure(text=AppContext.t("REGISTRANDO BIOMETRÍA"))
-            self.lbl_nombre.configure(text=AppContext.t("COLOQUE SU ROSTRO FRENTE A LA CÁMARA"))
-
-    # ══════════════════════════════════════════════════════════════════════════
-    # Detección de rostros
-    # ══════════════════════════════════════════════════════════════════════════
+        if self.modo == "registro" and estado != "negado":
+            self.status_label.configure(
+               text="REGISTRANDO BIOMETRÍA",
+               text_color=ACCENT_AMBER   # 🔥 amarillo
+            )
+            self.lbl_nombre.configure(
+               text="COLOQUE SU ROSTRO FRENTE A LA CÁMARA",
+               text_color=ACCENT_AMBER   # 🔥 amarillo también
+            )
 
     def detectar_rostros(self, frame):
         """Devuelve lista de todas las cajas detectadas."""
@@ -482,7 +482,10 @@ class TerminalView(ctk.CTkFrame):
                     self.escaneando = True
                     self.inicio_escaneo = ahora
                     self.usuario_detectado = ""   # se irá llenando frame a frame
-                    self.aplicar_estilo_visual("escaneando")
+                    if self.modo == "registro":
+                        self.aplicar_estilo_visual("escaneando")
+                    else:
+                        self.aplicar_estilo_visual("escaneando")
 
             if self.escaneando and self.face_box is not None:
                 fx, fy, fw, fh = self.face_box
@@ -506,11 +509,18 @@ class TerminalView(ctk.CTkFrame):
                     self.inicio_espera_reset = ahora
 
                     if self.modo == "registro":
-                        # 🔥 SOLO CAPTURA BIOMETRÍA
-                        if face_encoding is not None and self.on_capture:
-                            self.on_capture(face_encoding)
 
-                        self.aplicar_estilo_visual("escaneando")  # o crea uno tipo "registrado"
+                       if face_encoding is not None:
+
+        # ✅ SI ES NUEVO → capturar UNA SOLA VEZ
+                           if self.on_capture:
+                               self.on_capture(face_encoding)
+
+        # 🔥 cerrar cámara inmediatamente
+                           self.cerrar_y_volver()
+                           
+                           return  # o crea uno tipo "registrado"
+                           
                     else:
                     
                     # Si nunca se resolvió un nombre, usar el último mensaje disponible
@@ -523,6 +533,10 @@ class TerminalView(ctk.CTkFrame):
 
                     if face_encoding is not None and self.on_capture:
                         self.on_capture(face_encoding)
+
+                        # 🛑 DETENER LOOP PARA EVITAR MULTIPLES CAPTURAS
+                        self.running = False
+                        return
 
             if self.face_box is not None:
                 fx, fy, fw, fh = self.face_box

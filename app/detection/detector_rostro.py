@@ -104,3 +104,16 @@ def procesar_frame(frame):
     cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
 
     return frame, face_encoding, nombre_detectado
+
+def find_best_match(encoding, encodings_db, threshold=0.6):
+    if len(encodings_db) == 0:
+        return None, None
+
+    distancias = face_recognition.face_distance(encodings_db, encoding)
+    mejor_idx = np.argmin(distancias)
+    mejor_distancia = distancias[mejor_idx]
+
+    if mejor_distancia < threshold:
+        return mejor_idx, mejor_distancia
+
+    return None, mejor_distancia

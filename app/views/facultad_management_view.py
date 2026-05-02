@@ -20,12 +20,25 @@ class FacultadManagementView(ctk.CTkFrame):
         self.font_sub = ("Inter", 16, "bold")
         self.font_normal = ("Inter", 13)
         self.font_small = ("Inter", 11, "bold")
+
+        self.bind("<Configure>", self._on_resize)
+        self.is_compact = False
         
         self.crear_vista_tabla()
+
+
+
+    def _on_resize(self, event):
+        width = event.width
+        self.is_compact = width < 900  # puedes ajustar este valor
+        self.render_table_content()
     
     def crear_vista_tabla(self):
+
+        padx_main = 20 if self.is_compact else 40
+        pady_top = 20 if self.is_compact else 40
         header = ctk.CTkFrame(self, fg_color="transparent")
-        header.pack(fill="x", padx=40, pady=(40, 20))
+        header.pack(fill="x", padx=padx_main, pady=(pady_top, 20))
         
         title_cont = ctk.CTkFrame(header, fg_color="transparent")
         title_cont.pack(side="left")
@@ -37,7 +50,7 @@ class FacultadManagementView(ctk.CTkFrame):
 
         # 2. Barra de búsqueda
         bar = ctk.CTkFrame(self, fg_color="transparent")
-        bar.pack(fill="x", padx=40, pady=(0, 10))
+        bar.pack(fill="x", padx=padx_main, pady=(0, 10))
         self.entry_busqueda = ctk.CTkEntry(
             bar, placeholder_text="🔍 Buscar facultad por nombre...",
             height=42, corner_radius=10,
@@ -50,7 +63,7 @@ class FacultadManagementView(ctk.CTkFrame):
         # 3. Card Principal
         
         self.main_card = ctk.CTkFrame(self, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
-        self.main_card.pack(fill="both", expand=True, padx=40, pady=(0, 40))
+        self.main_card.pack(fill="both", expand=True, padx=padx_main, pady=(0, pady_top))
         
         self.render_table_content()
 

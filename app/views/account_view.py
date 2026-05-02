@@ -64,7 +64,7 @@ class AccountView(ctk.CTkFrame):
         self.create_read_only_field(AppContext.t("Facultad"), self.datos["facultad"], "🏛️")
 
         # Botón Cerrar Sesión
-        ctk.CTkButton(self.container, text="🚪 " + AppContext.t("Logout"), fg_color="#FFF1F2", text_color="#E11D48", 
+        ctk.CTkButton(self.container, text="🚪 " + AppContext.t("Cerrar Sesión"), fg_color="#FFF1F2", text_color="#E11D48", 
                      hover_color="#FEE2E2", height=50, corner_radius=12, font=self.font_sub, 
                      command=self.on_logout).pack(fill="x", pady=(40, 60), padx=100)
 

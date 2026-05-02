@@ -82,19 +82,19 @@ def actualizar_facultad(id_facultad, nombre, estado):
         return False
 
 
-def eliminar_facultad(id_facultad):
+def desactivar_facultad(id_facultad):
 
-    #Elimina una facultad de la base de datos
+    #Desactiva una facultad (cambia estado a 0)
     #Parámetros:
-        #- id_facultad: int - ID de la facultad a eliminar
-    #Retorna: True si se eliminó, False si falló
+        #- id_facultad: int - ID de la facultad a desactivar
+    #Retorna: True si se desactivó, False si falló
 
     try:
         conn = get_connection()
         cursor = conn.cursor()
         
         cursor.execute(
-            "DELETE FROM facultad WHERE id_facultad = ?",
+            "UPDATE facultad SET estado = 0 WHERE id_facultad = ?",
             (id_facultad,)
         )
         
@@ -104,7 +104,33 @@ def eliminar_facultad(id_facultad):
         return True
     
     except Exception as e:
-        print(f"Error al eliminar facultad: {e}")
+        print(f"Error al desactivar facultad: {e}")
+        return False
+
+
+def reactivar_facultad(id_facultad):
+
+    #Reactiva una facultad (cambia estado a 1)
+    #Parámetros:
+        #- id_facultad: int - ID de la facultad a reactivar
+    #Retorna: True si se reactivó, False si falló
+
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(
+            "UPDATE facultad SET estado = 1 WHERE id_facultad = ?",
+            (id_facultad,)
+        )
+        
+        conn.commit()
+        conn.close()
+        
+        return True
+    
+    except Exception as e:
+        print(f"Error al reactivar facultad: {e}")
         return False
 
 

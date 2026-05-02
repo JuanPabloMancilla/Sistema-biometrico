@@ -91,20 +91,14 @@ def actualizar_carrera(id_carrera, nombre, id_facultad, estado):
         print(f"Error al actualizar carrera: {e}")
         return False
 
-
-def eliminar_carrera(id_carrera):
-    
-    #Elimina una carrera de la base de datos
-    #Parámetros:
-        #- id_carrera: int - ID de la carrera a eliminar
-    #Retorna: True si se eliminó, False si falló
-    
+def desactivar_carrera(id_carrera):
+    """Desactiva una carrera sin eliminarla físicamente"""
     try:
         conn = get_connection()
         cursor = conn.cursor()
         
         cursor.execute(
-            "DELETE FROM carrera WHERE id_carrera = ?",
+            "UPDATE carrera SET estado = 0 WHERE id_carrera = ?",
             (id_carrera,)
         )
         
@@ -114,7 +108,27 @@ def eliminar_carrera(id_carrera):
         return True
     
     except Exception as e:
-        print(f"Error al eliminar carrera: {e}")
+        print(f"Error al desactivar carrera: {e}")
+        return False
+
+def reactivar_carrera(id_carrera):
+    """Reactiva una carrera inactiva"""
+    try:
+        conn = get_connection()
+        cursor = conn.cursor()
+        
+        cursor.execute(
+            "UPDATE carrera SET estado = 1 WHERE id_carrera = ?",
+            (id_carrera,)
+        )
+        
+        conn.commit()
+        conn.close()
+        
+        return True
+    
+    except Exception as e:
+        print(f"Error al reactivar carrera: {e}")
         return False
 
 

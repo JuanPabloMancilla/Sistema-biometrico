@@ -146,9 +146,14 @@ class LoginView(ctk.CTkFrame):
         if lang == "ES":
             self.es_btn.configure(fg_color="#1D1D1F", text_color="white", hover_color="#3E3E3F")
             self.en_btn.configure(fg_color="transparent", text_color="#4A4A4A", hover_color="#CBD5E1")
+            AppContext.set_idioma("es")
         else:
             self.en_btn.configure(fg_color="#1D1D1F", text_color="white", hover_color="#3E3E3F")
             self.es_btn.configure(fg_color="transparent", text_color="#4A4A4A", hover_color="#CBD5E1")
+            AppContext.set_idioma("en")
+        
+        # Redibujar el formulario con el nuevo idioma
+        self.recargar_vista()
 
     def regresar_a_terminal(self):
         self.master.mostrar_terminal()
@@ -192,3 +197,9 @@ class LoginView(ctk.CTkFrame):
     def validar_login(self):
         if self.user_entry.get() == "1" and self.pass_entry.get() == "1": self.on_login_success()
         else: self.error_label.configure(text=AppContext.t("Credenciales incorrectas."))
+
+    def recargar_vista(self):
+        """Destruye y recrea el formulario para aplicar cambios de idioma"""
+        for widget in self.card.winfo_children():
+            widget.destroy()
+        self.create_form()

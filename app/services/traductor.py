@@ -131,7 +131,54 @@ class TraductorOffline:
             # Títulos con iconos que podrían no estar mapeados
             "🎓 Gestión de Carreras": "🎓 Career Management",
             "🎓  Gestión de Carreras": "🎓  Career Management",
-            "🎓   Gestión de Carreras": "🎓   Career Management"
+            "🎓   Gestión de Carreras": "🎓   Career Management",
+            
+            # --- LOGIN Y ACCOUNT SETUP ---
+            "Sistema de Reconocimiento\nFacial": "Facial Recognition\nSystem",
+            "Sistema de Reconocimiento Facial": "Facial Recognition System",
+            "Ingresa tus credenciales para continuar": "Enter your credentials to continue",
+            "CORREO ELECTRÓNICO": "EMAIL ADDRESS",
+            "Escribe tu correo": "Enter your email",
+            "CONTRASEÑA": "PASSWORD",
+            "Escribe tu contraseña": "Enter your password",
+            "INICIAR SESIÓN": "SIGN IN",
+            "Credenciales incorrectas.": "Incorrect credentials.",
+            
+            # Account/Customization
+            "Account Setup": "Account Setup",
+            "Configure your profile and preferences": "Configure your profile and preferences",
+            "Customization": "Customization",
+            "System Language": "System Language",
+            "Account Details": "Account Details",
+            "First Name": "First Name",
+            "Email Address": "Email Address",
+            "Phone": "Phone",
+            "Faculty": "Faculty",
+            "Editar Perfil": "Edit Profile",
+            
+            # Modales y confirmaciones
+            "¿Desactivar esta carrera?": "Deactivate this career?",
+            "¿Desactivar esta facultad?": "Deactivate this faculty?",
+            "Desactivar": "Deactivate",
+            "Reactivar": "Reactivate",
+            "🔄 Activar": "🔄 Activate",
+            
+            # Filtros
+            "Rol": "Role",
+            "Todos": "All",
+            "DOCENTE": "TEACHER",
+            "TRABAJADOR": "STAFF",
+            
+            # Otros textos faltantes
+            "Buscar facultad por nombre...": "Search faculty by name...",
+            "Nombre de Facultad": "Faculty Name",
+            "Administra las unidades académicas del sistema": "Manage system academic units",
+            "No hay facultades registradas": "No faculties registered",
+            "Editar Facultad": "Edit Faculty",
+            "Nombre de la Carrera": "Career Name",
+            "Seleccionar facultad": "Select faculty",
+            "Active": "Active",
+            "Inactive": "Inactive",
         }
 
         # Búsqueda exacta (limpiando espacios por si acaso)

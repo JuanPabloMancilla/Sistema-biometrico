@@ -54,7 +54,7 @@ def obtener_usuario_por_id(id_usuario):
 
         cursor.execute("""
             SELECT id_usuario, nombre, a_paterno, a_materno,
-                   tipo_usuario, id_facultad, id_carrera
+                   tipo_usuario, id_facultad, id_carrera, cuenta, correo
             FROM usuario
             WHERE id_usuario = ?
         """, (id_usuario,))
@@ -72,6 +72,8 @@ def obtener_usuario_por_id(id_usuario):
             "tipo_usuario": f[4],
             "id_facultad": f[5],
             "id_carrera": f[6],
+            "cuenta": f[7],
+            "correo": f[8],
         }
 
     finally:
@@ -111,7 +113,7 @@ def crear_usuario(nombre, a_paterno, a_materno, tipo_usuario, id_facultad, id_ca
     finally:
         conn.close()
 
-def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo):
+def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo, estado=1):
     conn = get_connection()
     try:
         cursor = conn.cursor()
@@ -124,10 +126,11 @@ def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facu
                 cuenta = ?,
                 tipo_usuario = ?, 
                 id_facultad = ?, 
-                correo = ?, 
+                correo = ?,
+                estado = ?,
                 fecha_actualizacion = datetime('now')
             WHERE id_usuario = ?
-        """, (nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo, id_usuario))
+        """, (nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo, estado, id_usuario))
 
         conn.commit()
         return cursor.rowcount > 0
@@ -137,7 +140,7 @@ def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facu
         return False
     finally:
         conn.close()
-
+        
 def eliminar_usuario(id_usuario):
     conn = get_connection()
     try:
@@ -155,6 +158,20 @@ def desactivar_usuario(id_usuario):
         cursor.execute("""
             UPDATE usuario
             SET estado = 0
+            WHERE id_usuario = ?
+        """, (id_usuario,))
+        conn.commit()
+        return True
+    finally:
+        conn.close()
+
+def reactivar_usuario(id_usuario):
+    conn = get_connection()
+    try:
+        cursor = conn.cursor()
+        cursor.execute("""
+            UPDATE usuario
+            SET estado = 1
             WHERE id_usuario = ?
         """, (id_usuario,))
         conn.commit()
@@ -181,7 +198,7 @@ def obtener_carreras_por_facultad(id_facultad):
     conn = get_connection()
     try:
         cursor = conn.cursor()
-        cursor.execute("SELECT id_carrera, nombre FROM carrera WHERE id_facultad=?", (id_facultad,))
+        cursor.execute("SELECT id_carrera, nombre FROM carrera WHERE id_facultad=? AND estado=1", (id_facultad,))
         return {f[0]: f[1] for f in cursor.fetchall()}
     finally:
         conn.close()

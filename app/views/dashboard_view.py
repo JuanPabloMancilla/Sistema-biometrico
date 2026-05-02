@@ -86,7 +86,7 @@ class DashboardView(ctk.CTkFrame):
             return
 
         # fondo oscuro
-        self.overlay_bg = ctk.CTkFrame(self, fg_color="#000000")
+        self.overlay_bg = ctk.CTkFrame(self, fg_color="transparent")
         self.overlay_bg.place(relx=0, rely=0, relwidth=1, relheight=1)
 
         # click fuera cierra
@@ -110,6 +110,16 @@ class DashboardView(ctk.CTkFrame):
             font=("Times New Roman", 32, "bold"),
             text_color="#3C054F"
         ).pack(anchor="w", padx=20, pady=20)
+
+        ctk.CTkButton(
+            self.overlay_sidebar,
+            text="✕",
+            width=40,
+            height=40,
+            fg_color="transparent",
+            text_color=COLORS["text"],
+            command=self.cerrar_overlay
+        ).pack(anchor="ne", padx=10, pady=10)
 
         # BOTONES
         self.construir_menu(self.overlay_sidebar)

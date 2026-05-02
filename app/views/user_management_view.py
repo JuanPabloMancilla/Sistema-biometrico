@@ -436,28 +436,36 @@ class UserManagementView(ctk.CTkFrame):
        idx, distancia = find_best_match(encoding, encodings_db)
 
        if idx is not None:
-           print("❌ Rostro duplicado detectado")
+           usuario_detectado_id = usuarios_db[idx]
 
-           self.biometria_temp = None
+        # 🔥 CASO 1: MISMO USUARIO → PERMITIR
+           if self.usuario_editando_id and usuario_detectado_id == self.usuario_editando_id:
+               print("✔ Mismo usuario, permitido actualizar biometría")
 
-           if hasattr(self, "btn_biometria"):
-               self.btn_biometria.configure(
-                  text="❌ Rostro ya registrado",
-                  fg_color="#EF4444",
-                  hover_color="#DC2626"
-            )
+        # 🔥 CASO 2: OTRO USUARIO → BLOQUEAR
+           else:
+               print("❌ Rostro pertenece a otro usuario")
 
-           if hasattr(self, "label_estado"):
-               self.label_estado.configure(
-                  text="❌ Este rostro ya existe en el sistema",
-                  text_color="#EF4444"
-            )
+               self.biometria_temp = None
 
-           self.cerrar_terminal_biometrica()
-           return
+               if hasattr(self, "btn_biometria"):
+                   self.btn_biometria.configure(
+                      text="❌ Rostro ya registrado",
+                      fg_color="#EF4444",
+                      hover_color="#DC2626"
+                    )
 
-            # ✅ SOLO SI NO ES DUPLICADO
-       print("✔ Rostro único, válido para registro")
+               if hasattr(self, "label_estado"):
+                   self.label_estado.configure(
+                      text="❌ Este rostro ya pertenece a otro usuario",
+                      text_color="#EF4444"
+                    )
+
+               self.cerrar_terminal_biometrica()
+               return
+
+            # ✅ SI PASA VALIDACIÓN
+       print("✔ Rostro válido")
 
        self.biometria_temp = encoding
 
@@ -467,12 +475,12 @@ class UserManagementView(ctk.CTkFrame):
               fg_color="#10B981",
               hover_color="#059669",
               state="disabled"
-        )
+            )
 
        if hasattr(self, "label_estado"):
            self.label_estado.configure(
               text="✔ Biometría válida",
               text_color="#10B981"
-        )
+            )
 
        self.cerrar_terminal_biometrica()

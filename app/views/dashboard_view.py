@@ -60,12 +60,36 @@ class DashboardView(ctk.CTkFrame):
 
 
     def construir_menu(self, parent):
-        # BOTONES
-        self.btn_panel = self.crear_btn_sidebar(parent, "🏠  " + AppContext.t("Panel de Control"), self.mostrar_panel_control)
-        self.btn_users = self.crear_btn_sidebar(parent, "👥  " + AppContext.t("Gestión de Usuarios"), self.mostrar_gestion_usuarios)
-        self.btn_facultades = self.crear_btn_sidebar(parent, "🏫  " + AppContext.t("Gestión de Facultades"), self.mostrar_gestion_facultades)
-        self.btn_carreras = self.crear_btn_sidebar(parent, "📚  " + AppContext.t("Gestión de Carreras"), self.mostrar_gestion_carreras)
-        self.btn_account = self.crear_btn_sidebar(parent, "⚙️  " + AppContext.t("Configuración Cuenta"), self.mostrar_cuenta)
+        # BOTONES (🔥 AQUÍ está el cambio)
+        self.crear_btn_sidebar(
+            parent,
+            "🏠 Panel de Control",
+            lambda: [self.cerrar_overlay(), self.mostrar_panel_control()]
+        )
+
+        self.crear_btn_sidebar(
+            parent,
+            "👥 Gestion de Usuarios",
+            lambda: [self.cerrar_overlay(), self.mostrar_gestion_usuarios()]
+        )
+
+        self.crear_btn_sidebar(
+            parent,
+            "🏫 Gestion de Facultades",
+            lambda: [self.cerrar_overlay(), self.mostrar_gestion_facultades()]
+        )
+
+        self.crear_btn_sidebar(
+            parent,
+            "📚 Gestion de Carreras",
+            lambda: [self.cerrar_overlay(), self.mostrar_gestion_carreras()]
+        )
+
+        self.crear_btn_sidebar(
+            parent,
+            "⚙️ Configuración",
+            lambda: [self.cerrar_overlay(), self.mostrar_cuenta()]
+        )
 
         # LOGOUT
         ctk.CTkButton(
@@ -75,8 +99,6 @@ class DashboardView(ctk.CTkFrame):
             text_color="#EF4444",
             command=self.on_back
         ).pack(side="bottom", pady=30, padx=20, fill="x")
-    
-
 
     def toggle_sidebar_overlay(self):
 
@@ -86,6 +108,9 @@ class DashboardView(ctk.CTkFrame):
             return
 
         # fondo oscuro
+
+        root = self.winfo_toplevel()
+
         self.overlay_bg = ctk.CTkFrame(self, fg_color="transparent")
         self.overlay_bg.place(relx=0, rely=0, relwidth=1, relheight=1)
 
@@ -125,15 +150,7 @@ class DashboardView(ctk.CTkFrame):
         self.construir_menu(self.overlay_sidebar)
 
 
-        # logout
-        ctk.CTkButton(
-            self.overlay_sidebar,
-            text="🚪 Cerrar Sesión",
-            fg_color="transparent",
-            text_color="#EF4444",
-            command=self.on_back
-        ).pack(side="bottom", pady=30, padx=20, fill="x")
-
+        
     def crear_btn_overlay(self, texto, comando):
         ctk.CTkButton(
             self.overlay_sidebar,
@@ -147,7 +164,7 @@ class DashboardView(ctk.CTkFrame):
         ).pack(fill="x", padx=20, pady=5)
 
     def cerrar_overlay(self):
-        if hasattr(self, "overlay_bg"):
+        if hasattr(self, "overlay_bg") and self.overlay_bg.winfo_exists():
             self.overlay_bg.destroy()
 
     def toggle_sidebar(self):

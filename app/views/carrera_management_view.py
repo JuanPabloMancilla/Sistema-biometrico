@@ -5,7 +5,8 @@ from app.services.carrera_service import (
     obtener_todas_carreras,
     crear_carrera,
     actualizar_carrera,
-    eliminar_carrera,
+    desactivar_carrera,
+    reactivar_carrera,
     obtener_carrera_por_id,
     obtener_facultades_para_dropdown
 )
@@ -62,6 +63,9 @@ class CarreraManagementView(ctk.CTkFrame):
 
         # --- CUERPO SCROLLABLE ---
         todas = obtener_todas_carreras()
+        # Ordenar: activas primero, inactivas al final
+        todas.sort(key=lambda c: (c.get('estado', 1) == 0, c["nombre"]))
+        
         query = self.entry_busqueda.get().strip().lower() if hasattr(self, "entry_busqueda") else ""
         carreras = [c for c in todas if query in c["nombre"].lower() or query in (c.get("facultad_nombre") or "").lower()] if query else todas
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
@@ -130,9 +134,15 @@ class CarreraManagementView(ctk.CTkFrame):
             ctk.CTkButton(act_block, text="✏️", width=32, height=32, font=("Inter", 14), 
                          fg_color=COLORS["hover"], hover_color=COLORS["border"], text_color=COLORS["text"], 
                          command=lambda cid=c["id"]: self.abrir_formulario(cid)).pack(side="left", padx=4, pady=14)
-            ctk.CTkButton(act_block, text="🗑️", width=32, height=32, font=("Inter", 14), 
-                         fg_color="#FFF1F2", hover_color="#FEE2E2", text_color="#E11D48", 
-                         command=lambda cid=c["id"], n=c["nombre"]: self.confirmar_eliminar_modal(cid, n)).pack(side="left", padx=2, pady=14)
+            
+            if es_activa:
+                ctk.CTkButton(act_block, text="🗑️", width=32, height=32, font=("Inter", 14), 
+                             fg_color="#FFF1F2", hover_color="#FEE2E2", text_color="#E11D48", 
+                             command=lambda cid=c["id"], n=c["nombre"]: self.confirmar_desactivar_modal(cid, n)).pack(side="left", padx=2, pady=14)
+            else:
+                ctk.CTkButton(act_block, text=AppContext.t("🔄 Activar"), width=80, height=32, font=("Inter", 9, "bold"), 
+                             fg_color="#10B981", hover_color="#059669", text_color="white", 
+                             command=lambda cid=c["id"]: self.reactivar_carrera(cid)).pack(side="left", padx=2, pady=14)
 
             ctk.CTkFrame(scroll, fg_color=COLORS["hover"], height=1).pack(fill="x", padx=20, side="top")
 
@@ -186,8 +196,8 @@ class CarreraManagementView(ctk.CTkFrame):
         ctk.CTkButton(btns, text="❌ " + AppContext.t("Cancelar"), font=self.font_sub, fg_color="#FEE2E2", text_color="#991B1B", height=55, command=self.volver_a_tabla).pack(side="left", expand=True, fill="x", padx=(0, 10))
         ctk.CTkButton(btns, text="💾 " + AppContext.t("Guardar Carrera"), font=self.font_sub, fg_color="#D1FAE5", text_color="#065F46", height=55, command=self.guardar_carrera).pack(side="left", expand=True, fill="x", padx=(10, 0))
 
-    def confirmar_eliminar_modal(self, id_carrera, nombre):
-        """Modal flotante transparente con botones verde/rojo"""
+    def confirmar_desactivar_modal(self, id_carrera, nombre):
+        """Modal flotante para desactivar carrera"""
         self.overlay = ctk.CTkFrame(self, fg_color="transparent") 
         self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
         
@@ -195,26 +205,28 @@ class CarreraManagementView(ctk.CTkFrame):
         modal.place(relx=0.5, rely=0.5, anchor="center")
         modal.pack_propagate(False)
 
-        ctk.CTkLabel(modal, text="🗑️", font=("Inter", 45)).pack(pady=(25, 5))
-        ctk.CTkLabel(modal, text=AppContext.t("¿Está seguro que desea borrar la carrera?"), font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
-        ctk.CTkLabel(modal, text=f"Se eliminará: {nombre.upper()}", font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
+        ctk.CTkLabel(modal, text="🎓", font=("Inter", 45)).pack(pady=(25, 5))
+        ctk.CTkLabel(modal, text=AppContext.t("¿Desactivar esta carrera?"), font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text=f"{AppContext.t('Carrera')}: {nombre.upper()}", font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
         
         btns = ctk.CTkFrame(modal, fg_color="transparent")
         btns.pack(fill="x", side="bottom", pady=25, padx=30)
         
-        # Cancelar en ROJO
         ctk.CTkButton(btns, text=AppContext.t("Cancelar"), fg_color="#EF4444", text_color="white", hover_color="#DC2626", height=40, font=("Inter", 13, "bold"), command=self.cerrar_modal).pack(side="left", expand=True, padx=(0, 10))
         
-        # Confirmar en VERDE
-        ctk.CTkButton(btns, text=AppContext.t("Confirmar y Borrar"), fg_color="#10B981", text_color="white", hover_color="#059669", height=40, font=("Inter", 13, "bold"), command=lambda: self.borrar_carrera_y_cerrar(id_carrera)).pack(side="left", expand=True)
+        ctk.CTkButton(btns, text=AppContext.t("Desactivar"), fg_color="#10B981", text_color="white", hover_color="#059669", height=40, font=("Inter", 13, "bold"), command=lambda: self.desactivar_carrera_y_cerrar(id_carrera)).pack(side="left", expand=True)
 
     def cerrar_modal(self):
         if hasattr(self, 'overlay'): self.overlay.destroy()
 
-    def borrar_carrera_y_cerrar(self, id_carrera):
-        if eliminar_carrera(id_carrera):
+    def desactivar_carrera_y_cerrar(self, id_carrera):
+        if desactivar_carrera(id_carrera):  
             self.render_table_content()
         self.cerrar_modal()
+
+    def reactivar_carrera(self, id_carrera):
+        if reactivar_carrera(id_carrera):
+            self.render_table_content()
 
     def guardar_carrera(self):
         nombre = self.input_nombre.get().strip()

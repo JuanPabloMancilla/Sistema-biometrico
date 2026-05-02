@@ -5,7 +5,8 @@ from app.services.facultad_service import (
     obtener_todas_facultades,
     crear_facultad,
     actualizar_facultad,
-    eliminar_facultad,
+    desactivar_facultad,
+    reactivar_facultad,
     obtener_facultad_por_id
 )
 
@@ -69,9 +70,9 @@ class FacultadManagementView(ctk.CTkFrame):
         table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
         table_head.pack(fill="x", padx=20, pady=(10, 5))
 
-        ctk.CTkLabel(table_head, text="🏛️ NOMBRE DE FACULTAD", font=self.font_small, text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
-        ctk.CTkLabel(table_head, text="⚙️ ESTADO", font=self.font_small, text_color=COLORS["text"], width=ancho_estado, anchor="center").pack(side="left")
-        ctk.CTkLabel(table_head, text="ACCIONES", font=self.font_small, text_color=COLORS["text"]).pack(side="right", padx=60)
+        ctk.CTkLabel(table_head, text="🏛️ " + AppContext.t("Nombre de la Facultad").upper(), font=self.font_small, text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
+        ctk.CTkLabel(table_head, text="⚙️ " + AppContext.t("Estado").upper(), font=self.font_small, text_color=COLORS["text"], width=ancho_estado, anchor="center").pack(side="left")
+        ctk.CTkLabel(table_head, text=AppContext.t("Acciones").upper(), font=self.font_small, text_color=COLORS["text"]).pack(side="right", padx=60)
 
         ctk.CTkLabel(table_head, text="🏛️ " + AppContext.t("Nombre de la Facultad").upper(), font=self.font_small, text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
         ctk.CTkLabel(table_head, text="⚙️ " + AppContext.t("Estado").upper(), font=self.font_small, text_color=COLORS["text"], width=ancho_estado, anchor="center").pack(side="left")
@@ -80,6 +81,9 @@ class FacultadManagementView(ctk.CTkFrame):
         ctk.CTkFrame(self.main_card, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
 
         todas = obtener_todas_facultades()
+        # Ordenar: activas primero, inactivas al final
+        todas.sort(key=lambda f: (f.get('estado', 1) == 0, f["nombre"]))
+        
         query = self.entry_busqueda.get().strip().lower() if hasattr(self, "entry_busqueda") else ""
         facultades = [f for f in todas if query in f["nombre"].lower()] if query else todas
 
@@ -119,7 +123,11 @@ class FacultadManagementView(ctk.CTkFrame):
             act_block.pack(side="right", padx=20)
             
             ctk.CTkButton(act_block, text="✏️", width=32, height=32, fg_color=COLORS["hover"], text_color=COLORS["text"], command=lambda id_f=f["id"]: self.abrir_formulario(id_f)).pack(side="left", padx=4)
-            ctk.CTkButton(act_block, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_eliminar_modal(id_f, n)).pack(side="left", padx=2)
+            
+            if es_activa:
+                ctk.CTkButton(act_block, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_desactivar_modal(id_f, n)).pack(side="left", padx=2)
+            else:
+                ctk.CTkButton(act_block, text=AppContext.t("🔄 Activar"), width=80, height=32, fg_color="#10B981", text_color="white", font=("Inter", 9, "bold"), command=lambda id_f=f["id"]: self.reactivar_facultad(id_f)).pack(side="left", padx=2)
 
             ctk.CTkFrame(scroll, fg_color=COLORS["hover"], height=1).pack(fill="x", padx=20)
 
@@ -171,7 +179,7 @@ class FacultadManagementView(ctk.CTkFrame):
         else: crear_facultad(nombre, estado)
         self.volver_a_tabla()
 
-    def confirmar_eliminar_modal(self, id_facultad, nombre):
+    def confirmar_desactivar_modal(self, id_facultad, nombre):
         self.overlay = ctk.CTkFrame(self, fg_color="transparent") 
         self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
         
@@ -180,8 +188,8 @@ class FacultadManagementView(ctk.CTkFrame):
         modal.pack_propagate(False)
 
         ctk.CTkLabel(modal, text="🏛️", font=("Inter", 45)).pack(pady=(25, 5))
-        ctk.CTkLabel(modal, text=AppContext.t("¿Está seguro de eliminar esta facultad?"), font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
-        ctk.CTkLabel(modal, text=f"{AppContext.t('Se eliminará')}: {nombre.upper()}", font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
+        ctk.CTkLabel(modal, text=AppContext.t("¿Desactivar esta facultad?"), font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text=f"{AppContext.t('Facultad')}: {nombre.upper()}", font=("Inter", 12), text_color=COLORS["subtext"]).pack(pady=5)
         
         btns = ctk.CTkFrame(modal, fg_color="transparent")
         btns.pack(fill="x", side="bottom", pady=25, padx=30)
@@ -189,16 +197,20 @@ class FacultadManagementView(ctk.CTkFrame):
         ctk.CTkButton(btns, text=AppContext.t("Cancelar"), fg_color="#EF4444", text_color="white", hover_color="#DC2626", 
                      height=40, font=("Inter", 13, "bold"), command=self.cerrar_modal).pack(side="left", expand=True, padx=(0, 10))
         
-        ctk.CTkButton(btns, text=AppContext.t("Confirmar y Borrar"), fg_color="#10B981", text_color="white", hover_color="#059669", 
-                     height=40, font=("Inter", 13, "bold"), command=lambda: self.borrar_facultad_y_cerrar(id_facultad)).pack(side="left", expand=True)
+        ctk.CTkButton(btns, text=AppContext.t("Desactivar"), fg_color="#10B981", text_color="white", hover_color="#059669", 
+                     height=40, font=("Inter", 13, "bold"), command=lambda: self.desactivar_facultad_y_cerrar(id_facultad)).pack(side="left", expand=True)
 
     def cerrar_modal(self):
         if hasattr(self, 'overlay'): self.overlay.destroy()
 
-    def borrar_facultad_y_cerrar(self, id_facultad):
-        if eliminar_facultad(id_facultad):
+    def desactivar_facultad_y_cerrar(self, id_facultad):
+        if desactivar_facultad(id_facultad):
             self.render_table_content()
         self.cerrar_modal()
+
+    def reactivar_facultad(self, id_facultad):
+        if reactivar_facultad(id_facultad):
+            self.render_table_content()
 
     def volver_a_tabla(self):
         if hasattr(self, 'form_base'): self.form_base.destroy()

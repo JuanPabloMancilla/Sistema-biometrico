@@ -196,6 +196,14 @@ class CarreraManagementView(ctk.CTkFrame):
         ctk.CTkButton(btns, text="❌ " + AppContext.t("Cancelar"), font=self.font_sub, fg_color="#FEE2E2", text_color="#991B1B", height=55, command=self.volver_a_tabla).pack(side="left", expand=True, fill="x", padx=(0, 10))
         ctk.CTkButton(btns, text="💾 " + AppContext.t("Guardar Carrera"), font=self.font_sub, fg_color="#D1FAE5", text_color="#065F46", height=55, command=self.guardar_carrera).pack(side="left", expand=True, fill="x", padx=(10, 0))
 
+    def carrera_existe(self, nombre):
+        todas = obtener_todas_carreras()
+
+        return any(
+            c["nombre"].strip().lower() == nombre.strip().lower()
+            for c in todas
+        )
+
     def confirmar_desactivar_modal(self, id_carrera, nombre):
         """Modal flotante para desactivar carrera"""
         self.overlay = ctk.CTkFrame(self, fg_color="transparent") 
@@ -233,7 +241,16 @@ class CarreraManagementView(ctk.CTkFrame):
         estado = 1 if self.combo_estado.get() == AppContext.t("Activa") else 0
         fac_nombre = self.combo_facultad.get()
         id_facultad = next((id for id, n in self.facultades_dict.items() if n == fac_nombre), None)
-        if not nombre or not id_facultad: return
+        if not nombre or not id_facultad: return 
+
+        if len(nombre) < 3:
+            print("❌ Nombre muy corto")
+            return
+
+        if self.carrera_existe(nombre) and not self.modo_edicion:
+            print("❌ Carrera duplicada")
+            return
+
         if self.modo_edicion: actualizar_carrera(self.carrera_actual_id, nombre, id_facultad, estado)
         else: crear_carrera(nombre, id_facultad, estado)
         self.volver_a_tabla()

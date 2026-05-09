@@ -28,7 +28,6 @@ class FacultadManagementView(ctk.CTkFrame):
         self.crear_vista_tabla()
 
 
-
     def _on_resize(self, event):
         width = event.width
         self.is_compact = width < 900  # puedes ajustar este valor
@@ -184,10 +183,28 @@ class FacultadManagementView(ctk.CTkFrame):
         ctk.CTkButton(btns, text="❌ " + AppContext.t("Cancelar"), font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=55, command=self.volver_a_tabla).pack(side="left", expand=True, fill="x", padx=(0, 10))
         ctk.CTkButton(btns, text="💾 " + AppContext.t("Guardar Facultad"), font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=55, command=self.guardar_facultad).pack(side="left", expand=True, fill="x", padx=(10, 0))
 
+
+    def facultad_existe(self, nombre):
+        todas = obtener_todas_facultades()
+
+        return any(
+            f["nombre"].strip().lower() == nombre.strip().lower()
+            for f in todas
+        )
+
     def guardar_facultad(self):
         nombre = self.input_nombre.get().strip()
         estado = 1 if self.combo_estado.get() == AppContext.t("Activa") else 0
         if not nombre: return
+
+        if len(nombre) < 3:
+           print("❌ Nombre muy corto")
+           return
+
+        if self.facultad_existe(nombre) and not self.modo_edicion:
+            print("❌ Facultad duplicada")
+            return
+
         if self.modo_edicion: actualizar_facultad(self.facultad_actual_id, nombre, estado)
         else: crear_facultad(nombre, estado)
         self.volver_a_tabla()

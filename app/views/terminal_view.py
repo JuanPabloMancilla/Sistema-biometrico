@@ -8,6 +8,7 @@ from app.detection.detector_rostro import find_best_match
 from app.views.app_context import AppContext
 from app.camara.camara import iniciar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
+from app.services.usuario_service import usuario_activo
 
 
 # ── Paleta ────────────────────────────────────────────────────────────────────
@@ -428,7 +429,7 @@ class TerminalView(ctk.CTkFrame):
             self.loop_id = self.after(16, self.actualizar_video)
             return
 
-        frame_dibujado, face_encoding, mensaje = procesar_frame(frame)
+        frame_dibujado, face_encoding, mensaje, usuario_id  = procesar_frame(frame)
         fh_orig, fw_orig = frame_dibujado.shape[:2]
 
         # ── Detectar todos los rostros ────────────────────────────────────────
@@ -508,35 +509,74 @@ class TerminalView(ctk.CTkFrame):
                     self.esperando_reset = True
                     self.inicio_espera_reset = ahora
 
+                    # =========================================================
+                    # MODO REGISTRO
+                    # =========================================================
+
                     if self.modo == "registro":
 
-                       if face_encoding is not None:
+                        if face_encoding is not None:
 
-        # ✅ SI ES NUEVO → capturar UNA SOLA VEZ
-                           if self.on_capture:
-                               self.on_capture(face_encoding)
+                            # ✅ SI ES NUEVO → capturar UNA SOLA VEZ
+                            if self.on_capture:
+                                self.on_capture(face_encoding)
 
         # 🔥 cerrar cámara inmediatamente
-                           self.cerrar_y_volver()
-                           
-                           return  # o crea uno tipo "registrado"
-                           
+                             # Detener loop
+                            self.running = False
+
+                            # Cerrar cámara
+                            self.cerrar_y_volver()
+
+                            return
+                        
+                        # =========================================================
+                        # MODO ACCESO / RECONOCIMIENTO
+                        # =========================================================
+                    
                     else:
                     
                     # Si nunca se resolvió un nombre, usar el último mensaje disponible
                         if not self.usuario_detectado:
                             self.usuario_detectado = msg_actual
-                    if any(p in self.usuario_detectado for p in ("DESCONOCIDO", "ERROR", "NO REGISTRADO")):
-                        self.aplicar_estilo_visual("negado")
-                    else:
-                        self.aplicar_estilo_visual("autorizado", usuario=self.usuario_detectado)
+                        
+                        # Usuario desconocido
+                        if any(p in self.usuario_detectado for p in ("DESCONOCIDO", "ERROR", "NO REGISTRADO")):
 
-                    if face_encoding is not None and self.on_capture:
-                        self.on_capture(face_encoding)
+                            self.aplicar_estilo_visual("negado")
 
-                        # 🛑 DETENER LOOP PARA EVITAR MULTIPLES CAPTURAS
-                        self.running = False
-                        return
+                        else:
+
+                            #USUARIO ACTIVO
+                            if usuario_id is not None and usuario_activo(usuario_id):
+
+                                self.aplicar_estilo_visual(
+                                    "autorizado",
+                                    usuario=self.usuario_detectado
+                                )
+
+                            #usuario inactivo
+
+                            else:
+
+                                self.estado_actual = "negado"
+
+                                self.status_label.configure(
+                                    text="USUARIO INACTIVO",
+                                    text_color=ACCENT_RED
+                                )
+
+                                self.lbl_nombre.configure(
+                                    text=f"{self.usuario_detectado}\nUSUARIO INACTIVO",
+                                    text_color=ACCENT_RED
+                                )
+
+                                self.badge_label.configure(
+                                    text="✗ BLOQUEADO",
+                                    text_color=ACCENT_RED
+                                )
+
+                    
 
             if self.face_box is not None:
                 fx, fy, fw, fh = self.face_box

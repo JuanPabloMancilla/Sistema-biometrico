@@ -61,7 +61,7 @@ def procesar_frame(frame):
     if frame_count % 3 != 0 and ultimo_resultado[0] is not None:
         top, right, bottom, left = ultimo_resultado[0]
         cv2.rectangle(frame, (left, top), (right, bottom), (10, 185, 129), 2)
-        return frame, None, ultimo_resultado[1]
+        return frame, None, ultimo_resultado[1], None
 
     # 1. Reducir imagen para detección rápida (Escala 1/4)
     small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
@@ -72,10 +72,10 @@ def procesar_frame(frame):
     
     if not face_locations:
         ultimo_resultado = (None, "No se detectó ninguna cara")
-        return frame, None, "No se detectó ninguna cara"
+        return frame, None, "No se detectó ninguna cara", None
 
     if len(face_locations) > 1:
-        return frame, None, "Se detectaron múltiples caras"
+        return frame, None, "Se detectaron múltiples caras", None
 
     # 3. Reescalar coordenadas al tamaño original
     top, right, bottom, left = [v * 4 for v in face_locations[0]]
@@ -84,6 +84,7 @@ def procesar_frame(frame):
     face_encoding = face_recognition.face_encodings(frame, [(top, right, bottom, left)])[0]
     
     nombre_detectado = "DESCONOCIDO"
+    usuario_id = None
     if verificar_dimension(face_encoding) and len(encodings_db) > 0:
         distancias = face_recognition.face_distance(encodings_db, face_encoding)
         mejor_distancia = min(distancias)
@@ -103,7 +104,7 @@ def procesar_frame(frame):
     color = (16, 185, 129) if nombre_detectado != "DESCONOCIDO" else (239, 68, 68)
     cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
 
-    return frame, face_encoding, nombre_detectado
+    return frame, face_encoding, nombre_detectado, usuario_id
 def find_best_match(encoding, encodings_db, threshold=0.6):
     if len(encodings_db) == 0:
         return None, None

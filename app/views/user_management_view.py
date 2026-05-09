@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import re
 from app.views.terminal_view import TerminalView
 from app.services.theme import COLORS
 from app.views.app_context import AppContext
@@ -97,6 +98,16 @@ class UserManagementView(ctk.CTkFrame):
         if P == "": 
             return True
         return P.isdigit() and len(P) <= 8
+    
+    def validar_texto_real(self, texto):
+        texto = texto.strip()
+
+        if len(texto) < 2:
+            return False
+
+        permitidos = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚáéíóú "
+
+        return all(c in permitidos for c in texto)
 
     def render_table_content(self, user_list):
         for w in self.main_card.winfo_children(): 
@@ -267,19 +278,76 @@ class UserManagementView(ctk.CTkFrame):
         # 8. Guardar
         try:
             id_usuario = self.usuario_editando_id
+
+            cta = self.inputs_obligatorios.get("cuenta").get().strip()
+            if not n or not cta:
+                print("❌ Faltan datos:", n, cta, em)
+                return
+            
+            if em:
+                patron = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+
+                if not re.match(patron, em):
+                    self.inputs_obligatorios["correo"].configure(
+                        border_color="#EF4444"
+                    )
+
+                    print("❌ Correo inválido")
+                    return
+
+            if not self.usuario_editando_id and len(cta) != 8:
+                self.inputs_obligatorios["cuenta"].configure(border_color=COLORS["border"])
+                return
+
+
             ap = self.inputs_apellidos["Apellido Paterno"].get().strip()
             am = self.inputs_apellidos["Apellido Materno"].get().strip()
+
+            if not self.validar_texto_real(n):
+                print("❌ Nombre inválido")
+                return
+
+            if not self.validar_texto_real(ap):
+                print("❌ Apellido paterno inválido")
+                return
+
+            if am and not self.validar_texto_real(am):
+                print("❌ Apellido materno inválido")
+                return
+            
+            # Capitalizar automáticamente
+            n = n.title()
+            ap = ap.title()
+            am = am.title()
 
             tipo_texto = self.rol_var.get()
 
             TIPOS_USUARIO_INV = {
                 "ESTUDIANTE": 1,
                 "DOCENTE": 2,
-                "TRABAJADOR": 3
+                "AUXILIAR": 3
             }
 
             tipo_usuario = TIPOS_USUARIO_INV.get(tipo_texto.upper())
+
+
+            carrera_seleccionada = self.carrera_var.get()
+
+            carreras_validas = self.carreras_por_plantel.get(
+                self.plantel_menu.get(),
+                []
+            )
+
+            if carrera_seleccionada not in carreras_validas:
+                print("❌ Carrera inválida")
+                return
+
+
             id_fac = obtener_id_facultad_por_nombre(self.plantel_menu.get())
+
+            if not id_fac:
+                print("❌ Facultad inválida")
+                return
 
             if not tipo_usuario or not id_fac:
                 print("Error: tipo_usuario o id_fac inválido", tipo_usuario, id_fac)
@@ -457,19 +525,90 @@ class UserManagementView(ctk.CTkFrame):
         self.render_table_content(self.all_users)
 
     def abrir_terminal_biometrica(self):
-        self.form_base.pack_forget()
+         # =========================
+    # VALIDAR DATOS PRIMERO
+    # =========================
 
-        self.terminal_container = ctk.CTkFrame(self, fg_color="black")
-        self.terminal_container.pack(fill="both", expand=True)
+       nombres = self.inputs_obligatorios["Nombres"].get().strip()
+       cuenta = self.inputs_obligatorios["cuenta"].get().strip()
+       correo = self.inputs_obligatorios["correo"].get().strip()
 
-        self.terminal_view = TerminalView(
-            self.terminal_container,
-            user_id=None,
-            on_back=self.cerrar_terminal_biometrica,
-            on_capture=self.recibir_biometria,
-            modo="registro"
+       ap = self.inputs_apellidos["Apellido Paterno"].get().strip()
+       am = self.inputs_apellidos["Apellido Materno"].get().strip()
+
+    # Nombre obligatorio
+       if len(nombres) < 3 or not nombres.replace(" ", "").isalpha():
+            self.label_estado.configure(
+              text="❌ Nombre inválido",
+              text_color="#EF4444"
+            )
+            return
+
+    # Apellido obligatorio
+       if len(ap) < 3 or not ap.replace(" ", "").isalpha():
+            self.label_estado.configure(
+              text="❌ Apellido inválido",
+              text_color="#EF4444"
+            )
+            return
+       
+       if am and (len(am) < 3 or not am.replace(" ", "").isalpha()):
+            self.label_estado.configure(
+              text="❌ Apellido materno inválido",
+              text_color="#EF4444"
+            )
+            return
+
+    # Cuenta exacta de 8 dígitos
+       if not cuenta.isdigit() or len(cuenta) != 8:
+            self.label_estado.configure(
+               text="❌ La cuenta debe tener 8 números",
+               text_color="#EF4444"
+            )
+            return
+
+    # Correo válido
+       if correo:
+           patron = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+
+           if not re.match(patron, correo):
+                self.label_estado.configure(
+                  text="❌ Correo inválido",
+                  text_color="#EF4444"
+                )
+                return
+
+       # =========================
+       # ABRIR BIOMETRÍA
+       # =========================
+
+       self.form_base.pack_forget()
+
+       self.terminal_container = ctk.CTkFrame(
+          self,
+          fg_color="black"
         )
+
+       self.terminal_container.pack(
+         fill="both",
+         expand=True
+        )
+
+       self.terminal_view = TerminalView(
+          self.terminal_container,
+          user_id=None,
+          on_back=self.cerrar_terminal_biometrica,
+          on_capture=self.recibir_biometria,
+          modo="registro"
+        )
+
+       self.terminal_view.pack(
+          fill="both",
+          expand=True
+        )
+
         self.terminal_view.pack(fill="both", expand=True)
+
 
     def cerrar_terminal_biometrica(self):
         if hasattr(self, "terminal_view"):

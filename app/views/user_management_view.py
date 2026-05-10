@@ -24,7 +24,7 @@ from app.services.usuario_service import (
 TIPOS_USUARIO = {
     1: "Estudiante",
     2: "Docente",
-    3: "Trabajador"
+    3: "Auxiliar"
 }
 
 class UserManagementView(ctk.CTkFrame):
@@ -481,6 +481,19 @@ class UserManagementView(ctk.CTkFrame):
         self.filtro_rol_actual = v
         self.draw_tags()
 
+        # Mostrar todos
+        if v == "Todos":
+            self.render_table_content(self.all_users)
+            return
+
+        # Filtrar por rol
+        usuarios_filtrados = [
+            u for u in self.all_users
+            if u["r"].upper() == v.upper()
+        ]
+
+        self.render_table_content(usuarios_filtrados)
+
     def update_carreras_dinamicas(self, fn):
         c = self.carreras_por_plantel.get(fn, ["Sin Carreras"])
         self.carrera_menu.configure(values=c)
@@ -606,8 +619,6 @@ class UserManagementView(ctk.CTkFrame):
           fill="both",
           expand=True
         )
-
-        self.terminal_view.pack(fill="both", expand=True)
 
 
     def cerrar_terminal_biometrica(self):

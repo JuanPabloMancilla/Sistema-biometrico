@@ -523,7 +523,7 @@ class DashboardView(ctk.CTkFrame):
 
 
         if not self.is_compact:
-            profile = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
+            profile = ctk.CTkFrame(sidebar, fg_color="transparent")
             profile.pack(pady=(40, 15), padx=20, fill="x")
             ctk.CTkLabel(profile, text="👤", font=("Arial", 35)).pack(side="left")
             txt_info = ctk.CTkFrame(profile, fg_color="transparent")

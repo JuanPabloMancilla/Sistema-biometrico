@@ -24,7 +24,7 @@ from app.services.usuario_service import (
 TIPOS_USUARIO = {
     1: "Estudiante",
     2: "Docente",
-    3: "Auxiliar"
+    3: "Trabajador"
 }
 
 class UserManagementView(ctk.CTkFrame):
@@ -50,7 +50,7 @@ class UserManagementView(ctk.CTkFrame):
         self.colors = {
             "DOCENTE": {"bg": "#F3E8FF", "text": "#A855F7"}, 
             "ESTUDIANTE": {"bg": "#DBEAFE", "text": "#3B82F6"}, 
-            "AUXILIAR": {"bg": "#D1FAE5", "text": "#10B981"}
+            "TRABAJADOR": {"bg": "#D1FAE5", "text": "#10B981"}
         }
         
         self.filtro_rol_actual = "Todos"
@@ -325,7 +325,7 @@ class UserManagementView(ctk.CTkFrame):
             TIPOS_USUARIO_INV = {
                 "ESTUDIANTE": 1,
                 "DOCENTE": 2,
-                "AUXILIAR": 3
+                "TRABAJADOR": 3
             }
 
             tipo_usuario = TIPOS_USUARIO_INV.get(tipo_texto.upper())
@@ -472,7 +472,7 @@ class UserManagementView(ctk.CTkFrame):
         for w in self.filter_container.winfo_children(): w.destroy()
         r1 = ctk.CTkFrame(self.filter_container, fg_color="transparent"); r1.pack(fill="x", padx=20)
         ctk.CTkLabel(r1, text="👤 Rol:", font=self.font_small, text_color=COLORS["text"], width=80).pack(side="left")
-        for t in ["Todos", "ESTUDIANTE", "DOCENTE", "AUXILIAR"]:
+        for t in ["Todos", "ESTUDIANTE", "DOCENTE", "TRABAJADOR"]:
             act = self.filtro_rol_actual == t
             ctk.CTkButton(r1, text=t, height=28, corner_radius=10, fg_color=COLORS["hover"]
         if act else "white", text_color=COLORS["text"], border_color=COLORS["border"], command=lambda v=t: self.aplicar_filtro_visual(v)).pack(side="left", padx=3)

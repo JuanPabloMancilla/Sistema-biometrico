@@ -74,19 +74,37 @@ def find_best_match(encoding_actual, encoding_db, threshold=0.6):
 # Guardar encoding en JSON
 def guardar_encoding(usuario, encoding, archivo="encodings.json"):
 
+    # 🔥 Validar que realmente exista un encoding
+    if encoding is None:
+        print("❌ No hay encoding facial para guardar")
+        return False
+
+    # 🔥 Convertir a numpy array por seguridad
+    encoding = np.array(encoding)
+
+    # 🔥 Validar dimensión correcta
+    if len(encoding) != 128:
+        print("❌ Encoding inválido: dimensión incorrecta")
+        return False
+
     datos_usuario = {
         "usuario": usuario,
         "encoding": encoding.tolist()
     }
 
     if os.path.exists(archivo):
-
         with open(archivo, "r") as f:
             datos = json.load(f)
-
     else:
         datos = []
 
+    # 🔥 Evitar que el mismo usuario tenga encoding duplicado
+    for existente in datos:
+        if str(existente["usuario"]) == str(usuario):
+            print("❌ Este usuario ya tiene biometría registrada")
+            return False
+
+    # 🔥 Validar rostro duplicado
     for existente in datos:
         encoding_existente = np.array(existente["encoding"])
 
@@ -95,7 +113,7 @@ def guardar_encoding(usuario, encoding, archivo="encodings.json"):
             encoding
         )[0]
 
-        if distancia < 0.6:  # mismo rostro
+        if distancia < 0.6:
             print("❌ Este rostro ya está registrado")
             return False
 
@@ -104,8 +122,9 @@ def guardar_encoding(usuario, encoding, archivo="encodings.json"):
     with open(archivo, "w") as f:
         json.dump(datos, f, indent=4)
 
-    print(f"Encoding guardado como {usuario}")
+    print(f"✔ Encoding guardado como usuario {usuario}")
     return True
+
 
 
 # Comparar distancia entre rostros

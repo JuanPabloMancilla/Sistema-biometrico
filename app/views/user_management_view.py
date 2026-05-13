@@ -163,6 +163,11 @@ class UserManagementView(ctk.CTkFrame):
     def abrir_formulario(self, usuario=None):
         self.vista_tabla.pack_forget()
         self.inputs_obligatorios, self.inputs_apellidos = {}, {}
+
+        # Solo se limpia en registros nuevos
+        if not usuario:
+            self.biometria_temp = None
+
         self.usuario_editando_id = usuario["id"] if usuario else None 
         self.rol_var.set(usuario["r"] if usuario else "ESTUDIANTE")
         
@@ -207,6 +212,9 @@ class UserManagementView(ctk.CTkFrame):
         # Botón biométrico
         self.btn_biometria = ctk.CTkButton(self.form_container, text="📷 Registrar Biometría", height=50, fg_color="#0EA5E9", text_color="white", font=self.font_sub, command=self.abrir_terminal_biometrica) 
         self.btn_biometria.pack(fill="x", padx=60, pady=(20, 10))
+        self.label_estado = ctk.CTkLabel(self.form_container,text="",font=self.font_small,text_color="#EF4444")
+        self.label_estado.pack(fill="x", padx=60, pady=(0, 10))
+
         btns = ctk.CTkFrame(self.form_container, fg_color="transparent"); btns.pack(fill="x", padx=60, pady=(20, 50))
         ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=50, command=self.cerrar_formulario).pack(side="left", expand=True, fill="x", padx=(0, 10))
         ctk.CTkButton(btns, text="💾 Guardar", font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=50, command=self.validar_y_guardar).pack(side="left", expand=True, fill="x", padx=(10, 0))
@@ -225,6 +233,36 @@ class UserManagementView(ctk.CTkFrame):
             entry.insert(0, val); entry.pack(fill="x", pady=5)
             if "Apellido" in label: self.inputs_apellidos[label] = entry
             else: self.inputs_obligatorios[label] = entry
+
+    def _limpiar_errores(self):
+        for entry in self.inputs_obligatorios.values():
+            entry.configure(border_width=0)
+
+        for entry in self.inputs_apellidos.values():
+            entry.configure(border_width=0)
+
+        if hasattr(self, "label_estado"):
+            self.label_estado.configure(text="")
+
+
+    def _mostrar_error(self, campo, mensaje):
+        entry = self.inputs_obligatorios.get(campo)
+
+        if entry is None:
+            entry = self.inputs_apellidos.get(campo)
+
+        if entry:
+            entry.configure(
+                border_width=2,
+                border_color="#EF4444"
+            )
+
+        if hasattr(self, "label_estado"):
+            self.label_estado.configure(
+                text=f"❌ {mensaje}",
+                text_color="#EF4444"
+            )
+
 
     def validar_y_guardar(self):
         # 1. Limpiar todos los errores previos
@@ -355,43 +393,66 @@ class UserManagementView(ctk.CTkFrame):
 
             if self.usuario_editando_id:
 
-               actualizar_usuario(id_usuario, n, ap, am, cta, tipo_usuario, id_fac, em)
+                actualizar_usuario(id_usuario, n, ap, am, cta, tipo_usuario, id_fac, em)
 
-             # 🔥 SI TOMÓ NUEVA BIOMETRÍA → reemplazar
-               if hasattr(self, "biometria_temp") and self.biometria_temp is not None:
+                # Si tomó nueva biometría al editar, reemplazarla
+                if hasattr(self, "biometria_temp") and self.biometria_temp is not None:
+                    print("♻️ Reemplazando biometría...")
 
-                  print("♻️ Reemplazando biometría...")
+                    eliminar_encoding(id_usuario)
+                    guardar_encoding(id_usuario, self.biometria_temp)
 
-                  eliminar_encoding(id_usuario)  # borrar viejo
-                  guardar_encoding(id_usuario, self.biometria_temp)  # guardar nuevo
+                    encodings_db[:], usuarios_db[:] = cargar_encodings()
+                    self.biometria_temp = None
 
-                  encodings_db[:], usuarios_db[:] = cargar_encodings()
-
-                  self.biometria_temp = None
-                  
             else:
-                usuario_id = crear_usuario(n, ap, am, tipo_usuario, id_fac, None, cta, em)
 
-                print("DEBUG usuario_id:", usuario_id)
-                print("DEBUG biometria:", self.biometria_temp)
+                if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
+                    self.label_estado.configure(
+                        text="❌ Debes registrar biometría antes de guardar",
+                        text_color="#EF4444"
+                    )
+                    return
+
+                usuario_id = None
 
                 try:
-                    guardado = guardar_encoding(usuario_id, encoding=self.biometria_temp)
+                    usuario_id = crear_usuario(n, ap, am, tipo_usuario, id_fac, None, cta, em)
 
-                    if not guardado:
+                    if not usuario_id:
                         self.label_estado.configure(
-                            text="❌ Rostro ya registrado en el sistema",
+                            text="❌ No se pudo crear el usuario",
                             text_color="#EF4444"
-                        ) 
+                        )
                         return
 
-                    print("✔ Encoding guardado en BD")
-                
-                except Exception as e:
-                    print("ERROR al guardar encoding:", e)
+                    guardado = guardar_encoding(usuario_id, self.biometria_temp)
 
-                encodings_db[:], usuarios_db[:] = cargar_encodings()
-                self.biometria_temp = None
+                    if not guardado:
+                        desactivar_usuario(usuario_id)
+
+                        self.label_estado.configure(
+                            text="❌ Rostro ya registrado o biometría inválida. Usuario no guardado.",
+                            text_color="#EF4444"
+                        )
+                        return
+
+                    encodings_db[:], usuarios_db[:] = cargar_encodings()
+                    self.biometria_temp = None
+
+                    print("✔ Usuario y biometría guardados correctamente")
+
+                except Exception as e:
+                    print("ERROR al guardar usuario/biometría:", e)
+
+                    if usuario_id:
+                        desactivar_usuario(usuario_id)
+
+                    self.label_estado.configure(
+                        text="❌ Error al guardar. No se registró el usuario.",
+                        text_color="#EF4444"
+                    )
+                    return
 
             self.refresh_data()
             self.render_table_content(self.all_users)

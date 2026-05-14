@@ -171,6 +171,11 @@ class UserManagementView(ctk.CTkFrame):
         self.usuario_editando_id = usuario["id"] if usuario else None 
         self.rol_var.set(usuario["r"] if usuario else "ESTUDIANTE")
         
+        self.estado_var = ctk.BooleanVar(value=True)
+
+        if usuario:
+            self.estado_var.set(usuario.get("estado", 1) == 1)
+        
         self.dict_facultades = obtener_facultades_para_dropdown()
         nombres_f = list(self.dict_facultades.values()) if self.dict_facultades else ["Sin Datos"]
         self.carreras_por_plantel = {}
@@ -204,6 +209,34 @@ class UserManagementView(ctk.CTkFrame):
 
         self.create_section_card(self.form_container, "👤 Información Personal", [("Nombres", usuario["nombre_solo"] if usuario else ""), ("Apellido Paterno", usuario["ap"] if usuario else ""), ("Apellido Materno", usuario["am"] if usuario else "")])
         self.create_section_card(self.form_container, "🆔 Identificación", [("cuenta", str(usuario["cuenta"]) if usuario and usuario["cuenta"] else ""), ("correo", str(usuario["correo"]) if usuario and usuario["correo"] else "")])
+        
+        if usuario:
+            estado_card = ctk.CTkFrame(
+                self.form_container,
+                fg_color=COLORS["card"],
+                corner_radius=12,
+                border_width=1,
+                border_color=COLORS["border"]
+            )
+            estado_card.pack(fill="x", padx=60, pady=10)
+
+            ctk.CTkLabel(
+                estado_card,
+                text="⚙️ Estado del usuario",
+                font=self.font_sub,
+                text_color=COLORS["text"]
+            ).pack(anchor="w", padx=20, pady=(15, 5))
+
+            self.switch_estado = ctk.CTkSwitch(
+                estado_card,
+                text="Usuario activo",
+                variable=self.estado_var,
+                onvalue=True,
+                offvalue=False,
+                font=self.font_normal,
+                text_color=COLORS["text"]
+            )
+            self.switch_estado.pack(anchor="w", padx=20, pady=(5, 20))
 
         vcmd = (self.register(self.validar_ocho_numeros), '%P')
         entrada = self.inputs_obligatorios.get("cuenta") 
@@ -393,8 +426,9 @@ class UserManagementView(ctk.CTkFrame):
 
             if self.usuario_editando_id:
 
-                actualizar_usuario(id_usuario, n, ap, am, cta, tipo_usuario, id_fac, em)
+                estado_valor = 1 if self.estado_var.get() else 0
 
+                actualizar_usuario(id_usuario,n,ap,am,cta,tipo_usuario,id_fac,em,estado_valor)
                 # Si tomó nueva biometría al editar, reemplazarla
                 if hasattr(self, "biometria_temp") and self.biometria_temp is not None:
                     print("♻️ Reemplazando biometría...")
@@ -429,12 +463,27 @@ class UserManagementView(ctk.CTkFrame):
                     guardado = guardar_encoding(usuario_id, self.biometria_temp)
 
                     if not guardado:
-                        desactivar_usuario(usuario_id)
+                        from app.database.database import get_connection
+
+                        conn = get_connection()
+                        cursor = conn.cursor()
+
+                        cursor.execute(
+                            "DELETE FROM usuario WHERE id_usuario = ?",
+                            (usuario_id,)
+                        )
+
+                        conn.commit()
+                        conn.close()
 
                         self.label_estado.configure(
                             text="❌ Rostro ya registrado o biometría inválida. Usuario no guardado.",
                             text_color="#EF4444"
                         )
+
+                        self.refresh_data()
+                        self.render_table_content(self.all_users)
+
                         return
 
                     encodings_db[:], usuarios_db[:] = cargar_encodings()
@@ -443,11 +492,23 @@ class UserManagementView(ctk.CTkFrame):
                     print("✔ Usuario y biometría guardados correctamente")
 
                 except Exception as e:
+
                     print("ERROR al guardar usuario/biometría:", e)
 
                     if usuario_id:
-                        desactivar_usuario(usuario_id)
+                        from app.database.database import get_connection
 
+                        conn = get_connection()
+                        cursor = conn.cursor()
+
+                        cursor.execute(
+                            "DELETE FROM usuario WHERE id_usuario = ?",
+                            (usuario_id,)
+                        )
+
+                        conn.commit()
+                        conn.close()
+                    
                     self.label_estado.configure(
                         text="❌ Error al guardar. No se registró el usuario.",
                         text_color="#EF4444"

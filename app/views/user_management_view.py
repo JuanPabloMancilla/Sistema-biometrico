@@ -55,6 +55,8 @@ class UserManagementView(ctk.CTkFrame):
         
         self.filtro_rol_actual = "Todos"
         self.filter_visible = False 
+        self.is_compact = False
+        self.bind("<Configure>", self._on_resize)
 
         self.vista_tabla = ctk.CTkFrame(self, fg_color="transparent")
         self.vista_tabla.pack(fill="both", expand=True)
@@ -108,58 +110,248 @@ class UserManagementView(ctk.CTkFrame):
         permitidos = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚáéíóú "
 
         return all(c in permitidos for c in texto)
+    
+    
+    def _on_resize(self, event):
+        nuevo_compact = event.width < 700
+
+        if nuevo_compact != self.is_compact:
+            self.is_compact = nuevo_compact
+            if hasattr(self, "main_card"):
+                self.render_table_content(self.all_users)
+                
+                ###
 
     def render_table_content(self, user_list):
         for w in self.main_card.winfo_children(): 
             w.destroy()
 
-        ancho_foto, ancho_info, ancho_estado = 140, 400, 150
-        table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
-        table_head.pack(fill="x", padx=20, pady=(10, 5))
+        padx_card = 10 if self.is_compact else 20
 
-        ctk.CTkLabel(table_head, text="👤 " + AppContext.t("FOTOGRAFÍA"), font=self.font_small, text_color=COLORS["subtext"], width=ancho_foto).pack(side="left")
-        ctk.CTkLabel(table_head, text="🆔 " + AppContext.t("INFORMACIÓN"), font=self.font_small, text_color=COLORS["subtext"], width=ancho_info, anchor="w").pack(side="left")
-        ctk.CTkLabel(table_head, text="⚙️ " + AppContext.t("ESTADO"), font=self.font_small, text_color=COLORS["subtext"], width=ancho_estado).pack(side="left")
-        ctk.CTkLabel(table_head, text=AppContext.t("ACCIONES"), font=self.font_small, text_color=COLORS["subtext"]).pack(side="right", padx=60)
-
-        ctk.CTkFrame(self.main_card, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
-        scroll.pack(expand=True, fill="both")
-        
-        for u in user_list:
-            row = ctk.CTkFrame(scroll, fg_color="transparent", height=70); row.pack(fill="x", side="top", pady=1); row.pack_propagate(False)
-            f_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_foto); f_b.pack(side="left"); f_b.pack_propagate(False)
-            ctk.CTkLabel(f_b, text="👤", font=("Inter", 32)).pack(expand=True)
+        scroll.pack(expand=True, fill="both", padx=padx_card, pady=10)
 
-            i_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_info)
-            i_b.pack(side="left", fill="y")
-            i_b.pack_propagate(False)
-            i_in = ctk.CTkFrame(i_b, fg_color="transparent")
-            i_in.pack(expand=True, fill="x", anchor="w")
-            l_n = ctk.CTkFrame(i_in, fg_color="transparent")
-            l_n.pack(anchor="w")
-            ctk.CTkLabel(l_n, text=f"{u['nombre_solo']} {u['ap']} {u['am']}".upper(), font=("Inter", 13, "bold"), text_color=COLORS["text"]).pack(side="left")
-            
-            col = self.colors.get(u["r"].upper(), {"bg": "#E2E8F0", "text": "#475569"})
-            badge_r = ctk.CTkFrame(l_n, fg_color=col["bg"], corner_radius=4)
-            badge_r.pack(side="left", padx=8)
-            ctk.CTkLabel(badge_r, text=u["r"], font=("Inter", 9, "bold"), text_color=col["text"]).pack(padx=6, pady=1)
-            ctk.CTkLabel(i_in, text=f"ID: {u['cuenta']}  •  {u['correo']}", font=("Inter", 11), text_color=COLORS["subtext"]).pack(anchor="w")
+        if not user_list:
+            ctk.CTkLabel(
+                scroll,
+                text="No hay usuarios registrados",
+                font=self.font_normal,
+                text_color=COLORS["subtext"]
+            ).pack(pady=40)
+            return
 
-            e_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado)
-            e_b.pack(side="left", fill="y")
-            e_b.pack_propagate(False)
-            es_activo = u.get('estado', 1) == 1
-            badge_e = ctk.CTkFrame(e_b, fg_color="#D1FAE5" if es_activo else "#FEE2E2", corner_radius=20); badge_e.pack(expand=True)
-            ctk.CTkLabel(badge_e, text="● ACTIVO" if es_activo else "● INACTIVO", font=("Inter", 9, "bold"), text_color="#065F46" if es_activo else "#991B1B").pack(padx=10, pady=3)
+        if self.is_compact:
+            # Vista tipo tarjeta para Raspberry vertical 480x800
+            for u in user_list:
+                card = ctk.CTkFrame(
+                    scroll,
+                    fg_color=COLORS["card"],
+                    corner_radius=14,
+                    border_width=1,
+                    border_color=COLORS["border"]
+                )
+                card.pack(fill="x", padx=2, pady=8)
 
-            a_b = ctk.CTkFrame(row, fg_color="transparent"); a_b.pack(side="right", padx=20)
-            ctk.CTkButton(a_b, text="✏️", width=32, height=32, fg_color=COLORS["hover"]
-, text_color=COLORS["text"], command=lambda d=u: self.abrir_formulario(d)).pack(side="left", padx=4)
-            ctk.CTkButton(a_b, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda i=u['id']: self.ejecutar_eliminacion(i)).pack(side="left", padx=2)
-            ctk.CTkFrame(scroll, fg_color=COLORS["hover"]
-, height=1).pack(fill="x", padx=20, side="top")
+                top = ctk.CTkFrame(card, fg_color="transparent")
+                top.pack(fill="x", padx=12, pady=(12, 4))
 
+                ctk.CTkLabel(
+                    top,
+                    text="👤",
+                    font=("Inter", 28)
+                ).pack(side="left", padx=(0, 8))
+
+                info = ctk.CTkFrame(top, fg_color="transparent")
+                info.pack(side="left", fill="x", expand=True)
+
+                nombre_completo = f"{u['nombre_solo']} {u['ap']} {u['am']}".upper()
+
+                ctk.CTkLabel(
+                    info,
+                    text=nombre_completo,
+                    font=("Inter", 12, "bold"),
+                    text_color=COLORS["text"],
+                    anchor="w",
+                    wraplength=300,
+                    justify="left"
+                ).pack(anchor="w", fill="x")
+
+                ctk.CTkLabel(
+                    info,
+                    text=f"ID: {u['cuenta']}",
+                    font=("Inter", 11),
+                    text_color=COLORS["subtext"],
+                    anchor="w"
+                ).pack(anchor="w", fill="x")
+
+                if u["correo"]:
+                    ctk.CTkLabel(
+                        info,
+                        text=u["correo"],
+                        font=("Inter", 10),
+                        text_color=COLORS["subtext"],
+                        anchor="w",
+                        wraplength=300,
+                        justify="left"
+                    ).pack(anchor="w", fill="x")
+
+                badges = ctk.CTkFrame(card, fg_color="transparent")
+                badges.pack(fill="x", padx=12, pady=(4, 8))
+
+                col = self.colors.get(u["r"].upper(), {"bg": "#E2E8F0", "text": "#475569"})
+                badge_r = ctk.CTkFrame(badges, fg_color=col["bg"], corner_radius=12)
+                badge_r.pack(side="left", padx=(0, 6))
+
+                ctk.CTkLabel(
+                    badge_r,
+                    text=u["r"],
+                    font=("Inter", 9, "bold"),
+                    text_color=col["text"]
+                ).pack(padx=8, pady=3)
+
+                es_activo = u.get("estado", 1) == 1
+                badge_e = ctk.CTkFrame(
+                    badges,
+                    fg_color="#D1FAE5" if es_activo else "#FEE2E2",
+                    corner_radius=12
+                )
+                badge_e.pack(side="left")
+
+                ctk.CTkLabel(
+                    badge_e,
+                    text="● ACTIVO" if es_activo else "● INACTIVO",
+                    font=("Inter", 9, "bold"),
+                    text_color="#065F46" if es_activo else "#991B1B"
+                ).pack(padx=8, pady=3)
+
+                actions = ctk.CTkFrame(card, fg_color="transparent")
+                actions.pack(fill="x", padx=12, pady=(0, 12))
+
+                ctk.CTkButton(
+                    actions,
+                    text="✏️ Editar",
+                    height=34,
+                    fg_color=COLORS["hover"],
+                    text_color=COLORS["text"],
+                    command=lambda d=u: self.abrir_formulario(d)
+                ).pack(side="left", expand=True, fill="x", padx=(0, 6))
+
+                ctk.CTkButton(
+                    actions,
+                    text="🗑️ Desactivar",
+                    height=34,
+                    fg_color="#FFF1F2",
+                    text_color="#E11D48",
+                    command=lambda i=u["id"]: self.ejecutar_eliminacion(i)
+                ).pack(side="left", expand=True, fill="x", padx=(6, 0))
+
+        else:
+            # Vista normal horizontal
+            ancho_foto, ancho_info, ancho_estado = 140, 400, 150
+
+            table_head = ctk.CTkFrame(scroll, fg_color="transparent", height=35)
+            table_head.pack(fill="x", pady=(0, 5))
+
+            ctk.CTkLabel(table_head, text="👤 " + AppContext.t("FOTOGRAFÍA"), font=self.font_small, text_color=COLORS["subtext"], width=ancho_foto).pack(side="left")
+            ctk.CTkLabel(table_head, text="🆔 " + AppContext.t("INFORMACIÓN"), font=self.font_small, text_color=COLORS["subtext"], width=ancho_info, anchor="w").pack(side="left")
+            ctk.CTkLabel(table_head, text="⚙️ " + AppContext.t("ESTADO"), font=self.font_small, text_color=COLORS["subtext"], width=ancho_estado).pack(side="left")
+            ctk.CTkLabel(table_head, text=AppContext.t("ACCIONES"), font=self.font_small, text_color=COLORS["subtext"]).pack(side="right", padx=60)
+
+            ctk.CTkFrame(scroll, fg_color=COLORS["border"], height=1).pack(fill="x")
+
+            for u in user_list:
+                row = ctk.CTkFrame(scroll, fg_color="transparent", height=70)
+                row.pack(fill="x", side="top", pady=1)
+                row.pack_propagate(False)
+
+                f_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_foto)
+                f_b.pack(side="left")
+                f_b.pack_propagate(False)
+                ctk.CTkLabel(f_b, text="👤", font=("Inter", 32)).pack(expand=True)
+
+                i_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_info)
+                i_b.pack(side="left", fill="y")
+                i_b.pack_propagate(False)
+
+                i_in = ctk.CTkFrame(i_b, fg_color="transparent")
+                i_in.pack(expand=True, fill="x", anchor="w")
+
+                l_n = ctk.CTkFrame(i_in, fg_color="transparent")
+                l_n.pack(anchor="w")
+
+                ctk.CTkLabel(
+                    l_n,
+                    text=f"{u['nombre_solo']} {u['ap']} {u['am']}".upper(),
+                    font=("Inter", 13, "bold"),
+                    text_color=COLORS["text"]
+                ).pack(side="left")
+
+                col = self.colors.get(u["r"].upper(), {"bg": "#E2E8F0", "text": "#475569"})
+                badge_r = ctk.CTkFrame(l_n, fg_color=col["bg"], corner_radius=4)
+                badge_r.pack(side="left", padx=8)
+
+                ctk.CTkLabel(
+                    badge_r,
+                    text=u["r"],
+                    font=("Inter", 9, "bold"),
+                    text_color=col["text"]
+                ).pack(padx=6, pady=1)
+
+                ctk.CTkLabel(
+                    i_in,
+                    text=f"ID: {u['cuenta']}  •  {u['correo']}",
+                    font=("Inter", 11),
+                    text_color=COLORS["subtext"]
+                ).pack(anchor="w")
+
+                e_b = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado)
+                e_b.pack(side="left", fill="y")
+                e_b.pack_propagate(False)
+
+                es_activo = u.get("estado", 1) == 1
+
+                badge_e = ctk.CTkFrame(
+                    e_b,
+                    fg_color="#D1FAE5" if es_activo else "#FEE2E2",
+                    corner_radius=20
+                )
+                badge_e.pack(expand=True)
+
+                ctk.CTkLabel(
+                    badge_e,
+                    text="● ACTIVO" if es_activo else "● INACTIVO",
+                    font=("Inter", 9, "bold"),
+                    text_color="#065F46" if es_activo else "#991B1B"
+                ).pack(padx=10, pady=3)
+
+                a_b = ctk.CTkFrame(row, fg_color="transparent")
+                a_b.pack(side="right", padx=20)
+
+                ctk.CTkButton(
+                    a_b,
+                    text="✏️",
+                    width=32,
+                    height=32,
+                    fg_color=COLORS["hover"],
+                    text_color=COLORS["text"],
+                    command=lambda d=u: self.abrir_formulario(d)
+                ).pack(side="left", padx=4)
+
+                ctk.CTkButton(
+                    a_b,
+                    text="🗑️",
+                    width=32,
+                    height=32,
+                    fg_color="#FFF1F2",
+                    text_color="#E11D48",
+                    command=lambda i=u["id"]: self.ejecutar_eliminacion(i)
+                ).pack(side="left", padx=2)
+
+                ctk.CTkFrame(scroll, fg_color=COLORS["hover"], height=1).pack(fill="x")
+
+    
+    ####
+    
     def abrir_formulario(self, usuario=None):
         self.vista_tabla.pack_forget()
         self.inputs_obligatorios, self.inputs_apellidos = {}, {}

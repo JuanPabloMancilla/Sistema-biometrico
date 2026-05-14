@@ -34,10 +34,14 @@ class FacultadManagementView(ctk.CTkFrame):
         self.render_table_content()
     
     def crear_vista_tabla(self):
+        
+        
+        self.vista_tabla = ctk.CTkFrame(self, fg_color="transparent")
+        self.vista_tabla.pack(fill="both", expand=True)
 
         padx_main = 20 if self.is_compact else 40
         pady_top = 20 if self.is_compact else 40
-        header = ctk.CTkFrame(self, fg_color="transparent")
+        header = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
         header.pack(fill="x", padx=padx_main, pady=(pady_top, 20))
         
         title_cont = ctk.CTkFrame(header, fg_color="transparent")
@@ -49,7 +53,7 @@ class FacultadManagementView(ctk.CTkFrame):
                      font=self.font_sub, height=50, corner_radius=12, command=self.abrir_formulario).pack(side="right", anchor="n")
 
         # 2. Barra de búsqueda
-        bar = ctk.CTkFrame(self, fg_color="transparent")
+        bar = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
         bar.pack(fill="x", padx=padx_main, pady=(0, 10))
         self.entry_busqueda = ctk.CTkEntry(
             bar, placeholder_text="🔍 Buscar facultad por nombre...",
@@ -62,7 +66,7 @@ class FacultadManagementView(ctk.CTkFrame):
         
         # 3. Card Principal
         
-        self.main_card = ctk.CTkFrame(self, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
+        self.main_card = ctk.CTkFrame(self.vista_tabla, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
         self.main_card.pack(fill="both", expand=True, padx=padx_main, pady=(0, pady_top))
         
         self.render_table_content()
@@ -144,7 +148,7 @@ class FacultadManagementView(ctk.CTkFrame):
             ctk.CTkFrame(scroll, fg_color=COLORS["hover"], height=1).pack(fill="x", padx=20)
 
     def abrir_formulario(self, id_facultad=None):
-        self.main_card.pack_forget()
+        self.vista_tabla.pack_forget()
         
         if id_facultad:
             self.modo_edicion = True
@@ -243,6 +247,8 @@ class FacultadManagementView(ctk.CTkFrame):
             self.render_table_content()
 
     def volver_a_tabla(self):
-        if hasattr(self, 'form_base'): self.form_base.destroy()
-        self.main_card.pack(fill="both", expand=True, padx=40, pady=(0, 40))
+        if hasattr(self, 'form_base'):
+            self.form_base.destroy()
+
+        self.vista_tabla.pack(fill="both", expand=True)
         self.render_table_content()

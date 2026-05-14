@@ -73,79 +73,283 @@ class FacultadManagementView(ctk.CTkFrame):
 
     def _on_search(self, event=None):
         self.render_table_content()
+        
+        ##responsive 
 
     def render_table_content(self):
-        """Renderiza la tabla de facultades, filtrando por búsqueda"""
-        for w in self.main_card.winfo_children(): 
+        for w in self.main_card.winfo_children():
             w.destroy()
 
-        ancho_id = 100
-        ancho_nombre = 450
-        ancho_estado = 150
-
-        table_head = ctk.CTkFrame(self.main_card, fg_color="transparent", height=35)
-        table_head.pack(fill="x", padx=20, pady=(10, 5))
-
-        ctk.CTkLabel(table_head, text="🏛️ " + AppContext.t("Nombre de la Facultad").upper(), font=self.font_small, text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
-        ctk.CTkLabel(table_head, text="⚙️ " + AppContext.t("Estado").upper(), font=self.font_small, text_color=COLORS["text"], width=ancho_estado, anchor="center").pack(side="left")
-        ctk.CTkLabel(table_head, text=AppContext.t("Acciones").upper(), font=self.font_small, text_color=COLORS["text"]).pack(side="right", padx=60)
-
-        ctk.CTkLabel(table_head, text="🏛️ " + AppContext.t("Nombre de la Facultad").upper(), font=self.font_small, text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
-        ctk.CTkLabel(table_head, text="⚙️ " + AppContext.t("Estado").upper(), font=self.font_small, text_color=COLORS["text"], width=ancho_estado, anchor="center").pack(side="left")
-        ctk.CTkLabel(table_head, text=AppContext.t("Acciones").upper(), font=self.font_small, text_color=COLORS["text"]).pack(side="right", padx=60)
-
-        ctk.CTkFrame(self.main_card, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
-
         todas = obtener_todas_facultades()
-        # Ordenar: activas primero, inactivas al final
-        todas.sort(key=lambda f: (f.get('estado', 1) == 0, f["nombre"]))
-        
-        query = self.entry_busqueda.get().strip().lower() if hasattr(self, "entry_busqueda") else ""
-        facultades = [f for f in todas if query in f["nombre"].lower()] if query else todas
 
-        scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
-        scroll.pack(expand=True, fill="both")
+        # Activas primero
+        todas.sort(key=lambda f: (f.get('estado', 1) == 0, f["nombre"]))
+
+        query = self.entry_busqueda.get().strip().lower() if hasattr(self, "entry_busqueda") else ""
+
+        facultades = [
+            f for f in todas
+            if query in f["nombre"].lower()
+        ] if query else todas
+
+        scroll = ctk.CTkScrollableFrame(
+            self.main_card,
+            fg_color="transparent"
+        )
+        scroll.pack(expand=True, fill="both", padx=10, pady=10)
 
         if not facultades:
-            msg = f"No se encontraron facultades para \"{query}\"" if query else "No hay facultades registradas"
-            ctk.CTkLabel(scroll, text=AppContext.t(msg), font=self.font_normal, text_color="#94A3B8").pack(pady=40)
-            return
-
-        for f in facultades:
-            row = ctk.CTkFrame(scroll, fg_color="transparent", height=65)
-            row.pack(fill="x", side="top", pady=1)
-            row.pack_propagate(False)
-
-            ctk.CTkLabel(row, text=f"#{f['id']}", font=self.font_normal, text_color=COLORS["text"], width=ancho_id).pack(side="left")
-            ctk.CTkLabel(row, text=f["nombre"].upper(), font=("Inter", 12, "bold"), text_color=COLORS["text"], width=ancho_nombre, anchor="w").pack(side="left")
-
-            es_activa = f.get('estado', 1) == 1
-
-            estado_box = ctk.CTkFrame(row, fg_color="transparent", width=ancho_estado)
-            estado_box.pack(side="left", fill="y")
-            estado_box.pack_propagate(False)
-
-            badge_est = ctk.CTkFrame(estado_box, fg_color="#D1FAE5" if es_activa else "#FEE2E2", corner_radius=20)
-            badge_est.pack(expand=True)
+            msg = f"No se encontraron facultades para '{query}'" if query else "No hay facultades registradas"
 
             ctk.CTkLabel(
-                badge_est,
-                text="● " + (AppContext.t("Activa").upper() if es_activa else AppContext.t("Inactiva").upper()),
-                font=("Inter", 9, "bold"),
-                text_color="#065F46" if es_activa else "#991B1B"
-            ).pack(padx=10, pady=3)
+                scroll,
+                text=AppContext.t(msg),
+                font=self.font_normal,
+                text_color="#94A3B8"
+            ).pack(pady=40)
 
-            act_block = ctk.CTkFrame(row, fg_color="transparent")
-            act_block.pack(side="right", padx=20)
-            
-            ctk.CTkButton(act_block, text="✏️", width=32, height=32, fg_color=COLORS["hover"], text_color=COLORS["text"], command=lambda id_f=f["id"]: self.abrir_formulario(id_f)).pack(side="left", padx=4)
-            
-            if es_activa:
-                ctk.CTkButton(act_block, text="🗑️", width=32, height=32, fg_color="#FFF1F2", text_color="#E11D48", command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_desactivar_modal(id_f, n)).pack(side="left", padx=2)
-            else:
-                ctk.CTkButton(act_block, text=AppContext.t("🔄 Activar"), width=80, height=32, fg_color="#10B981", text_color="white", font=("Inter", 9, "bold"), command=lambda id_f=f["id"]: self.reactivar_facultad(id_f)).pack(side="left", padx=2)
+            return
 
-            ctk.CTkFrame(scroll, fg_color=COLORS["hover"], height=1).pack(fill="x", padx=20)
+        # =========================
+        # VISTA COMPACTA RASPBERRY
+        # =========================
+        if self.is_compact:
+
+            for f in facultades:
+
+                es_activa = f.get("estado", 1) == 1
+
+                card = ctk.CTkFrame(
+                    scroll,
+                    fg_color=COLORS["card"],
+                    corner_radius=14,
+                    border_width=1,
+                    border_color=COLORS["border"]
+                )
+
+                card.pack(fill="x", padx=2, pady=8)
+
+                top = ctk.CTkFrame(card, fg_color="transparent")
+                top.pack(fill="x", padx=14, pady=(14, 8))
+
+                ctk.CTkLabel(
+                    top,
+                    text="🏫",
+                    font=("Inter", 26)
+                ).pack(side="left", padx=(0, 10))
+
+                info = ctk.CTkFrame(top, fg_color="transparent")
+                info.pack(side="left", fill="x", expand=True)
+
+                ctk.CTkLabel(
+                    info,
+                    text=f["nombre"].upper(),
+                    font=("Inter", 13, "bold"),
+                    text_color=COLORS["text"],
+                    anchor="w",
+                    wraplength=260,
+                    justify="left"
+                ).pack(anchor="w", fill="x")
+
+                ctk.CTkLabel(
+                    info,
+                    text=f"ID Facultad: {f['id']}",
+                    font=("Inter", 10),
+                    text_color=COLORS["subtext"]
+                ).pack(anchor="w")
+
+                badge_wrap = ctk.CTkFrame(card, fg_color="transparent")
+                badge_wrap.pack(fill="x", padx=14, pady=(0, 10))
+
+                badge_est = ctk.CTkFrame(
+                    badge_wrap,
+                    fg_color="#D1FAE5" if es_activa else "#FEE2E2",
+                    corner_radius=20
+                )
+
+                badge_est.pack(side="left")
+
+                ctk.CTkLabel(
+                    badge_est,
+                    text="● ACTIVA" if es_activa else "● INACTIVA",
+                    font=("Inter", 9, "bold"),
+                    text_color="#065F46" if es_activa else "#991B1B"
+                ).pack(padx=10, pady=4)
+
+                actions = ctk.CTkFrame(card, fg_color="transparent")
+                actions.pack(fill="x", padx=14, pady=(0, 14))
+
+                ctk.CTkButton(
+                    actions,
+                    text="✏️ Editar",
+                    height=36,
+                    fg_color=COLORS["hover"],
+                    text_color=COLORS["text"],
+                    command=lambda id_f=f["id"]: self.abrir_formulario(id_f)
+                ).pack(side="left", expand=True, fill="x", padx=(0, 6))
+
+                if es_activa:
+
+                    ctk.CTkButton(
+                        actions,
+                        text="🗑️ Desactivar",
+                        height=36,
+                        fg_color="#FFF1F2",
+                        text_color="#E11D48",
+                        command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_desactivar_modal(id_f, n)
+                    ).pack(side="left", expand=True, fill="x", padx=(6, 0))
+
+                else:
+
+                    ctk.CTkButton(
+                        actions,
+                        text="🔄 Activar",
+                        height=36,
+                        fg_color="#10B981",
+                        text_color="white",
+                        command=lambda id_f=f["id"]: self.reactivar_facultad(id_f)
+                    ).pack(side="left", expand=True, fill="x", padx=(6, 0))
+
+        # =========================
+        # VISTA ESCRITORIO
+        # =========================
+        else:
+
+            ancho_id = 100
+            ancho_nombre = 450
+            ancho_estado = 150
+
+            table_head = ctk.CTkFrame(scroll, fg_color="transparent", height=35)
+            table_head.pack(fill="x", pady=(0, 5))
+
+            ctk.CTkLabel(
+                table_head,
+                text="🏛️ NOMBRE DE LA FACULTAD",
+                font=self.font_small,
+                text_color=COLORS["text"],
+                width=ancho_nombre,
+                anchor="w"
+            ).pack(side="left")
+
+            ctk.CTkLabel(
+                table_head,
+                text="⚙️ ESTADO",
+                font=self.font_small,
+                text_color=COLORS["text"],
+                width=ancho_estado
+            ).pack(side="left")
+
+            ctk.CTkLabel(
+                table_head,
+                text="ACCIONES",
+                font=self.font_small,
+                text_color=COLORS["text"]
+            ).pack(side="right", padx=60)
+
+            ctk.CTkFrame(
+                scroll,
+                fg_color=COLORS["border"],
+                height=1
+            ).pack(fill="x")
+
+            for f in facultades:
+
+                es_activa = f.get("estado", 1) == 1
+
+                row = ctk.CTkFrame(
+                    scroll,
+                    fg_color="transparent",
+                    height=65
+                )
+
+                row.pack(fill="x", pady=1)
+                row.pack_propagate(False)
+
+                ctk.CTkLabel(
+                    row,
+                    text=f"#{f['id']}",
+                    font=self.font_normal,
+                    text_color=COLORS["text"],
+                    width=ancho_id
+                ).pack(side="left")
+
+                ctk.CTkLabel(
+                    row,
+                    text=f["nombre"].upper(),
+                    font=("Inter", 12, "bold"),
+                    text_color=COLORS["text"],
+                    width=ancho_nombre,
+                    anchor="w"
+                ).pack(side="left")
+
+                estado_box = ctk.CTkFrame(
+                    row,
+                    fg_color="transparent",
+                    width=ancho_estado
+                )
+
+                estado_box.pack(side="left", fill="y")
+                estado_box.pack_propagate(False)
+
+                badge_est = ctk.CTkFrame(
+                    estado_box,
+                    fg_color="#D1FAE5" if es_activa else "#FEE2E2",
+                    corner_radius=20
+                )
+
+                badge_est.pack(expand=True)
+
+                ctk.CTkLabel(
+                    badge_est,
+                    text="● ACTIVA" if es_activa else "● INACTIVA",
+                    font=("Inter", 9, "bold"),
+                    text_color="#065F46" if es_activa else "#991B1B"
+                ).pack(padx=10, pady=3)
+
+                act_block = ctk.CTkFrame(row, fg_color="transparent")
+                act_block.pack(side="right", padx=20)
+
+                ctk.CTkButton(
+                    act_block,
+                    text="✏️",
+                    width=32,
+                    height=32,
+                    fg_color=COLORS["hover"],
+                    text_color=COLORS["text"],
+                    command=lambda id_f=f["id"]: self.abrir_formulario(id_f)
+                ).pack(side="left", padx=4)
+
+                if es_activa:
+
+                    ctk.CTkButton(
+                        act_block,
+                        text="🗑️",
+                        width=32,
+                        height=32,
+                        fg_color="#FFF1F2",
+                        text_color="#E11D48",
+                        command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_desactivar_modal(id_f, n)
+                    ).pack(side="left", padx=2)
+
+                else:
+
+                    ctk.CTkButton(
+                        act_block,
+                        text="🔄",
+                        width=50,
+                        height=32,
+                        fg_color="#10B981",
+                        text_color="white",
+                        command=lambda id_f=f["id"]: self.reactivar_facultad(id_f)
+                    ).pack(side="left", padx=2)
+
+                ctk.CTkFrame(
+                    scroll,
+                    fg_color=COLORS["hover"],
+                    height=1
+                ).pack(fill="x")
+            
+            ## 
 
     def abrir_formulario(self, id_facultad=None):
         self.vista_tabla.pack_forget()

@@ -428,7 +428,18 @@ class CarreraManagementView(ctk.CTkFrame):
         estado = 1 if self.combo_estado.get() == AppContext.t("Activa") else 0
         fac_nombre = self.combo_facultad.get()
         id_facultad = next((id for id, n in self.facultades_dict.items() if n == fac_nombre), None)
-        if not nombre or not id_facultad: return 
+        if not nombre or not id_facultad:
+            return
+
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+
+        if not re.match(patron, nombre):
+            print("❌ Carrera inválida")
+            return
+
+        if len(nombre) < 4:
+            print("❌ Nombre de carrera demasiado corto")
+            return
 
         if len(nombre) < 3:
             print("❌ Nombre muy corto")

@@ -13,6 +13,8 @@ from app.views.app_context import AppContext
 from datetime import datetime
 from tkcalendar import DateEntry
 from app.detection.detector_rostro import logs_accesos
+from app.database.database import get_connection
+
 
 
 class DashboardView(ctk.CTkFrame):
@@ -274,6 +276,45 @@ class DashboardView(ctk.CTkFrame):
             self.actualizar_navegacion(self.btn_account)
         AccountView(self.content_container, on_logout=self.on_back).pack(fill="both", expand=True, padx=40)
 
+
+
+    def obtener_estadisticas_dashboard(self):
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        hoy = datetime.now().strftime("%Y-%m-%d")
+
+        cursor.execute("SELECT COUNT(*) FROM usuario")
+        total_registros = cursor.fetchone()[0]
+
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM registro_acceso
+            WHERE DATE(fecha_hora) = ?
+        """, (hoy,))
+        accesos_hoy = cursor.fetchone()[0]
+
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM registro_acceso
+            WHERE DATE(fecha_hora) = ?
+            AND resultado = 1
+        """, (hoy,))
+        autorizados = cursor.fetchone()[0]
+
+        cursor.execute("""
+            SELECT COUNT(*) 
+            FROM registro_acceso
+            WHERE DATE(fecha_hora) = ?
+            AND resultado = 0
+        """, (hoy,))
+        denegados = cursor.fetchone()[0]
+
+        conn.close()
+
+        return total_registros, accesos_hoy, autorizados, denegados
+    
+    
     # --- RENDERIZADO DEL PANEL DE CONTROL (DASHBOARD) ---
     def render_dashboard_principal(self):
         
@@ -295,10 +336,12 @@ class DashboardView(ctk.CTkFrame):
             stats_frame.grid_columnconfigure(0, weight=1)
             stats_frame.grid_columnconfigure(1, weight=1)
 
-        self.create_stat_card(stats_frame, "👥 " + AppContext.t("Total Registros"), "17", "#3B82F6", 0)
-        self.create_stat_card(stats_frame, "🕒 " + AppContext.t("Accesos Hoy"), "5", "#6366F1", 1)
-        self.create_stat_card(stats_frame, "✅ " + AppContext.t("Autorizados"), "4", "#10B981", 2)
-        self.create_stat_card(stats_frame, "🚫 " + AppContext.t("Denegados"), "1", "#EF4444", 3)
+        total_registros, accesos_hoy, autorizados, denegados = self.obtener_estadisticas_dashboard()
+
+        self.create_stat_card(stats_frame, "👥 " + AppContext.t("Total Registros"), str(total_registros), "#3B82F6", 0)
+        self.create_stat_card(stats_frame, "🕒 " + AppContext.t("Accesos Hoy"), str(accesos_hoy), "#6366F1", 1)
+        self.create_stat_card(stats_frame, "✅ " + AppContext.t("Autorizados"), str(autorizados), "#10B981", 2)
+        self.create_stat_card(stats_frame, "🚫 " + AppContext.t("Denegados"), str(denegados), "#EF4444", 3)
         
         # Contenedor de la Gráfica
         graph_box = ctk.CTkFrame(main_scroll, fg_color=COLORS["card"], corner_radius=20, border_width=1, border_color=COLORS["border"], height=280)

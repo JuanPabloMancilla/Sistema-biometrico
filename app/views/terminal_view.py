@@ -9,6 +9,8 @@ from app.views.app_context import AppContext
 from app.camara.camara import iniciar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
 from app.services.usuario_service import usuario_activo
+from app.database.database import get_connection
+from datetime import datetime
 
 
 # ── Paleta ────────────────────────────────────────────────────────────────────
@@ -544,6 +546,12 @@ class TerminalView(ctk.CTkFrame):
                         if any(p in self.usuario_detectado for p in ("DESCONOCIDO", "ERROR", "NO REGISTRADO")):
 
                             self.aplicar_estilo_visual("negado")
+                            self.registrar_acceso_bd(
+                                usuario_id,
+                                0,
+                                None,
+                                "Acceso denegado"
+                            )
 
                         else:
 
@@ -554,12 +562,25 @@ class TerminalView(ctk.CTkFrame):
                                     "autorizado",
                                     usuario=self.usuario_detectado
                                 )
+                                self.registrar_acceso_bd(
+                                    usuario_id,
+                                    1,
+                                    None,
+                                    "Acceso autorizado"
+                                )
 
                             #usuario inactivo
 
                             else:
 
                                 self.estado_actual = "negado"
+                                
+                                self.registrar_acceso_bd(
+                                usuario_id,
+                                0,
+                                None,
+                                "Usuario inactivo"
+                                )
 
                                 self.status_label.configure(
                                     text="USUARIO INACTIVO",
@@ -678,3 +699,30 @@ class TerminalView(ctk.CTkFrame):
                 print("📷 Cámara liberada")
 
         self.cap = None
+        
+        
+        
+    def registrar_acceso_bd(self, id_usuario, resultado, confianza=None, motivo=""):
+        try:
+            conn = get_connection()
+            cursor = conn.cursor()
+
+            cursor.execute("""
+                INSERT INTO registro_acceso
+                (id_usuario, fecha_hora, resultado, confianza, motivo)
+                VALUES (?, ?, ?, ?, ?)
+            """, (
+                id_usuario,
+                datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                resultado,
+                confianza,
+                motivo
+            ))
+
+            conn.commit()
+            conn.close()
+
+            print("✔ Acceso registrado en BD:", motivo)
+
+        except Exception as e:
+            print("❌ Error registrando acceso:", e)

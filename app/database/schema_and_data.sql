@@ -86,10 +86,5 @@ INSERT OR IGNORE INTO "carrera" VALUES (8,'Ingeniería en Tecnologías Electrón
 INSERT OR IGNORE INTO "carrera" VALUES (9,'Ingeniería en Mecatrónica (IMT)',4,1);
 INSERT OR IGNORE INTO "carrera" VALUES (10,'Ingeniería de Software (IS)',4,1);
 
-INSERT OR IGNORE INTO "usuario" 
-(id_usuario, nombre, a_paterno, a_materno, cuenta, correo, tipo_usuario, estado, fecha_registro, fecha_actualizacion, id_facultad, id_carrera)
-VALUES 
-(1,'Juan Pablo','Mancilla','Rodriguez',NULL,NULL,1,1,'2026-03-08 18:45:43',NULL,4,10),
-(2,'valeria','cuevas','cervantes',NULL,NULL,1,1,'2026-03-08 18:45:43',NULL,4,10);
 
 COMMIT;

@@ -107,7 +107,7 @@ class UserManagementView(ctk.CTkFrame):
     def validar_texto_real(self, texto):
         texto = texto.strip()
 
-        if len(texto) < 3:
+        if len(texto) < 2:
             return False
 
         patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
@@ -122,8 +122,6 @@ class UserManagementView(ctk.CTkFrame):
             if hasattr(self, "main_card"):
                 self.render_table_content(self.all_users)
                 
-                ###
-
     def render_table_content(self, user_list):
         for w in self.main_card.winfo_children(): 
             w.destroy()
@@ -143,7 +141,6 @@ class UserManagementView(ctk.CTkFrame):
             return
 
         if self.is_compact:
-            # Vista tipo tarjeta para Raspberry vertical 480x800
             for u in user_list:
                 card = ctk.CTkFrame(
                     scroll,
@@ -248,7 +245,6 @@ class UserManagementView(ctk.CTkFrame):
                 ).pack(side="left", expand=True, fill="x", padx=(6, 0))
 
         else:
-            # Vista normal horizontal
             ancho_foto, ancho_info, ancho_estado = 140, 400, 150
 
             table_head = ctk.CTkFrame(scroll, fg_color="transparent", height=35)
@@ -351,14 +347,10 @@ class UserManagementView(ctk.CTkFrame):
 
                 ctk.CTkFrame(scroll, fg_color=COLORS["hover"], height=1).pack(fill="x")
 
-    
-    ####
-    
     def abrir_formulario(self, usuario=None):
         self.vista_tabla.pack_forget()
         self.inputs_obligatorios, self.inputs_apellidos = {}, {}
 
-        # Solo se limpia en registros nuevos
         if not usuario:
             self.biometria_temp = None
 
@@ -373,9 +365,9 @@ class UserManagementView(ctk.CTkFrame):
         self.dict_facultades = obtener_facultades_para_dropdown()
         nombres_f = list(self.dict_facultades.values()) if self.dict_facultades else ["Sin Datos"]
         self.carreras_por_plantel = {}
-        # Filtrar solo carreras activas (estado = 1)
+
         for c in obtener_todas_carreras():
-            if c.get('estado', 1) != 1:  # Saltar carreras inactivas
+            if c.get('estado', 1) != 1:
                 continue
             fn = c['facultad_nombre']
             if fn not in self.carreras_por_plantel: 
@@ -811,12 +803,10 @@ class UserManagementView(ctk.CTkFrame):
         self.filtro_rol_actual = v
         self.draw_tags()
 
-        # Mostrar todos
         if v == "Todos":
             self.render_table_content(self.all_users)
             return
 
-        # Filtrar por rol
         usuarios_filtrados = [
             u for u in self.all_users
             if u["r"].upper() == v.upper()
@@ -830,12 +820,9 @@ class UserManagementView(ctk.CTkFrame):
         self.carrera_var.set(c[0])
 
     def ejecutar_eliminacion(self, id_cuenta):
-        # 1. Overlay Transparente (eliminamos el color azul oscuro)
         self.overlay = ctk.CTkFrame(self, fg_color="transparent") 
         self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
-        
-        # 2. Caja del Modal (la ventanita blanca)
-        # Añadimos borde más fuerte para que resalte sobre el fondo blanco
+         
         modal = ctk.CTkFrame(self.overlay, fg_color=COLORS["card"], corner_radius=20, width=420, height=240, border_width=2, border_color="#CBD5E1")
         modal.place(relx=0.5, rely=0.5, anchor="center")
         modal.pack_propagate(False)
@@ -846,11 +833,9 @@ class UserManagementView(ctk.CTkFrame):
         
         btns = ctk.CTkFrame(modal, fg_color="transparent")
         btns.pack(fill="x", side="bottom", pady=25, padx=30)
-        
-        # CANCELAR - Rojo
+      
         ctk.CTkButton(btns, text="Cancelar", fg_color="#EF4444", text_color="white", hover_color="#DC2626", height=40, font=("Inter", 13, "bold"), command=self.cerrar_modal).pack(side="left", expand=True, padx=(0, 10))
-        
-        # CONFIRMAR - Verde
+   
         ctk.CTkButton(btns, text="Confirmar y Borrar", fg_color="#10B981", text_color="white", hover_color="#059669", height=40, font=("Inter", 13, "bold"), command=lambda: self.confirmar_borrado(id_cuenta)).pack(side="left", expand=True)
 
     def cerrar_modal(self):
@@ -868,90 +853,121 @@ class UserManagementView(ctk.CTkFrame):
         self.render_table_content(self.all_users)
 
     def abrir_terminal_biometrica(self):
-       nombres = self.limpiar_texto(
+
+        self._limpiar_errores()
+
+        nombres = self.limpiar_texto(
             self.inputs_obligatorios["Nombres"].get()
         )
-       cuenta = self.inputs_obligatorios["cuenta"].get().strip()
-       correo = self.inputs_obligatorios["correo"].get().strip()
 
-       ap = self.limpiar_texto(
+        cuenta = self.inputs_obligatorios["cuenta"].get().strip()
+
+        correo = self.inputs_obligatorios["correo"].get().strip()
+
+        ap = self.limpiar_texto(
             self.inputs_apellidos["Apellido Paterno"].get()
         )
-       am = self.limpiar_texto(
+
+        am = self.limpiar_texto(
             self.inputs_apellidos["Apellido Materno"].get()
         )
 
-    # Nombre obligatorio
-       if not self.validar_texto_real(nombres):
-            self.label_estado.configure(
-              text="❌ Nombre inválido",
-              text_color="#EF4444"
-            )
-            return
+        hay_error = False
 
-    # Apellido obligatorio
-       if not self.validar_texto_real(ap):
-            self.label_estado.configure(
-              text="❌ Apellido inválido",
-              text_color="#EF4444"
+        if not self.validar_texto_real(nombres):
+            self._mostrar_error(
+                "Nombres",
+                "El nombre solo debe contener letras"
             )
-            return
-       
-       if am and not self.validar_texto_real(am):
-            self.label_estado.configure(
-              text="❌ Apellido materno inválido",
-              text_color="#EF4444"
+            hay_error = True
+
+        if not self.validar_texto_real(ap):
+            self._mostrar_error(
+                "Apellido Paterno",
+                "Apellido paterno inválido"
             )
-            return
+            hay_error = True
 
-    # Cuenta exacta de 8 dígitos
-       if not cuenta.isdigit() or len(cuenta) != 8:
-            self.label_estado.configure(
-               text="❌ La cuenta debe tener 8 números",
-               text_color="#EF4444"
+        if am and not self.validar_texto_real(am):
+            self._mostrar_error(
+                "Apellido Materno",
+                "Apellido materno inválido"
             )
-            return
+            hay_error = True
 
-    # Correo válido
-       if correo:
-           patron = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+        if not cuenta:
+            self._mostrar_error(
+                "cuenta",
+                "La cuenta es obligatoria"
+            )
+            hay_error = True
 
-           if not re.match(patron, correo):
-                self.label_estado.configure(
-                  text="❌ Correo inválido",
-                  text_color="#EF4444"
+        elif not cuenta.isdigit():
+            self._mostrar_error(
+                "cuenta",
+                "La cuenta solo debe contener números"
+            )
+            hay_error = True
+
+        elif len(cuenta) != 8:
+            self._mostrar_error(
+                "cuenta",
+                "La cuenta debe tener exactamente 8 números"
+            )
+            hay_error = True
+
+        if correo:
+
+            patron = r"^[\w\.-]+@[\w\.-]+\.\w+$"
+
+            if not re.match(patron, correo):
+
+                self._mostrar_error(
+                    "correo",
+                    "Correo electrónico inválido"
                 )
-                return
 
-       # =========================
-       # ABRIR BIOMETRÍA
-       # =========================
+                hay_error = True
 
-       self.form_base.pack_forget()
+        if hay_error:
 
-       self.terminal_container = ctk.CTkFrame(
-          self,
-          fg_color="black"
+            self.btn_biometria.configure(
+                text="❌ Corrige los datos primero",
+                fg_color="#EF4444",
+                hover_color="#DC2626"
+            )
+
+            return
+
+        self.btn_biometria.configure(
+            text="📷 Abriendo cámara...",
+            fg_color="#0EA5E9"
         )
 
-       self.terminal_container.pack(
-         fill="both",
-         expand=True
+        self.form_base.pack_forget()
+
+        self.terminal_container = ctk.CTkFrame(
+            self,
+            fg_color="black"
         )
 
-       self.terminal_view = TerminalView(
-          self.terminal_container,
-          user_id=None,
-          on_back=self.cerrar_terminal_biometrica,
-          on_capture=self.recibir_biometria,
-          modo="registro"
+        self.terminal_container.pack(
+            fill="both",
+            expand=True
         )
 
-       self.terminal_view.pack(
-          fill="both",
-          expand=True
+        self.terminal_view = TerminalView(
+            self.terminal_container,
+            user_id=None,
+            on_back=self.cerrar_terminal_biometrica,
+            on_capture=self.recibir_biometria,
+            modo="registro"
         )
 
+        self.terminal_view.pack(
+            fill="both",
+            expand=True
+        )
 
     def cerrar_terminal_biometrica(self):
         if hasattr(self, "terminal_view"):

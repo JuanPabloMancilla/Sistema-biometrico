@@ -462,26 +462,40 @@ class DashboardView(ctk.CTkFrame):
         if not self.graph_container.winfo_exists():
             return
 
-
-
         for widget in self.graph_container.winfo_children():
             widget.destroy()
 
-        mode = ctk.get_appearance_mode()
-        bg_color = "#1E293B" if mode == "Dark" else "#FFFFFF"
-        text_color = "#F8FAFC" if mode == "Dark" else "#000000"
-        grid_color = "#334155" if mode == "Dark" else "#E2E8F0"
-
         fecha = self.fecha_var.get()
+
+        conn = get_connection()
+        cursor = conn.cursor()
+
+        cursor.execute("""
+            SELECT 
+                CAST(strftime('%H', fecha_hora) AS INTEGER) AS hora,
+                COUNT(*) AS total
+            FROM registro_acceso
+            WHERE DATE(fecha_hora) = ?
+            GROUP BY hora
+            ORDER BY hora
+        """, (fecha,))
+
+        filas = cursor.fetchall()
+        conn.close()
+
         horas = list(range(24))
         conteo = [0] * 24
 
-        for log in logs_accesos:
-            if log["fecha"] == fecha:
-                h = int(log["hora"])
-                conteo[h] += 1
+        for fila in filas:
+            conteo[int(fila[0])] = int(fila[1])
 
-        fig = Figure(figsize=(6, 3), dpi=100)
+        mode = ctk.get_appearance_mode()
+        bg_color = "#1E293B" if mode == "Dark" else "#FFFFFF"
+        text_color = "#F8FAFC" if mode == "Dark" else "#0F172A"
+        grid_color = "#334155" if mode == "Dark" else "#E2E8F0"
+        line_color = "#3B82F6"
+
+        fig = Figure(figsize=(7, 3.2), dpi=100)
         ax = fig.add_subplot(111)
 
         fig.patch.set_facecolor(bg_color)
@@ -490,31 +504,71 @@ class DashboardView(ctk.CTkFrame):
         x = np.array(horas)
         y = np.array(conteo)
 
-        if sum(y) == 0:
-            y = np.zeros(24)
+        if sum(conteo) > 0:
+            x_smooth = np.linspace(x.min(), x.max(), 300)
+            spl = make_interp_spline(x, y, k=3)
+            y_smooth = np.clip(spl(x_smooth), 0, None)
 
-        x_smooth = np.linspace(x.min(), x.max(), 300)
-        spl = make_interp_spline(x, y, k=3)
-        y_smooth = spl(x_smooth)
-        y_smooth = np.clip(y_smooth, 0, None)
+            ax.fill_between(x_smooth, y_smooth, color=line_color, alpha=0.22)
+            ax.plot(x_smooth, y_smooth, color=line_color, linewidth=2.8)
 
-        ax.fill_between(x_smooth, y_smooth, color="#3B82F6", alpha=0.4)
-        ax.plot(x_smooth, y_smooth, color="#3B82F6", linewidth=2)
+            ax.scatter(
+                x,
+                y, 
+                s=28,
+                color=line_color,
+                edgecolors=bg_color,
+                linewidths=1.2,
+                zorder=3
+            )
+        else:
+            ax.plot(horas, conteo, color=line_color, linewidth=2.5, alpha=0.6)
 
-        ax.tick_params(colors=text_color, labelsize=9)
-        ax.xaxis.label.set_color(text_color)
-        ax.yaxis.label.set_color(text_color)
-        ax.title.set_color(text_color)
-        ax.grid(axis='y', linestyle='--', alpha=0.3, color=grid_color)
+            ax.text(
+                0.5,
+                0.5,
+                "Sin accesos registrados en esta fecha",
+                transform=ax.transAxes,
+                ha="center",
+                va="center",
+                fontsize=11,
+                color=text_color,
+                alpha=0.7
+            )
+
+        ax.set_xlim(0, 23)
+        ax.set_ylim(bottom=0)
+
+        max_y = max(conteo) if conteo else 0
+        ax.set_ylim(0, max(3, max_y + 1))
+
+        ax.set_xticks([0, 3, 6, 9, 12, 15, 18, 21, 23])
+        ax.set_xticklabels(
+            ["00:00", "03:00", "06:00", "09:00", "12:00", "15:00", "18:00", "21:00", "23:00"],
+            fontsize=9,
+            color=text_color
+        )
+
+        ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+        ax.tick_params(axis="y", colors=text_color, labelsize=9)
+
+        ax.grid(axis="y", linestyle="--", alpha=0.25, color=grid_color)
+        ax.grid(axis="x", visible=False)
 
         for spine in ax.spines.values():
             spine.set_visible(False)
 
-        #ax.set_title(f"Accesos del día {fecha}", fontsize=11, pad=10)
-        
+        ax.set_xlabel("")
+        ax.set_ylabel("")
+
+        fig.tight_layout(pad=1.4)
+
         canvas = FigureCanvasTkAgg(fig, master=self.graph_container)
         canvas.draw()
-        canvas.get_tk_widget().pack(fill="both", expand=True)
+
+        widget = canvas.get_tk_widget()
+        widget.configure(bg=bg_color, highlightthickness=0)
+        widget.pack(fill="both", expand=True)
         
     def render_mini_tabla_accesos_data(self):
         if not hasattr(self, "contenedor_tabla"):

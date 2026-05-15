@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import re
 from app.services.theme import COLORS
 from app.views.app_context import AppContext
 from app.services.facultad_service import (
@@ -403,7 +404,18 @@ class FacultadManagementView(ctk.CTkFrame):
     def guardar_facultad(self):
         nombre = self.input_nombre.get().strip()
         estado = 1 if self.combo_estado.get() == AppContext.t("Activa") else 0
-        if not nombre: return
+        if not nombre:
+            return
+
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
+
+        if not re.match(patron, nombre):
+            print("❌ Nombre de facultad inválido")
+            return
+
+        if len(nombre) < 5:
+            print("❌ Facultad demasiado corta")
+            return
 
         if len(nombre) < 3:
            print("❌ Nombre muy corto")

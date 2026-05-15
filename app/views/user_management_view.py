@@ -101,16 +101,18 @@ class UserManagementView(ctk.CTkFrame):
             return True
         return P.isdigit() and len(P) <= 8
     
+    def limpiar_texto(self, texto):
+        return " ".join(texto.strip().split()).title()
+    
     def validar_texto_real(self, texto):
         texto = texto.strip()
 
-        if len(texto) < 2:
+        if len(texto) < 3:
             return False
 
-        permitidos = "ABCDEFGHIJKLMNÑOPQRSTUVWXYZabcdefghijklmnñopqrstuvwxyzÁÉÍÓÚáéíóú "
+        patron = r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$"
 
-        return all(c in permitidos for c in texto)
-    
+        return bool(re.match(patron, texto))
     
     def _on_resize(self, event):
         nuevo_compact = event.width < 700
@@ -442,8 +444,22 @@ class UserManagementView(ctk.CTkFrame):
 
         btns = ctk.CTkFrame(self.form_container, fg_color="transparent"); btns.pack(fill="x", padx=60, pady=(20, 50))
         ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=50, command=self.cerrar_formulario).pack(side="left", expand=True, fill="x", padx=(0, 10))
-        ctk.CTkButton(btns, text="💾 Guardar", font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=50, command=self.validar_y_guardar).pack(side="left", expand=True, fill="x", padx=(10, 0))
-        
+        self.btn_guardar = ctk.CTkButton(
+            btns,
+            text="💾 Guardar",
+            font=self.font_sub,
+            fg_color="#D1FAE5",
+            text_color=COLORS["text"],
+            height=50,
+            command=self.validar_y_guardar
+        )
+
+        self.btn_guardar.pack(
+            side="left",
+            expand=True,
+            fill="x",
+            padx=(10, 0)
+        )
 
     def create_section_card(self, master, title, fields):
         card = ctk.CTkFrame(master, fg_color=COLORS["card"], corner_radius=12, border_width=1, border_color=COLORS["border"]); card.pack(fill="x", padx=60, pady=10)
@@ -852,19 +868,21 @@ class UserManagementView(ctk.CTkFrame):
         self.render_table_content(self.all_users)
 
     def abrir_terminal_biometrica(self):
-         # =========================
-    # VALIDAR DATOS PRIMERO
-    # =========================
-
-       nombres = self.inputs_obligatorios["Nombres"].get().strip()
+       nombres = self.limpiar_texto(
+            self.inputs_obligatorios["Nombres"].get()
+        )
        cuenta = self.inputs_obligatorios["cuenta"].get().strip()
        correo = self.inputs_obligatorios["correo"].get().strip()
 
-       ap = self.inputs_apellidos["Apellido Paterno"].get().strip()
-       am = self.inputs_apellidos["Apellido Materno"].get().strip()
+       ap = self.limpiar_texto(
+            self.inputs_apellidos["Apellido Paterno"].get()
+        )
+       am = self.limpiar_texto(
+            self.inputs_apellidos["Apellido Materno"].get()
+        )
 
     # Nombre obligatorio
-       if len(nombres) < 3 or not nombres.replace(" ", "").isalpha():
+       if not self.validar_texto_real(nombres):
             self.label_estado.configure(
               text="❌ Nombre inválido",
               text_color="#EF4444"
@@ -872,14 +890,14 @@ class UserManagementView(ctk.CTkFrame):
             return
 
     # Apellido obligatorio
-       if len(ap) < 3 or not ap.replace(" ", "").isalpha():
+       if not self.validar_texto_real(ap):
             self.label_estado.configure(
               text="❌ Apellido inválido",
               text_color="#EF4444"
             )
             return
        
-       if am and (len(am) < 3 or not am.replace(" ", "").isalpha()):
+       if am and not self.validar_texto_real(am):
             self.label_estado.configure(
               text="❌ Apellido materno inválido",
               text_color="#EF4444"

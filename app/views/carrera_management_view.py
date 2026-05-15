@@ -1,4 +1,5 @@
 import customtkinter as ctk
+import re
 from app.services.theme import COLORS
 from app.views.app_context import AppContext
 from app.services.carrera_service import (

@@ -580,33 +580,129 @@ class DashboardView(ctk.CTkFrame):
         for widget in self.contenedor_tabla.winfo_children():
             widget.destroy()
 
-        logs = [
-            {"u": "MARÍA ELENA RODRÍGUEZ HERNÁNDEZ", "id_c": "31702938", "m": "MARIA.ROD@UNIV.MX", "ok": True},
-            {"u": "JOSÉ LUIS PÉREZ RAMÍREZ", "id_c": "31702969", "m": "JOSE.PEREZ@UNIV.MX", "ok": False, "motivo": "⚠️ Rostro no reconocido"},
-            {"u": "CARLOS ALBERTO MARTÍNEZ GARCÍA", "id_c": "31702945", "m": "CARLOS.M@UNIV.MX", "ok": True}
-        ]
+        mode = ctk.get_appearance_mode()
+        bg_color = "#1E293B" if mode == "Dark" else "#FFFFFF"
+        row_color = "#0F172A" if mode == "Dark" else "#F8FAFC"
+        text_color = "#F8FAFC" if mode == "Dark" else "#0F172A"
+        subtext_color = "#CBD5E1" if mode == "Dark" else "#64748B"
+        border_color = "#334155" if mode == "Dark" else "#E2E8F0"
 
-        for log in logs:
-            row = ctk.CTkFrame(self.contenedor_tabla, fg_color="transparent", height=85)
-            row.pack(fill="x", side="top")
-            row.pack_propagate(False)
+        self.contenedor_tabla.configure(
+            fg_color=bg_color,
+            border_color=border_color
+        )
 
-            ctk.CTkLabel(row, text="👤", font=("Inter", 20)).pack(side="left", padx=20)
+        conn = get_connection()
+        cursor = conn.cursor()
 
-            mid = ctk.CTkFrame(row, fg_color="transparent")
-            mid.pack(side="left", fill="both", expand=True)
+        cursor.execute("""
+            SELECT 
+                r.id_registro,
+                r.fecha_hora,
+                r.resultado,
+                r.motivo,
+                u.nombre,
+                u.a_paterno,
+                u.a_materno,
+                u.cuenta,
+                u.correo
+            FROM registro_acceso r
+            LEFT JOIN usuario u ON r.id_usuario = u.id_usuario
+            ORDER BY r.fecha_hora DESC
+            LIMIT 10
+        """)
 
-            ctk.CTkLabel(mid, text=log["u"], font=("Inter", 13, "bold"),
-                         text_color=COLORS["text"]).pack(anchor="w", pady=(15, 0))
+        registros = cursor.fetchall()
+        conn.close()
 
-            det = f"ID: {log['id_c']} • {log['m']}"
-            if not log["ok"]:
-                det += f"  {log.get('motivo', '')}"
+        if not registros:
+            ctk.CTkLabel(
+                self.contenedor_tabla,
+                text="Sin accesos registrados",
+                font=("Inter", 13),
+                text_color=subtext_color
+            ).pack(pady=30)
+            return
 
-            ctk.CTkLabel(mid, text=det, font=("Inter", 11),
-                         text_color=COLORS["subtext"]).pack(anchor="w")
+        for reg in registros:
+            _, fecha_hora, resultado, motivo, nombre, ap, am, cuenta, correo = reg
 
-            ctk.CTkFrame(self.contenedor_tabla, fg_color=COLORS["border"], height=1).pack(fill="x", padx=20)
+            ok = int(resultado) == 1
+
+            nombre_completo = (
+                f"{nombre or ''} {ap or ''} {am or ''}".strip().upper()
+                if nombre else "USUARIO NO REGISTRADO"
+            )
+
+            cuenta_txt = cuenta if cuenta else "Sin cuenta"
+            correo_txt = correo if correo else "Sin correo"
+            motivo_txt = motivo if motivo else ("Acceso autorizado" if ok else "Acceso denegado")
+
+            card = ctk.CTkFrame(
+                self.contenedor_tabla,
+                fg_color=row_color,
+                corner_radius=12,
+                border_width=1,
+                border_color=border_color
+            )
+            card.pack(fill="x", padx=16, pady=8)
+
+            top = ctk.CTkFrame(card, fg_color="transparent")
+            top.pack(fill="x", padx=14, pady=(12, 4))
+
+            ctk.CTkLabel(
+                top,
+                text="✅" if ok else "🚫",
+                font=("Inter", 22)
+            ).pack(side="left", padx=(0, 10))
+
+            info = ctk.CTkFrame(top, fg_color="transparent")
+            info.pack(side="left", fill="x", expand=True)
+
+            ctk.CTkLabel(
+                info,
+                text=nombre_completo,
+                font=("Inter", 13, "bold"),
+                text_color=text_color,
+                anchor="w"
+            ).pack(anchor="w", fill="x")
+
+            ctk.CTkLabel(
+                info,
+                text=f"ID: {cuenta_txt}  •  {correo_txt}",
+                font=("Inter", 11),
+                text_color=subtext_color,
+                anchor="w"
+            ).pack(anchor="w", fill="x")
+
+            badge = ctk.CTkFrame(
+                top,
+                fg_color="#D1FAE5" if ok else "#FEE2E2",
+                corner_radius=16
+            )
+            badge.pack(side="right")
+
+            ctk.CTkLabel(
+                badge,
+                text="AUTORIZADO" if ok else "DENEGADO",
+                font=("Inter", 9, "bold"),
+                text_color="#065F46" if ok else "#991B1B"
+            ).pack(padx=10, pady=4)
+
+            bottom = ctk.CTkFrame(card, fg_color="transparent")
+            bottom.pack(fill="x", padx=14, pady=(0, 12))
+
+            ctk.CTkLabel(
+                bottom,
+                text=f"🕒 {fecha_hora}   •   {motivo_txt}",
+                font=("Inter", 10),
+                text_color=subtext_color,
+                anchor="w"
+            ).pack(anchor="w")
+    
+    
+    
+    
     # --- SIDEBAR ---
     def create_sidebar(self):
         sidebar = ctk.CTkFrame(self, width=280, corner_radius=0, fg_color=COLORS["sidebar"], border_width=1, border_color=COLORS["border"])

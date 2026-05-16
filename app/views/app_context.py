@@ -1,25 +1,24 @@
 # app/context.py
-from app.services.traductor import TraductorOffline
+
+# from app.services.traductor import TraductorOffline
 
 class AppContext:
     # Estado global del idioma
     idioma_actual = "es"
-    
-    # Instancia única del traductor para toda la app (Singleton)
-    traductor = TraductorOffline()
+
+    # Desactivado temporalmente en Raspberry
+    traductor = None
 
     @classmethod
     def t(cls, texto):
         """
-        Función estática para traducir. 
-        Uso: AppContext.t("Hola")
+        Función de traducción temporal.
         """
-        return cls.traductor.procesar_texto(texto, cls.idioma_actual)
-    
+        return texto
+
     @classmethod
     def set_idioma(cls, nuevo_idioma):
         """
-        Cambia el idioma global. 
-        Uso: AppContext.set_idioma("en")
+        Cambia el idioma global.
         """
         cls.idioma_actual = nuevo_idioma

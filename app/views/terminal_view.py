@@ -6,7 +6,7 @@ import time
 from app.recognition.encoding_manager import cargar_encodings
 from app.detection.detector_rostro import find_best_match
 from app.views.app_context import AppContext
-from app.camara.camara import iniciar_camara, obtener_frame
+from app.camara.camara import iniciar_camara, liberar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
 from app.services.usuario_service import usuario_activo
 from app.database.database import get_connection
@@ -677,7 +677,7 @@ class TerminalView(ctk.CTkFrame):
             self.after_cancel(self.loop_id)
             self.loop_id = None
         if self.cap:
-            self.cap.release()
+            liberar_camara(self.cap)
             self.cap = None
         self.on_back()
 

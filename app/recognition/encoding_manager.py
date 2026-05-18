@@ -3,8 +3,6 @@ import json
 import os
 import numpy as np
 
-
-# Generar encoding facial
 def generar_face_encoding(frame_rgb):
 
     encodings = face_recognition.face_encodings(frame_rgb)
@@ -16,8 +14,6 @@ def generar_face_encoding(frame_rgb):
 
     return encoding
 
-
-# Verificar que tenga dimensión 128
 def verificar_dimension(encoding):
 
     if encoding is None:
@@ -51,10 +47,15 @@ def compare_embeddings(embedding1, embedding2):
 
     return distancia
 
-def find_best_match(encoding_actual, encoding_db, threshold=0.6):
+def find_best_match(
+    encoding_actual,
+    encoding_db,
+    usuarios_db,
+    threshold=0.6
+):
 
     mejor_distancia = float("inf")
-    mejor_index = None
+    mejor_usuario = None
 
     for i, encoding_guardado in enumerate(encoding_db):
 
@@ -62,72 +63,93 @@ def find_best_match(encoding_actual, encoding_db, threshold=0.6):
             encoding_guardado,
             encoding_actual
         )
+
         if distancia < mejor_distancia:
             mejor_distancia = distancia
-            mejor_index = i
+            mejor_usuario = usuarios_db[i]
 
     if mejor_distancia < threshold:
-        return mejor_index, mejor_distancia
-    else:
-        return None, mejor_distancia
 
-# Guardar encoding en JSON
+        return mejor_usuario, mejor_distancia
+
+    return None, mejor_distancia
+
 def guardar_encoding(usuario, encoding, archivo="encodings.json"):
 
-    # 🔥 Validar que realmente exista un encoding
-    if encoding is None:
-        print("❌ No hay encoding facial para guardar")
-        return False
+        if encoding is None:
 
-    # 🔥 Convertir a numpy array por seguridad
-    encoding = np.array(encoding)
+            return {
+                "ok": False,
+                "error": "No hay encoding facial"
+            }
 
-    # 🔥 Validar dimensión correcta
-    if len(encoding) != 128:
-        print("❌ Encoding inválido: dimensión incorrecta")
-        return False
+        encoding = np.array(encoding)
 
-    datos_usuario = {
-        "usuario": usuario,
-        "encoding": encoding.tolist()
-    }
+        if len(encoding) != 128:
 
-    if os.path.exists(archivo):
-        with open(archivo, "r") as f:
-            datos = json.load(f)
-    else:
-        datos = []
+            return {
+                "ok": False,
+                "error": "Encoding inválido"
+            }
 
-    # 🔥 Evitar que el mismo usuario tenga encoding duplicado
-    for existente in datos:
-        if str(existente["usuario"]) == str(usuario):
-            print("❌ Este usuario ya tiene biometría registrada")
-            return False
+        datos_usuario = {
+            "usuario": usuario,
+            "encoding": encoding.tolist()
+        }
 
-    # 🔥 Validar rostro duplicado
-    for existente in datos:
-        encoding_existente = np.array(existente["encoding"])
+        if os.path.exists(archivo):
 
-        distancia = face_recognition.face_distance(
-            [encoding_existente],
-            encoding
-        )[0]
+            with open(archivo, "r") as f:
+                datos = json.load(f)
 
-        if distancia < 0.6:
-            print("❌ Este rostro ya está registrado")
-            return False
+        else:
+            datos = []
 
-    datos.append(datos_usuario)
+        for existente in datos:
 
-    with open(archivo, "w") as f:
-        json.dump(datos, f, indent=4)
+            if str(existente["usuario"]) == str(usuario):
 
-    print(f"✔ Encoding guardado como usuario {usuario}")
-    return True
+                return {
+                    "ok": False,
+                    "error": "usuario_duplicado"
+                }
 
+        for existente in datos:
 
+            encoding_existente = np.array(
+                existente["encoding"]
+            )
 
-# Comparar distancia entre rostros
+            distancia = face_recognition.face_distance(
+                [encoding_existente],
+                encoding
+            )[0]
+
+            print(
+                f"Comparando con {existente['usuario']} "
+                f"-> distancia: {distancia}"
+            )
+
+            if distancia < 0.45:
+
+                return {
+                    "ok": False,
+                    "error": "rostro_duplicado",
+                    "usuario_duplicado": existente["usuario"],
+                    "distancia": float(distancia)
+                }
+
+        datos.append(datos_usuario)
+
+        with open(archivo, "w") as f:
+            json.dump(datos, f, indent=4)
+
+        print(f"✔ Encoding guardado como usuario {usuario}")
+
+        return {
+            "ok": True
+        }
+
 def comparar_encodings(encoding_guardado, encoding_actual):
 
     distancia = face_recognition.face_distance(

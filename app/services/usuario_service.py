@@ -222,6 +222,59 @@ def obtener_carreras_por_facultad(id_facultad):
     finally:
         conn.close()
 
+from app.database.database import get_connection
+
+def existe_cuenta(cuenta, excluir_id=None):
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    if excluir_id:
+        cursor.execute("""
+            SELECT id_usuario
+            FROM usuario
+            WHERE cuenta = ? AND id_usuario != ?
+        """, (cuenta, excluir_id))
+    else:
+        cursor.execute("""
+            SELECT id_usuario
+            FROM usuario
+            WHERE cuenta = ?
+        """, (cuenta,))
+
+    resultado = cursor.fetchone()
+
+    conn.close()
+
+    return resultado is not None
+
+
+def existe_correo(correo, excluir_id=None):
+
+    if not correo:
+        return False
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    if excluir_id:
+        cursor.execute("""
+            SELECT id_usuario
+            FROM usuario
+            WHERE correo = ? AND id_usuario != ?
+        """, (correo, excluir_id))
+    else:
+        cursor.execute("""
+            SELECT id_usuario
+            FROM usuario
+            WHERE correo = ?
+        """, (correo,))
+
+    resultado = cursor.fetchone()
+
+    conn.close()
+
+    return resultado is not None
+
 def obtener_usuario_por_cuenta(cuenta):
     conn = get_connection()
     try:

@@ -14,6 +14,8 @@ from app.services.carrera_service import obtener_todas_carreras, obtener_faculta
 from app.services.usuario_service import (
     crear_usuario, 
     actualizar_usuario,
+    existe_correo,
+    existe_cuenta,
     obtener_todos_usuarios,
     obtener_usuario_por_id,  # ← AGREGAR ESTA LÍNEA
     obtener_id_facultad_por_nombre, 
@@ -33,13 +35,11 @@ class UserManagementView(ctk.CTkFrame):
         self.controller = controller
         self.usuario_editando_id = None 
         
-        # --- Configuración de Fuentes ---
         self.font_header = ("Inter", 30, "bold")
         self.font_sub = ("Inter", 16, "bold")
         self.font_normal = ("Inter", 13)
         self.font_small = ("Inter", 11, "bold")
         
-        # --- Variables ---
         self.rol_var = ctk.StringVar(value="ESTUDIANTE")
         self.carrera_var = ctk.StringVar()
         self.inputs_obligatorios = {}
@@ -88,7 +88,6 @@ class UserManagementView(ctk.CTkFrame):
                     "estado": u.get("estado", 1)
                 })
             
-            # Ordenar: activos primero, inactivos al final
             self.all_users.sort(key=lambda u: (u["estado"] == 0, u["nombre_solo"]))
 
         except Exception as e:
@@ -498,10 +497,8 @@ class UserManagementView(ctk.CTkFrame):
 
 
     def validar_y_guardar(self):
-        # 1. Limpiar todos los errores previos
         self._limpiar_errores()
 
-        # 2. Validar biometría (solo en creación)
         if not self.usuario_editando_id:
             if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
                 print("❌ Debes registrar biometría primero")
@@ -514,19 +511,16 @@ class UserManagementView(ctk.CTkFrame):
 
                 return
 
-        # 3. Obtener valores
         n   = self.inputs_obligatorios.get("Nombres").get().strip()
         em  = self.inputs_obligatorios.get("correo").get().strip()
         cta = self.inputs_obligatorios.get("cuenta").get().strip()
 
         hay_error = False
 
-        # 4. Validar Nombres
         if not n:
             self._mostrar_error("Nombres", "El nombre es obligatorio")
             hay_error = True
 
-        # 5. Validar Cuenta: obligatoria y exactamente 8 dígitos
         if not cta:
             self._mostrar_error("cuenta", "La cuenta es obligatoria")
             hay_error = True
@@ -537,16 +531,27 @@ class UserManagementView(ctk.CTkFrame):
             self._mostrar_error("cuenta", f"La cuenta debe tener 8 dígitos (actualmente tiene {len(cta)})")
             hay_error = True
 
-        # 6. Validar Correo: si se proporcionó debe contener @
         if em and "@" not in em:
             self._mostrar_error("correo", "El correo debe contener @")
             hay_error = True
 
-        # 7. Si hay errores, detener
         if hay_error:
             return
+        
+        if existe_cuenta(cta, self.usuario_editando_id):
+            self._mostrar_error(
+                "cuenta",
+                "La cuenta ya está registrada"
+            )
+            return
+        
+        if em and existe_correo(em, self.usuario_editando_id):
+            self._mostrar_error(
+                "correo",
+                "El correo ya está registrado"
+            )
+            return
 
-        # 8. Guardar
         try:
             id_usuario = self.usuario_editando_id
 
@@ -563,7 +568,7 @@ class UserManagementView(ctk.CTkFrame):
                         border_color="#EF4444"
                     )
 
-                    print("❌ Correo inválido")
+                    self._mostrar_error("correo", "Correo inválido")
                     return
 
             if not self.usuario_editando_id and len(cta) != 8:
@@ -575,18 +580,17 @@ class UserManagementView(ctk.CTkFrame):
             am = self.inputs_apellidos["Apellido Materno"].get().strip()
 
             if not self.validar_texto_real(n):
-                print("❌ Nombre inválido")
+                self._mostrar_error("Nombres", "Nombre inválido")
                 return
 
             if not self.validar_texto_real(ap):
-                print("❌ Apellido paterno inválido")
+                self._mostrar_error("Apellido Paterno", "Apellido paterno inválido")
                 return
 
             if am and not self.validar_texto_real(am):
-                print("❌ Apellido materno inválido")
+                self._mostrar_error("Apellido Materno", "Apellido materno inválido")    
                 return
             
-            # Capitalizar automáticamente
             n = n.title()
             ap = ap.title()
             am = am.title()
@@ -629,9 +633,8 @@ class UserManagementView(ctk.CTkFrame):
                 estado_valor = 1 if self.estado_var.get() else 0
 
                 actualizar_usuario(id_usuario,n,ap,am,cta,tipo_usuario,id_fac,em,estado_valor)
-                # Si tomó nueva biometría al editar, reemplazarla
                 if hasattr(self, "biometria_temp") and self.biometria_temp is not None:
-                    print("♻️ Reemplazando biometría...")
+                    print("Reemplazando biometría...")
 
                     eliminar_encoding(id_usuario)
                     guardar_encoding(id_usuario, self.biometria_temp)
@@ -660,9 +663,13 @@ class UserManagementView(ctk.CTkFrame):
                         )
                         return
 
-                    guardado = guardar_encoding(usuario_id, self.biometria_temp)
+                    resultado = guardar_encoding(
+                        usuario_id,
+                        self.biometria_temp
+                    )
 
-                    if not guardado:
+                    if not resultado["ok"]:
+
                         from app.database.database import get_connection
 
                         conn = get_connection()
@@ -676,10 +683,54 @@ class UserManagementView(ctk.CTkFrame):
                         conn.commit()
                         conn.close()
 
-                        self.label_estado.configure(
-                            text="❌ Rostro ya registrado o biometría inválida. Usuario no guardado.",
-                            text_color="#EF4444"
+                        error = resultado.get("error")
+
+                        resultado = guardar_encoding(
+                        usuario_id,
+                        self.biometria_temp
+                    )
+
+                    if not resultado["ok"]:
+
+                        from app.database.database import get_connection
+
+                        conn = get_connection()
+                        cursor = conn.cursor()
+
+                        cursor.execute(
+                            "DELETE FROM usuario WHERE id_usuario = ?",
+                            (usuario_id,)
                         )
+
+                        conn.commit()
+                        conn.close()
+
+                        error = resultado.get("error")
+
+                        if error == "rostro_duplicado":
+
+                            usuario_dup = resultado.get(
+                                "usuario_duplicado"
+                            )
+
+                            self.label_estado.configure(
+                                text=f"❌ Este rostro ya pertenece al usuario ID {usuario_dup}",
+                                text_color="#EF4444"
+                            )
+
+                        elif error == "usuario_duplicado":
+
+                            self.label_estado.configure(
+                                text="❌ Este usuario ya tiene biometría",
+                                text_color="#EF4444"
+                            )
+
+                        else:
+
+                            self.label_estado.configure(
+                                text="❌ Error al guardar biometría",
+                                text_color="#EF4444"
+                            )
 
                         self.refresh_data()
                         self.render_table_content(self.all_users)
@@ -725,14 +776,12 @@ class UserManagementView(ctk.CTkFrame):
     def cambiar_estado_usuario(self, id_usuario, nuevo_estado):
         """Cambia el estado de un usuario entre activo e inactivo"""
         try:
-            # Obtener datos actuales del usuario
             usuario = obtener_usuario_por_id(id_usuario)
             
             if not usuario:
-                print(f"❌ Usuario {id_usuario} no encontrado")
+                print(f" Usuario {id_usuario} no encontrado")
                 return
-            
-            # Actualizar solo el estado
+        
             estado_valor = 1 if nuevo_estado else 0
             
             actualizar_usuario(
@@ -740,10 +789,9 @@ class UserManagementView(ctk.CTkFrame):
                 usuario["nombre"],
                 usuario["a_paterno"],
                 usuario["a_materno"],
-                "", # cuenta (no cambiar)
+                "",
                 usuario["tipo_usuario"],
                 usuario["id_facultad"],
-                "", # email (no cambiar)
                 estado_valor
             )
             
@@ -983,6 +1031,21 @@ class UserManagementView(ctk.CTkFrame):
 
     def recibir_biometria(self, encoding):
         print("✔ Captura recibida")
+
+        match_id, distancia = find_best_match(
+            encoding,
+            encodings_db,
+            usuarios_db
+        )
+
+        if match_id is not None and distancia < 0.45:
+
+            self.label_estado.configure(
+                text=f"❌ Este rostro ya está registrado",
+                text_color="#EF4444"
+            )
+
+            return
 
         self.biometria_temp = encoding
 

@@ -29,10 +29,18 @@ class FacultadManagementView(ctk.CTkFrame):
         self.crear_vista_tabla()
 
 
+    
     def _on_resize(self, event):
-        width = event.width
-        self.is_compact = width < 900  # puedes ajustar este valor
-        self.render_table_content()
+        nuevo_compact = event.width < 700
+
+        if nuevo_compact != self.is_compact:
+            self.is_compact = nuevo_compact
+
+            if hasattr(self, "vista_tabla") and self.vista_tabla.winfo_exists():
+                self.vista_tabla.destroy()
+
+            self.crear_vista_tabla()
+    
     
     def crear_vista_tabla(self):
         
@@ -41,18 +49,73 @@ class FacultadManagementView(ctk.CTkFrame):
         self.vista_tabla.pack(fill="both", expand=True)
 
         padx_main = 20 if self.is_compact else 40
-        pady_top = 20 if self.is_compact else 40
+        pady_top = 10 if self.is_compact else 40
         header = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
         header.pack(fill="x", padx=padx_main, pady=(pady_top, 20))
         
         title_cont = ctk.CTkFrame(header, fg_color="transparent")
-        title_cont.pack(side="left")
-        ctk.CTkLabel(title_cont, text="🏫   " + AppContext.t("Gestión de Facultades"), font=self.font_header, text_color=COLORS["text"]).pack(anchor="w")
-        ctk.CTkLabel(title_cont, text=AppContext.t("Administra las unidades académicas del sistema"), font=self.font_normal, text_color=COLORS["subtext"]).pack(anchor="w")
-        
-        ctk.CTkButton(header, text="➕ " + AppContext.t("Agregar Facultad"), fg_color=COLORS["text"], hover_color=COLORS["hover"], text_color=COLORS["bg"],
-                     font=self.font_sub, height=50, corner_radius=12, command=self.abrir_formulario).pack(side="right", anchor="n")
 
+        if self.is_compact:
+            title_cont.pack(fill="x")
+
+            ctk.CTkLabel(
+                title_cont,
+                text="🏫 " + AppContext.t("Gestión de Facultades"),
+                font=("Inter", 22, "bold"),
+                text_color=COLORS["text"]
+            ).pack(anchor="center", pady=(0, 6))
+
+            ctk.CTkLabel(
+                title_cont,
+                text=AppContext.t("Administra las unidades académicas"),
+                font=("Inter", 12),
+                text_color=COLORS["subtext"]
+            ).pack(anchor="center", pady=(0, 10))
+
+            ctk.CTkButton(
+                header,
+                text="➕ " + AppContext.t("Agregar Facultad"),
+                fg_color=COLORS["text"],
+                hover_color=COLORS["hover"],
+                text_color=COLORS["bg"],
+                font=self.font_sub,
+                height=45,
+                corner_radius=12,
+                command=self.abrir_formulario
+            ).pack(fill="x", padx=10)
+
+        else:
+            title_cont.pack(side="left")
+
+            ctk.CTkLabel(
+                title_cont,
+                text="🏫   " + AppContext.t("Gestión de Facultades"),
+                font=self.font_header,
+                text_color=COLORS["text"]
+            ).pack(anchor="w")
+
+            ctk.CTkLabel(
+                title_cont,
+                text=AppContext.t("Administra las unidades académicas del sistema"),
+                font=self.font_normal,
+                text_color=COLORS["subtext"]
+            ).pack(anchor="w")
+
+            ctk.CTkButton(
+                header,
+                text="➕ " + AppContext.t("Agregar Facultad"),
+                fg_color=COLORS["text"],
+                hover_color=COLORS["hover"],
+                text_color=COLORS["bg"],
+                font=self.font_sub,
+                height=50,
+                corner_radius=12,
+                command=self.abrir_formulario
+            ).pack(side="right", anchor="n")
+        
+        
+        
+        
         # 2. Barra de búsqueda
         bar = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
         bar.pack(fill="x", padx=padx_main, pady=(0, 10))
@@ -370,11 +433,12 @@ class FacultadManagementView(ctk.CTkFrame):
 
         self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
+        padx_form = 12 if self.is_compact else 60
         
-        ctk.CTkLabel(self.form_base, text=titulo, font=self.font_header, text_color=COLORS["text"]).pack(anchor="w", padx=60, pady=(40, 20))
+        ctk.CTkLabel(self.form_base, text=titulo, font=self.font_header, text_color=COLORS["text"]).pack(anchor="w", padx=padx_form, pady=(40, 20))
 
         form_card = ctk.CTkFrame(self.form_base, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
-        form_card.pack(fill="x", padx=60, pady=10)
+        form_card.pack(fill="x", padx=padx_form, pady=10)
 
         ctk.CTkLabel(form_card, text="🏛️ " + AppContext.t("Nombre de la Facultad"), font=self.font_small, text_color=COLORS["text"]).pack(anchor="w", padx=25, pady=(25, 5))
         self.input_nombre = ctk.CTkEntry(form_card, height=45, font=self.font_normal, fg_color=COLORS["hover"], border_width=0, text_color=COLORS["text"])
@@ -387,11 +451,38 @@ class FacultadManagementView(ctk.CTkFrame):
         self.combo_estado.pack(fill="x", padx=25, pady=(0, 30))
 
         btns = ctk.CTkFrame(self.form_base, fg_color="transparent")
-        btns.pack(fill="x", padx=60, pady=30)
+        btns.pack(fill="x", padx=padx_form, pady=30)
         
-        ctk.CTkButton(btns, text="❌ " + AppContext.t("Cancelar"), font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=55, command=self.volver_a_tabla).pack(side="left", expand=True, fill="x", padx=(0, 10))
-        ctk.CTkButton(btns, text="💾 " + AppContext.t("Guardar Facultad"), font=self.font_sub, fg_color="#D1FAE5", text_color=COLORS["text"], height=55, command=self.guardar_facultad).pack(side="left", expand=True, fill="x", padx=(10, 0))
+        
+        btn_cancelar = ctk.CTkButton(
+            btns,
+            text="❌ " + AppContext.t("Cancelar"),
+            font=self.font_sub,
+            fg_color="#FEE2E2",
+            text_color=COLORS["text"],
+            height=55,
+            command=self.volver_a_tabla
+        )
 
+        btn_guardar = ctk.CTkButton(
+            btns,
+            text="💾 " + AppContext.t("Guardar Facultad"),
+            font=self.font_sub,
+            fg_color="#D1FAE5",
+            text_color=COLORS["text"],
+            height=55,
+            command=self.guardar_facultad
+        )
+
+        if self.is_compact:
+            btn_cancelar.pack(fill="x", pady=(0, 10))
+            btn_guardar.pack(fill="x")
+        else:
+            btn_cancelar.pack(side="left", expand=True, fill="x", padx=(0, 10))
+            btn_guardar.pack(side="left", expand=True, fill="x", padx=(10, 0))
+        
+        
+        
 
     def facultad_existe(self, nombre):
         todas = obtener_todas_facultades()

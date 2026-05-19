@@ -47,8 +47,42 @@ class CarreraManagementView(ctk.CTkFrame):
 
         if nuevo_compact != self.is_compact:
             self.is_compact = nuevo_compact
-            if hasattr(self, "main_card"):
-                self.render_table_content()
+
+            if hasattr(self, "vista_tabla") and self.vista_tabla.winfo_exists():
+                self.vista_tabla.destroy()
+
+            self.vista_tabla = ctk.CTkFrame(self, fg_color="transparent")
+            self.vista_tabla.pack(fill="both", expand=True)
+
+            self.create_header(self.vista_tabla)
+            self.create_search_bar(self.vista_tabla)
+
+            self.main_card = ctk.CTkFrame(
+                self.vista_tabla,
+                fg_color=COLORS["card"],
+                corner_radius=15,
+                border_width=1,
+                border_color=COLORS["border"]
+            )
+
+            padx_card = 10 if self.is_compact else 40
+
+            self.main_card.pack(
+                fill="both",
+                expand=True,
+                padx=padx_card,
+                pady=(0, 20 if self.is_compact else 40)
+            )
+
+            self.render_table_content()
+        
+        
+        
+    
+    
+    
+    
+    
 
     
     def render_table_content(self):
@@ -357,11 +391,12 @@ class CarreraManagementView(ctk.CTkFrame):
 
         self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
+        padx_form = 12 if self.is_compact else 60
         
-        ctk.CTkLabel(self.form_base, text=titulo, font=self.font_header, text_color=COLORS["text"]).pack(anchor="w", padx=60, pady=(40, 20))
+        ctk.CTkLabel(self.form_base, text=titulo, font=self.font_header, text_color=COLORS["text"]).pack(anchor="w", padx=padx_form, pady=(40, 20))
 
         form_card = ctk.CTkFrame(self.form_base, fg_color=COLORS["card"], corner_radius=15, border_width=1, border_color=COLORS["border"])
-        form_card.pack(fill="x", padx=60, pady=10)
+        form_card.pack(fill="x", padx=padx_form, pady=10)
 
         # Inputs con letras negras (#000000)
         ctk.CTkLabel(form_card, text="📖 " + AppContext.t("Nombre de la Carrera"), font=self.font_small, text_color=COLORS["subtext"]).pack(anchor="w", padx=25, pady=(25, 5))
@@ -380,7 +415,7 @@ class CarreraManagementView(ctk.CTkFrame):
         self.combo_estado.pack(fill="x", padx=25, pady=(0, 30))
 
         btns = ctk.CTkFrame(self.form_base, fg_color="transparent")
-        btns.pack(fill="x", padx=60, pady=30)
+        btns.pack(fill="x", padx=padx_form, pady=30)
         ctk.CTkButton(btns, text="❌ " + AppContext.t("Cancelar"), font=self.font_sub, fg_color="#FEE2E2", text_color="#991B1B", height=55, command=self.volver_a_tabla).pack(side="left", expand=True, fill="x", padx=(0, 10))
         ctk.CTkButton(btns, text="💾 " + AppContext.t("Guardar Carrera"), font=self.font_sub, fg_color="#D1FAE5", text_color="#065F46", height=55, command=self.guardar_carrera).pack(side="left", expand=True, fill="x", padx=(10, 0))
 
@@ -459,17 +494,70 @@ class CarreraManagementView(ctk.CTkFrame):
         self.vista_tabla.pack(fill="both", expand=True)
         self.render_table_content()
 
+            
     def create_header(self, master):
+        padx_header = 12 if self.is_compact else 30
+
         h = ctk.CTkFrame(master, fg_color="transparent")
-        h.pack(fill="x", padx=30, pady=(20, 10))
-        ctk.CTkLabel(h, text=AppContext.t("🎓   Gestión de Carreras"), font=self.font_header, text_color=COLORS["text"]).pack(side="left")
-        ctk.CTkButton(h, text="➕ " + AppContext.t("Agregar Carrera"), font=self.font_sub, fg_color="#000000", height=50, corner_radius=12, command=self.abrir_formulario).pack(side="right")
+        h.pack(fill="x", padx=padx_header, pady=(15, 10))
+
+        if self.is_compact:
+            ctk.CTkLabel(
+                h,
+                text=AppContext.t("🎓 Gestión de Carreras"),
+                font=("Inter", 26, "bold"),
+                text_color=COLORS["text"]
+            ).pack(anchor="center", pady=(0, 10))
+
+            ctk.CTkButton(
+                h,
+                text="➕ " + AppContext.t("Agregar Carrera"),
+                font=self.font_sub,
+                fg_color="#000000",
+                height=45,
+                corner_radius=12,
+                command=self.abrir_formulario
+            ).pack(fill="x", padx=10)
+
+        else:
+            ctk.CTkLabel(
+                h,
+                text=AppContext.t("🎓   Gestión de Carreras"),
+                font=self.font_header,
+                text_color=COLORS["text"]
+            ).pack(side="left")
+
+            ctk.CTkButton(
+                h,
+                text="➕ " + AppContext.t("Agregar Carrera"),
+                font=self.font_sub,
+                fg_color="#000000",
+                height=50,
+                corner_radius=12,
+                command=self.abrir_formulario
+            ).pack(side="right")
+            
+            
+    
+
 
     def create_search_bar(self, master):
+        padx_bar = 12 if self.is_compact else 30
+
         bar = ctk.CTkFrame(master, fg_color="transparent")
-        bar.pack(fill="x", padx=30, pady=10)
-        self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 " + AppContext.t("Buscar carrera por nombre..."), height=42, corner_radius=10, fg_color=COLORS["hover"], border_width=1, text_color=COLORS["text"])
-        self.entry_busqueda.pack(side="left", fill="x", expand=True)
+        bar.pack(fill="x", padx=padx_bar, pady=10)
+
+        self.entry_busqueda = ctk.CTkEntry(
+            bar,
+            placeholder_text="🔍 " + AppContext.t("Buscar carrera por nombre..."),
+            height=42,
+            corner_radius=10,
+            fg_color=COLORS["hover"],
+            border_width=1,
+            text_color=COLORS["text"]
+        )
+
+        self.entry_busqueda.pack(fill="x", expand=True)
         self.entry_busqueda.bind("<KeyRelease>", lambda e: self.render_table_content())
 
     

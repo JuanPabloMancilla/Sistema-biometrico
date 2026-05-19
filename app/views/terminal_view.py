@@ -520,15 +520,10 @@ class TerminalView(ctk.CTkFrame):
                         if face_encoding is not None:
 
                             # ✅ SI ES NUEVO → capturar UNA SOLA VEZ
-                            if self.on_capture:
-                                self.on_capture(face_encoding)
-
-        # 🔥 cerrar cámara inmediatamente
-                             # Detener loop
                             self.running = False
 
-                            # Cerrar cámara
-                            self.cerrar_y_volver()
+                            if self.on_capture:
+                                self.on_capture(face_encoding)
 
                             return
                         
@@ -673,14 +668,24 @@ class TerminalView(ctk.CTkFrame):
             )
 
     def cerrar_y_volver(self):
+        self.running = False
+
         if self.loop_id:
-            self.after_cancel(self.loop_id)
+            try:
+                self.after_cancel(self.loop_id)
+            except Exception:
+                pass
             self.loop_id = None
+
         if self.cap:
             liberar_camara(self.cap)
             self.cap = None
-        self.on_back()
 
+        if self.on_back:
+            self.on_back()
+
+    
+        
     def on_close(self):
         print("🛑 Cerrando terminal biométrica")
 
@@ -689,19 +694,23 @@ class TerminalView(ctk.CTkFrame):
         if self.loop_id:
             try:
                 self.after_cancel(self.loop_id)
-            except:
+            except Exception:
                 pass
+
             self.loop_id = None
 
-        if hasattr(self, "cap") and self.cap is not None:
-             if self.cap.isOpened():
-                self.cap.release()
-                print("📷 Cámara liberada")
+        try:
+            from app.camara.camara import liberar_camara
+            liberar_camara(self.cap)
+
+        except Exception as e:
+            print("Error liberando cámara:", e)
 
         self.cap = None
         
-        
-        
+    
+    
+    
     def registrar_acceso_bd(self, id_usuario, resultado, confianza=None, motivo=""):
         try:
             conn = get_connection()

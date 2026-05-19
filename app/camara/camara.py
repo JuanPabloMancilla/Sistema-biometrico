@@ -2,7 +2,6 @@ import cv2
 import time
 import platform
 
-# Detectar si estamos en Raspberry Pi/Linux
 ES_RASPBERRY = platform.system() == "Linux"
 
 if ES_RASPBERRY:
@@ -14,9 +13,18 @@ picam2 = None
 def iniciar_camara():
     global picam2
 
-    # ===== RASPBERRY PI =====
     if ES_RASPBERRY:
         try:
+            # Si ya había una cámara abierta, cerrarla primero
+            if picam2 is not None:
+                try:
+                    picam2.stop()
+                    picam2.close()
+                except Exception:
+                    pass
+                picam2 = None
+                time.sleep(0.5)
+
             picam2 = Picamera2()
 
             config = picam2.create_preview_configuration(
@@ -29,17 +37,24 @@ def iniciar_camara():
             picam2.configure(config)
             picam2.start()
 
-            time.sleep(2)
+            time.sleep(1)
 
             print("Cámara Raspberry iniciada")
-
             return picam2
 
         except Exception as e:
             print(f"Error iniciando cámara Raspberry: {e}")
+
+            try:
+                if picam2 is not None:
+                    picam2.stop()
+                    picam2.close()
+            except Exception:
+                pass
+
+            picam2 = None
             return None
 
-    # ===== WINDOWS / PC =====
     else:
         cap = cv2.VideoCapture(0)
 
@@ -48,13 +63,13 @@ def iniciar_camara():
             return None
 
         print("Cámara PC iniciada")
-
         return cap
 
 
 def obtener_frame(cap):
+    if cap is None:
+        return None
 
-    # ===== RASPBERRY =====
     if ES_RASPBERRY:
         try:
             frame = cap.capture_array()
@@ -62,9 +77,6 @@ def obtener_frame(cap):
             if frame is None:
                 return None
 
-            #frame = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
-            
-            # Rotar cámara
             frame = cv2.rotate(frame, cv2.ROTATE_180)
 
             return frame
@@ -73,7 +85,6 @@ def obtener_frame(cap):
             print(f"Error capturando frame Raspberry: {e}")
             return None
 
-    # ===== WINDOWS =====
     else:
         ret, frame = cap.read()
 
@@ -84,12 +95,34 @@ def obtener_frame(cap):
         return frame
 
 
-def liberar_camara(cap):
+def liberar_camara(cap=None):
+    global picam2
 
     if ES_RASPBERRY:
-        if cap is not None:
-            cap.stop()
+        cam = cap if cap is not None else picam2
+
+        if cam is not None:
+            try:
+                cam.stop()
+            except Exception:
+                pass
+
+            try:
+                cam.close()
+            except Exception:
+                pass
+
+        picam2 = None
+        time.sleep(0.5)
+
+        print("📷 Cámara liberada")
 
     else:
         if cap is not None:
-            cap.release()
+            try:
+                cap.release()
+            except Exception:
+                pass
+
+        cv2.destroyAllWindows()
+        print("📷 Cámara liberada")

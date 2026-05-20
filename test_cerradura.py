@@ -1,25 +1,23 @@
 from gpiozero import OutputDevice
 from time import sleep
 
-# GPIO17 = pin físico 11
 relay = OutputDevice(
     17,
-    active_high=False,
+    active_high=True,
     initial_value=False
 )
 
-print("🔒 Estado inicial")
-
-sleep(5)
-
-print("🔓 Activando relevador...")
-relay.on()
-
-sleep(3)
-
-print("🔒 Apagando relevador...")
+print("🔒 Cerradura cerrada")
 relay.off()
 
 sleep(5)
 
-print("✅ Fin de prueba")
+print("🔓 Abriendo cerradura")
+relay.on()
+
+sleep(3)
+
+print("🔒 Cerrando cerradura")
+relay.off()
+
+print("✅ Fin")

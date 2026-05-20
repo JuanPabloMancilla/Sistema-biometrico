@@ -11,6 +11,7 @@ from app.detection.detector_rostro import procesar_frame
 from app.services.usuario_service import usuario_activo
 from app.database.database import get_connection
 from datetime import datetime
+from app.hardware.cerradura import Cerradura
 
 
 # ── Paleta ────────────────────────────────────────────────────────────────────
@@ -132,6 +133,7 @@ class TerminalView(ctk.CTkFrame):
         self.loop_id = None
         self.estado_actual = None
         self.running = True
+        self.cerradura = Cerradura()
 
         self.escaneando = False
         self.inicio_escaneo = 0.0
@@ -580,6 +582,8 @@ class TerminalView(ctk.CTkFrame):
                                 None,
                                 "Acceso denegado"
                             )
+                            
+                            self.cerradura.cerrar()
 
                         else:
 
@@ -590,12 +594,15 @@ class TerminalView(ctk.CTkFrame):
                                     "autorizado",
                                     usuario=self.usuario_detectado
                                 )
+
                                 self.registrar_acceso_bd(
                                     usuario_id,
                                     1,
                                     None,
                                     "Acceso autorizado"
                                 )
+
+                                self.cerradura.abrir(segundos=3)
 
                             #usuario inactivo
 
@@ -609,6 +616,7 @@ class TerminalView(ctk.CTkFrame):
                                 None,
                                 "Usuario inactivo"
                                 )
+                                self.cerradura.cerrar()
 
                                 self.status_label.configure(
                                     text="USUARIO INACTIVO",

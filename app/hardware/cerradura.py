@@ -13,7 +13,7 @@ except Exception as e:
 PIN_RELEVADOR = 17  # Pin físico 11 = GPIO17
 
 # Si tu relevador funciona al revés, cambia a True
-ACTIVE_HIGH = False
+ACTIVE_HIGH = True
 
 
 class Cerradura:

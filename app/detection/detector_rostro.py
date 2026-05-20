@@ -105,16 +105,38 @@ def procesar_frame(frame):
     cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
 
     return frame, face_encoding, nombre_detectado, usuario_id
-def find_best_match(encoding, encodings_db, threshold=0.6):
-    if len(encodings_db) == 0:
+    
+def find_best_match(face_encoding, known_encodings, known_ids, threshold=0.45):
+    import numpy as np
+
+    if face_encoding is None:
         return None, None
 
-    distancias = face_recognition.face_distance(encodings_db, encoding)
-    mejor_idx = np.argmin(distancias)
-    mejor_distancia = distancias[mejor_idx]
+    if known_encodings is None or len(known_encodings) == 0:
+        return None, None
+
+    if known_ids is None or len(known_ids) == 0:
+        return None, None
+
+    face_encoding = np.array(face_encoding, dtype=np.float64)
+
+    distancias = []
+
+    for enc in known_encodings:
+        enc = np.array(enc, dtype=np.float64)
+
+        # Asegurar que sea vector plano
+        enc = enc.flatten()
+        face_encoding_flat = face_encoding.flatten()
+
+        distancia = np.linalg.norm(enc - face_encoding_flat)
+        distancias.append(float(distancia))
+
+    mejor_indice = int(np.argmin(distancias))
+    mejor_distancia = float(distancias[mejor_indice])
 
     if mejor_distancia < threshold:
-        return mejor_idx, mejor_distancia
+        return known_ids[mejor_indice], mejor_distancia
 
     return None, mejor_distancia
    

@@ -133,7 +133,11 @@ class TerminalView(ctk.CTkFrame):
         self.loop_id = None
         self.estado_actual = None
         self.running = True
-        self.cerradura = Cerradura()
+        self.cerradura = None
+
+        #  SOLO usar cerradura en modo acceso
+        if self.modo != "registro":
+            self.cerradura = Cerradura()
 
         self.escaneando = False
         self.inicio_escaneo = 0.0
@@ -521,14 +525,15 @@ class TerminalView(ctk.CTkFrame):
 
                         if face_encoding is not None:
 
-                            # 🔍 Verificar si el rostro ya existe
+                            
+                            # ?? Verificar si el rostro ya existe
                             match_id, distancia = find_best_match(
                                 face_encoding,
                                 cargar_encodings()[0],
                                 cargar_encodings()[1]
                             )
 
-                            # ❌ Rostro duplicado
+                            # ? Rostro duplicado
                             if match_id is not None and distancia < 0.45:
 
                                 self.status_label.configure(
@@ -542,11 +547,11 @@ class TerminalView(ctk.CTkFrame):
                                 )
 
                                 self.badge_label.configure(
-                                    text="✗ DUPLICADO",
+                                    text="? DUPLICADO",
                                     text_color=ACCENT_RED
                                 )
 
-                                # 🔥 volver a permitir escaneo
+                                # ?? volver a permitir escaneo
                                 self.esperando_reset = False
                                 self.escaneando = False
                                 self.pos_linea = 0
@@ -554,7 +559,8 @@ class TerminalView(ctk.CTkFrame):
                                 self.loop_id = self.after(1500, self.actualizar_video)
                                 return
 
-                            # ✅ Rostro nuevo
+
+                            # ? Rostro nuevo
                             self.running = False
 
                             if self.on_capture:
@@ -583,7 +589,8 @@ class TerminalView(ctk.CTkFrame):
                                 "Acceso denegado"
                             )
                             
-                            self.cerradura.abrir_normal()
+                            if self.cerradura:
+                                self.cerradura.abrir_normal()
 
                         else:
 
@@ -602,7 +609,8 @@ class TerminalView(ctk.CTkFrame):
                                     "Acceso autorizado"
                                 )
 
-                                self.cerradura.cerrar_temporal(segundos=2)
+                                if self.cerradura:
+                                    self.cerradura.cerrar_temporal(segundos=2)
 
                             #usuario inactivo
 
@@ -616,7 +624,8 @@ class TerminalView(ctk.CTkFrame):
                                 None,
                                 "Usuario inactivo"
                                 )
-                                self.cerradura.abrir_normal()
+                                if self.cerradura:
+                                    self.cerradura.abrir_normal()
 
                                 self.status_label.configure(
                                     text="USUARIO INACTIVO",

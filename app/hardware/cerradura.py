@@ -24,8 +24,10 @@ class Cerradura:
             self.rele = OutputDevice(
                 PIN_RELEVADOR,
                 active_high=ACTIVE_HIGH,
-                initial_value=False
+                initial_value=True
             )
+            
+            self.rele.off()
             print("🔐 Cerradura lista en GPIO17")
         else:
             print("⚠️ Cerradura en modo simulación")

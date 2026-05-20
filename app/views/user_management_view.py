@@ -859,17 +859,30 @@ class UserManagementView(ctk.CTkFrame):
                 self.terminal_view.on_close()
             except Exception:
                 pass
-            if hasattr(self, "terminal_container"):
-                self.terminal_container.destroy()
-            self.form_base.pack(fill="both", expand=True)
+        if hasattr(self, "terminal_container"):
+            self.terminal_container.destroy()
+            
+        self.form_base.pack(fill="both", expand=True)
+        
+        # 🔥 Restaurar botón si NO se registró biometría
+        if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
+            self.btn_biometria.configure(
+                text="📷 Registrar Biometría",
+                fg_color="#0EA5E9",
+                hover_color="#0284C7"
+            )
 
     def recibir_biometria(self, encoding):
         print("✔ Captura recibida")
-        match_id, distancia = find_best_match(encoding, encodings_db, usuarios_db)
-        if match_id is not None and distancia < 0.45:
-            self.label_estado.configure(text="❌ Este rostro ya está registrado", text_color="#EF4444")
-            return
+        
+
         self.biometria_temp = encoding
+
         if hasattr(self, "btn_biometria"):
-            self.btn_biometria.configure(text="✔ Biometría registrada", fg_color="#10B981", hover_color="#059669")
+            self.btn_biometria.configure(
+                text="✔ Biometría registrada",
+                fg_color="#10B981",
+                hover_color="#059669"
+            )
+
         self.cerrar_terminal_biometrica()

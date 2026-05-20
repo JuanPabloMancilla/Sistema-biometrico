@@ -519,7 +519,40 @@ class TerminalView(ctk.CTkFrame):
 
                         if face_encoding is not None:
 
-                            # ✅ SI ES NUEVO → capturar UNA SOLA VEZ
+                            # 🔍 Verificar si el rostro ya existe
+                            match_id, distancia = find_best_match(
+                                face_encoding,
+                                cargar_encodings()[0],
+                                cargar_encodings()[1]
+                            )
+
+                            # ❌ Rostro duplicado
+                            if match_id is not None and distancia < 0.45:
+
+                                self.status_label.configure(
+                                    text="USUARIO YA REGISTRADO",
+                                    text_color=ACCENT_RED
+                                )
+
+                                self.lbl_nombre.configure(
+                                    text="ESTE ROSTRO YA EXISTE EN EL SISTEMA",
+                                    text_color=ACCENT_RED
+                                )
+
+                                self.badge_label.configure(
+                                    text="✗ DUPLICADO",
+                                    text_color=ACCENT_RED
+                                )
+
+                                # 🔥 volver a permitir escaneo
+                                self.esperando_reset = False
+                                self.escaneando = False
+                                self.pos_linea = 0
+
+                                self.loop_id = self.after(1500, self.actualizar_video)
+                                return
+
+                            # ✅ Rostro nuevo
                             self.running = False
 
                             if self.on_capture:

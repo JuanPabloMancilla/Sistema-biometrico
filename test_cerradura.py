@@ -1,23 +1,30 @@
+import time
 from gpiozero import OutputDevice
-from time import sleep
 
 relay = OutputDevice(
     17,
     active_high=True,
-    initial_value=False
+    initial_value=True  # Arranca ABIERTA
 )
 
-print("🔒 Cerradura cerrada")
-relay.off()
+def ejecutar_cerradura(segundos=2):
+    print("🔓 ABIERTA")
+    relay.on()
+    time.sleep(3)
 
-sleep(5)
+    print("🔒 CERRADA")
+    relay.off()
+    time.sleep(segundos)
 
-print("🔓 Abriendo cerradura")
-relay.on()
+    print("🔓 ABIERTA")
+    relay.on()
 
-sleep(3)
+# ─── Aquí va tu sistema de reconocimiento ───────────────────
+def reconocimiento():
+    # sea RFID, facial, PIN, lo que sea...
+    resultado = tu_modulo_de_reconocimiento()
 
-print("🔒 Cerrando cerradura")
-relay.off()
-
-print("✅ Fin")
+    if resultado == "admitido":
+        ejecutar_cerradura(segundos=2)  # ← se dispara aquí
+    else:
+        print("❌ Acceso denegado")

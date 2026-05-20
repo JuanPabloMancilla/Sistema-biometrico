@@ -583,7 +583,7 @@ class TerminalView(ctk.CTkFrame):
                                 "Acceso denegado"
                             )
                             
-                            self.cerradura.cerrar()
+                            self.cerradura.abrir_normal()
 
                         else:
 
@@ -602,7 +602,7 @@ class TerminalView(ctk.CTkFrame):
                                     "Acceso autorizado"
                                 )
 
-                                self.cerradura.abrir(segundos=3)
+                                self.cerradura.cerrar_temporal(segundos=2)
 
                             #usuario inactivo
 
@@ -616,7 +616,7 @@ class TerminalView(ctk.CTkFrame):
                                 None,
                                 "Usuario inactivo"
                                 )
-                                self.cerradura.cerrar()
+                                self.cerradura.abrir_normal()
 
                                 self.status_label.configure(
                                     text="USUARIO INACTIVO",

@@ -64,6 +64,17 @@ TEMAS = {
         "badge":    "✗  ERROR",
         "b_color":  ACCENT_RED,
     },
+    "inactivo": {
+        "border":   ACCENT_RED,
+        "bar":      ACCENT_RED,
+        "banner":   "#1a0508",
+        "dot":      ACCENT_RED,
+        "status":   "USUARIO INACTIVO",
+        "st_color": ACCENT_RED,
+        "name":     "",
+        "badge":    "🚫 BLOQUEADO",
+        "b_color":  ACCENT_RED,
+},
     "multiples": {
         "border":   ACCENT_CYAN,
         "bar":      ACCENT_CYAN,
@@ -317,6 +328,8 @@ class TerminalView(ctk.CTkFrame):
         nombre = t["name"]
         if estado == "autorizado":
             nombre = f"BIENVENIDO:  {usuario}" if usuario else "ACCESO CONCEDIDO"
+        elif estado == "inactivo":
+            nombre = f"{usuario}\nUSUARIO INACTIVO" if usuario else "USUARIO INACTIVO"
 
         self.video_container.configure(border_color=t["border"])
         self.data_banner.configure(fg_color=t["banner"])
@@ -655,7 +668,10 @@ class TerminalView(ctk.CTkFrame):
                                 # USUARIO INACTIVO
                                 else:
 
-                                    self.aplicar_estilo_visual("negado")
+                                    self.aplicar_estilo_visual(
+                                        "inactivo",
+                                        usuario=self.usuario_detectado
+                                    )
 
                                     self.registrar_acceso_bd(
                                         usuario_id,
@@ -665,22 +681,9 @@ class TerminalView(ctk.CTkFrame):
                                     )
 
                                     if self.cerradura:
-                                        self.cerradura.bloquear()
+                                        self.cerradura.bloquear() ##
 
-                                    self.status_label.configure(
-                                        text="USUARIO INACTIVO",
-                                        text_color=ACCENT_RED
-                                    )
-
-                                    self.lbl_nombre.configure(
-                                        text=f"{self.usuario_detectado}\nUSUARIO INACTIVO",
-                                        text_color=ACCENT_RED
-                                    )
-
-                                    self.badge_label.configure(
-                                        text="🚫 BLOQUEADO",
-                                        text_color=ACCENT_RED
-                                    )
+                                    
 
 ####---
 

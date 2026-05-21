@@ -6,52 +6,51 @@ try:
     GPIO_OK = True
 except Exception as e:
     GPIO_OK = False
-    print("⚠️ GPIO no disponible:", e)
+    print("GPIO no disponible:", e)
 
-
-PIN_RELEVADOR = 17  # GPIO17 = pin físico 11
+PIN_RELEVADOR = 22
 
 
 class Cerradura:
+
     def __init__(self):
+
         self.rele = None
 
         if GPIO_OK:
+
             self.rele = OutputDevice(
                 PIN_RELEVADOR,
                 active_high=True,
                 initial_value=False
             )
 
-            # Estado normal: ABIERTA
-            self.abrir_normal()
+            self.bloquear()
 
-            print("🔐 Cerradura lista en GPIO17")
-        else:
-            print("⚠️ Cerradura en modo simulación")
+            print("?? Cerradura lista")
 
-    def abrir_normal(self):
-        # En tu conexión: OFF = abierta
+    def desbloquear(self):
+
+        if self.rele:
+            self.rele.on()
+
+        print("?? LED ENCENDIDO")
+
+    def bloquear(self):
+
         if self.rele:
             self.rele.off()
-        print("🔓 Cerradura ABIERTA / estado normal")
 
-    def cerrar_temporal(self, segundos=2):
+        print("? LED APAGADO")
+
+    def desbloquear_temporal(self, segundos=2):
+
         def tarea():
-            # En tu conexión: ON = cerrada/bloqueada
-            print("🔒 Cerrando cerradura")
-            if self.rele:
-                self.rele.on()
+
+            self.desbloquear()
 
             sleep(segundos)
 
-            print("🔓 Volviendo a abrir")
-            if self.rele:
-                self.rele.off()
+            self.bloquear()
 
         Thread(target=tarea, daemon=True).start()
-
-    def cerrar(self):
-        if self.rele:
-            self.rele.on()
-        print("🔒 Cerradura cerrada")

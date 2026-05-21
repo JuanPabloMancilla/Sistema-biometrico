@@ -582,19 +582,22 @@ class TerminalView(ctk.CTkFrame):
                         if any(p in self.usuario_detectado for p in ("DESCONOCIDO", "ERROR", "NO REGISTRADO")):
 
                             self.aplicar_estilo_visual("negado")
+
                             self.registrar_acceso_bd(
                                 usuario_id,
                                 0,
                                 None,
                                 "Acceso denegado"
                             )
-                            
+
+                            # ?? mantener bloqueada
                             if self.cerradura:
-                                self.cerradura.abrir_normal()
+                                self.cerradura.bloquear()
+
 
                         else:
 
-                            #USUARIO ACTIVO
+                            # USUARIO ACTIVO
                             if usuario_id is not None and usuario_activo(usuario_id):
 
                                 self.aplicar_estilo_visual(
@@ -609,23 +612,25 @@ class TerminalView(ctk.CTkFrame):
                                     "Acceso autorizado"
                                 )
 
+                                # ?? abrir temporalmente
                                 if self.cerradura:
-                                    self.cerradura.cerrar_temporal(segundos=2)
+                                    self.cerradura.desbloquear_temporal(2)
 
-                            #usuario inactivo
-
+                            # USUARIO INACTIVO
                             else:
 
                                 self.estado_actual = "negado"
-                                
+
                                 self.registrar_acceso_bd(
-                                usuario_id,
-                                0,
-                                None,
-                                "Usuario inactivo"
+                                    usuario_id,
+                                    0,
+                                    None,
+                                    "Usuario inactivo"
                                 )
+
+                                # ?? mantener cerrada
                                 if self.cerradura:
-                                    self.cerradura.abrir_normal()
+                                    self.cerradura.bloquear()
 
                                 self.status_label.configure(
                                     text="USUARIO INACTIVO",
@@ -638,7 +643,7 @@ class TerminalView(ctk.CTkFrame):
                                 )
 
                                 self.badge_label.configure(
-                                    text="✗ BLOQUEADO",
+                                    text="? BLOQUEADO",
                                     text_color=ACCENT_RED
                                 )
 

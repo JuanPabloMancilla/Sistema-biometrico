@@ -594,60 +594,95 @@ class TerminalView(ctk.CTkFrame):
                             if self.cerradura:
                                 self.cerradura.bloquear()
 
-
+####-
                         else:
 
-                            # USUARIO ACTIVO
-                            if usuario_id is not None and usuario_activo(usuario_id):
+                            # Si nunca se resolvió un nombre, usar el último mensaje disponible
+                            if not self.usuario_detectado:
+                                self.usuario_detectado = msg_actual
 
-                                self.aplicar_estilo_visual(
-                                    "autorizado",
-                                    usuario=self.usuario_detectado
-                                )
+                            # Usuario desconocido
+                            if any(p in self.usuario_detectado for p in ("DESCONOCIDO", "ERROR", "NO REGISTRADO")):
+
+                                self.aplicar_estilo_visual("negado")
 
                                 self.registrar_acceso_bd(
-                                    usuario_id,
-                                    1,
                                     None,
-                                    "Acceso autorizado"
-                                )
-
-                                # ?? abrir temporalmente
-                                if self.cerradura:
-                                    self.cerradura.desbloquear_temporal(2)
-
-                            # USUARIO INACTIVO
-                            else:
-
-                                self.estado_actual = "negado"
-
-                                self.registrar_acceso_bd(
-                                    usuario_id,
                                     0,
                                     None,
-                                    "Usuario inactivo"
+                                    "Acceso denegado"
                                 )
 
-                                # ?? mantener cerrada
                                 if self.cerradura:
                                     self.cerradura.bloquear()
 
-                                self.status_label.configure(
-                                    text="USUARIO INACTIVO",
-                                    text_color=ACCENT_RED
-                                )
+                            # Usuario identificado
+                            else:
 
-                                self.lbl_nombre.configure(
-                                    text=f"{self.usuario_detectado}\nUSUARIO INACTIVO",
-                                    text_color=ACCENT_RED
-                                )
+                                # USUARIO SIN ID
+                                if usuario_id is None:
 
-                                self.badge_label.configure(
-                                    text="? BLOQUEADO",
-                                    text_color=ACCENT_RED
-                                )
+                                    self.aplicar_estilo_visual("negado")
 
-                    
+                                    self.registrar_acceso_bd(
+                                        None,
+                                        0,
+                                        None,
+                                        "Usuario no identificado"
+                                    )
+
+                                    if self.cerradura:
+                                        self.cerradura.bloquear()
+
+                                # USUARIO ACTIVO
+                                elif usuario_activo(usuario_id):
+
+                                    self.aplicar_estilo_visual(
+                                        "autorizado",
+                                        usuario=self.usuario_detectado
+                                    )
+
+                                    self.registrar_acceso_bd(
+                                        usuario_id,
+                                        1,
+                                        None,
+                                    "Acceso autorizado"
+                                    )
+
+                                    if self.cerradura:
+                                        self.cerradura.desbloquear_temporal(2)
+
+                                # USUARIO INACTIVO
+                                else:
+
+                                    self.aplicar_estilo_visual("negado")
+
+                                    self.registrar_acceso_bd(
+                                        usuario_id,
+                                        0,
+                                        None,
+                                        "Usuario inactivo"
+                                    )
+
+                                    if self.cerradura:
+                                        self.cerradura.bloquear()
+
+                                    self.status_label.configure(
+                                        text="USUARIO INACTIVO",
+                                        text_color=ACCENT_RED
+                                    )
+
+                                    self.lbl_nombre.configure(
+                                        text=f"{self.usuario_detectado}\nUSUARIO INACTIVO",
+                                        text_color=ACCENT_RED
+                                    )
+
+                                    self.badge_label.configure(
+                                        text="🚫 BLOQUEADO",
+                                        text_color=ACCENT_RED
+                                    )
+
+####---
 
             if self.face_box is not None:
                 fx, fy, fw, fh = self.face_box

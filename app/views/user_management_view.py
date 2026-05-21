@@ -756,8 +756,38 @@ class UserManagementView(ctk.CTkFrame):
         bar.pack(fill="x", padx=30, pady=10)
         self.entry_busqueda = ctk.CTkEntry(bar, placeholder_text="🔍 Buscar usuario...", height=42, corner_radius=10, fg_color=COLORS["hover"], border_color=COLORS["border"], text_color=COLORS["text"])
         self.entry_busqueda.pack(side="left", fill="x", expand=True, padx=(0, 15))
+        self.entry_busqueda.bind("<KeyRelease>", self.buscar_usuarios)
         self.btn_filter = ctk.CTkButton(bar, text="⚙️ Filtrar ⌵", width=110, height=42, corner_radius=10, fg_color=COLORS["card"], text_color=COLORS["text"], border_color=COLORS["border"], command=self.toggle_filter)
         self.btn_filter.pack(side="left")
+        
+    def buscar_usuarios(self, event=None):
+        texto = self.entry_busqueda.get().strip().lower()
+
+        usuarios_filtrados = []
+
+        for u in self.all_users:
+            nombre_completo = f"{u['nombre_solo']} {u['ap']} {u['am']}".lower()
+            cuenta = str(u.get("cuenta", "")).lower()
+            correo = str(u.get("correo", "")).lower()
+            rol = str(u.get("r", "")).lower()
+            estado = "activo" if u.get("estado", 1) == 1 else "inactivo"
+
+            if (
+                texto in nombre_completo
+                or texto in cuenta
+                or texto in correo
+                or texto in rol
+                or texto in estado
+            ):
+                usuarios_filtrados.append(u)
+
+        if self.filtro_rol_actual != "Todos":
+            usuarios_filtrados = [
+                u for u in usuarios_filtrados
+                if u["r"].upper() == self.filtro_rol_actual.upper()
+            ]
+
+        self.render_table_content(usuarios_filtrados)
 
     def toggle_filter(self):
         if not self.filter_visible:
@@ -788,10 +818,7 @@ class UserManagementView(ctk.CTkFrame):
     def aplicar_filtro_visual(self, v):
         self.filtro_rol_actual = v
         self.draw_tags()
-        if v == "Todos":
-            self.render_table_content(self.all_users)
-            return
-        self.render_table_content([u for u in self.all_users if u["r"].upper() == v.upper()])
+        self.buscar_usuarios()
 
     def update_carreras_dinamicas(self, fn):
         c = self.carreras_por_plantel.get(fn, ["Sin Carreras"])

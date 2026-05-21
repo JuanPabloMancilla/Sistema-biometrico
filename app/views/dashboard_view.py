@@ -105,30 +105,59 @@ class DashboardView(ctk.CTkFrame):
 
     def toggle_sidebar_overlay(self):
 
-        # cerrar si ya existe
+        # Si ya está abierto, lo cierra
         if hasattr(self, "overlay_sidebar") and self.overlay_sidebar.winfo_exists():
             self.overlay_sidebar.destroy()
             return
 
+        # Sidebar flotante, NO usa grid
         self.overlay_sidebar = ctk.CTkFrame(
             self,
             width=280,
             fg_color=COLORS["sidebar"],
             border_width=1,
-            border_color=COLORS["border"]
+            border_color=COLORS["border"],
+            corner_radius=0
         )
-        self.overlay_sidebar.grid(row=0, column=0, sticky="ns")
-        self.overlay_sidebar.grid_propagate(False)
 
-        # HEADER
-        ctk.CTkLabel(
+        # Se pone encima sin mover nada
+        self.overlay_sidebar.place(
+            x=0,
+            y=0,
+            relheight=1
+        )
+
+        self.overlay_sidebar.lift()
+
+        # HEADER con logo y botón cerrar
+        header = ctk.CTkFrame(
             self.overlay_sidebar,
+            fg_color="transparent",
+            height=75
+        )
+        header.pack(fill="x", padx=15, pady=(10, 5))
+        header.pack_propagate(False)
+
+        ctk.CTkLabel(
+            header,
             text="K O D A",
             font=("Times New Roman", 32, "bold"),
             text_color="#3C054F"
-        ).pack(anchor="w", padx=20, pady=20)
+        ).pack(side="left", padx=(5, 0))
 
-        # BOTONES
+        ctk.CTkButton(
+            header,
+            text="☰",
+            width=22,
+            height=22,
+            fg_color="transparent",
+            text_color=COLORS["text"],
+            hover_color=COLORS["hover"],
+            font=("Inter", 14, "bold"),
+            command=self.cerrar_overlay
+        ).pack(side="right", padx=(0, 5), pady=5)
+
+        # Menú
         self.construir_menu(self.overlay_sidebar)
 
 
@@ -147,6 +176,9 @@ class DashboardView(ctk.CTkFrame):
     def cerrar_overlay(self):
         if hasattr(self, "overlay_sidebar") and self.overlay_sidebar.winfo_exists():
             self.overlay_sidebar.destroy()
+            
+            
+            
 
     def toggle_sidebar(self):
         self.is_compact = not self.is_compact

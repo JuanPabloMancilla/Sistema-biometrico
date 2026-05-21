@@ -47,6 +47,8 @@ def obtener_todos_usuarios():
         conn.close()
 
 def usuario_activo(id_usuario):
+    if id_usuario is None:
+        return False
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -58,13 +60,13 @@ def usuario_activo(id_usuario):
     """, (id_usuario,))
 
     row = cursor.fetchone()
-
     conn.close()
 
-    if row:
-        return row[0] == 1
+    if not row:
+        return False
+    
+    return int(row[0]) == 1
 
-    return False
 
 def obtener_usuario_por_id(id_usuario):
     conn = get_connection()

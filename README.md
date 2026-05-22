@@ -65,6 +65,20 @@ sistema-biometrico/
 └── README.md                      # Este archivo
 ```
 
+## Seguridad de datos sensibles
+
+Este proyecto trabaja con informacion biometrica y registros de acceso, por lo que algunos archivos se generan solo de forma local y no deben subirse al repositorio:
+
+- `encodings.json`: contiene representaciones numericas de rostros registrados. Aunque no sea una fotografia, sigue siendo informacion biometrica sensible.
+- `logs_accesos.json`: contiene historial de accesos, fechas, horas e intentos de ingreso, informacion que puede revelar patrones de uso o actividad de personas.
+
+Por seguridad, estos archivos estan incluidos en `.gitignore`. En su lugar se incluyen archivos de ejemplo vacios:
+
+- `encodings.example.json`
+- `logs_accesos.example.json`
+
+Esto permite documentar la estructura esperada sin exponer datos reales de usuarios, credenciales, registros internos o informacion perteneciente a una institucion/equipo.
+
 ## 🚀 Instalación y Configuración
 
 ### 1. 📥 Clonar el repositorio

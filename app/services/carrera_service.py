@@ -188,3 +188,20 @@ def obtener_facultades_para_dropdown():
     except Exception as e:
         print(f"Error al obtener facultades: {e}")
         return {}
+    
+def obtener_id_carrera_por_nombre(nombre):
+    from app.database.database import get_connection
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT id_carrera
+        FROM carrera
+        WHERE nombre = ?
+    """, (nombre,))
+
+    row = cursor.fetchone()
+    conn.close()
+
+    return row[0] if row else None

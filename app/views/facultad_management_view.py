@@ -72,8 +72,8 @@ class FacultadManagementView(ctk.CTkFrame):
             ctk.CTkButton(
                 header,
                 text="➕ " + AppContext.t("Agregar Facultad"),
-                fg_color=COLORS["text"], hover_color=COLORS["hover"],
-                text_color=COLORS["bg"], font=self.font_sub,
+                fg_color="#000000",
+                font=self.font_sub,
                 height=45, corner_radius=12,
                 command=self.abrir_formulario
             ).pack(fill="x", padx=10)
@@ -433,7 +433,7 @@ class FacultadManagementView(ctk.CTkFrame):
         )
         btn_guardar = ctk.CTkButton(
             btns, text="💾 " + AppContext.t("Guardar Facultad"),
-            font=self.font_sub, fg_color="#D1FAE5", text_color="#065F46",
+            font=self.font_sub, fg_color="#10B981", text_color="white",
             height=55, command=self.guardar_facultad
         )
 

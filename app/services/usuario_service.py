@@ -134,7 +134,7 @@ def crear_usuario(nombre, a_paterno, a_materno, tipo_usuario, id_facultad, id_ca
     finally:
         conn.close()
 
-def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo, estado=1):
+def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facultad, id_carrera, correo, estado=1):
     conn = get_connection()
     try:
         cursor = conn.cursor()
@@ -147,11 +147,12 @@ def actualizar_usuario(id_usuario, nombre, ap, am, cuenta, tipo_usuario, id_facu
                 cuenta = ?,
                 tipo_usuario = ?, 
                 id_facultad = ?, 
+                id_carrera = ?,
                 correo = ?,
                 estado = ?,
                 fecha_actualizacion = datetime('now')
             WHERE id_usuario = ?
-        """, (nombre, ap, am, cuenta, tipo_usuario, id_facultad, correo, estado, id_usuario))
+        """, (nombre, ap, am, cuenta, tipo_usuario, id_facultad, id_carrera, correo, estado, id_usuario))
 
         conn.commit()
         return cursor.rowcount > 0

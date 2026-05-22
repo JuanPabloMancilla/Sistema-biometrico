@@ -60,7 +60,7 @@ TEMAS = {
         "dot":      ACCENT_RED,
         "status":   "ACCESO DENEGADO",
         "st_color": ACCENT_RED,
-        "name":     "USUARIO NO REGISTRADO",
+        "name":     "USUARIO NO AUTORIZADO",
         "badge":    "✗  ERROR",
         "b_color":  ACCENT_RED,
     },

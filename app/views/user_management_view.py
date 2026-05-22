@@ -10,7 +10,7 @@ from app.recognition.encoding_manager import (
     guardar_encoding,
     find_best_match
 )
-from app.services.carrera_service import obtener_todas_carreras, obtener_facultades_para_dropdown
+from app.services.carrera_service import obtener_todas_carreras, obtener_facultades_para_dropdown, obtener_id_carrera_por_nombre
 from app.services.usuario_service import (
     crear_usuario,
     actualizar_usuario,
@@ -93,7 +93,9 @@ class UserManagementView(ctk.CTkFrame):
                     "cuenta":      u.get("cuenta", ""),
                     "id":          u["id_usuario"],
                     "correo":      u.get("correo", ""),
-                    "estado":      u.get("estado", 1)
+                    "estado":      u.get("estado", 1),
+                    "facultad": u.get("facultad_nombre", ""),
+                    "carrera": u.get("carrera_nombre", "")
                 })
             self.all_users.sort(key=lambda u: (u["estado"] == 0, u["nombre_solo"]))
         except Exception as e:
@@ -439,7 +441,7 @@ class UserManagementView(ctk.CTkFrame):
                 self.carreras_por_plantel[fn] = []
             self.carreras_por_plantel[fn].append(c["nombre"])
 
-        self.form_base = ctk.CTkFrame(self, fg_color="#F8FAFC")
+        self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
 
         padx_form = 12 if self.is_compact else 60
@@ -471,8 +473,24 @@ class UserManagementView(ctk.CTkFrame):
             self.plantel_menu.pack(side="left", expand=True, fill="x", padx=5)
             self.carrera_menu.pack(side="left", expand=True, fill="x", padx=5)
 
-        if nombres_f:
-            self.update_carreras_dinamicas(nombres_f[0])
+        if usuario:
+            facultad_actual = usuario.get("facultad", "")
+            carrera_actual = usuario.get("carrera", "")
+
+            if facultad_actual in nombres_f:
+                self.plantel_menu.set(facultad_actual)
+                self.update_carreras_dinamicas(facultad_actual)
+
+                carreras_disponibles = self.carreras_por_plantel.get(facultad_actual, [])
+
+                if carrera_actual in carreras_disponibles:
+                    self.carrera_var.set(carrera_actual)
+            else:
+                self.update_carreras_dinamicas(nombres_f[0])
+
+        else:
+            if nombres_f:
+                self.update_carreras_dinamicas(nombres_f[0])
 
         self.create_section_card(self.form_container, "👤 Información Personal", [
             ("Nombres",          usuario["nombre_solo"] if usuario else ""),
@@ -506,19 +524,50 @@ class UserManagementView(ctk.CTkFrame):
         self.label_estado = ctk.CTkLabel(self.form_container, text="", font=self.font_small, text_color="#EF4444")
         self.label_estado.pack(fill="x", padx=padx_form, pady=(0, 10))
 
-        btns = ctk.CTkFrame(self.form_container, fg_color="transparent")
-        btns.pack(fill="x", padx=padx_form, pady=(20, 50))
+        btns = ctk.CTkFrame(self.form_base, fg_color="transparent")
+        btns.pack(fill="x", padx=padx_form, pady=30)
 
-        self.btn_guardar = ctk.CTkButton(btns, text="💾 Guardar", font=self.font_sub, fg_color="#10B981", text_color="white", hover_color="#059669", height=50, command=self.validar_y_guardar)
-        btn_cancelar     = ctk.CTkButton(btns, text="❌ Cancelar", font=self.font_sub, fg_color="#FEE2E2", text_color=COLORS["text"], height=50, command=self.cerrar_formulario)
+        btn_guardar = ctk.CTkButton(
+            btns,
+            text="?? " + AppContext.t("Guardar Usuario"),
+            font=self.font_sub,
+            fg_color="#10B981",
+            text_color="white",
+            hover_color="#059669",
+            corner_radius=12,
+            height=55,
+            command=self.guardar_usuario
+        )      
+        btn_cancelar = ctk.CTkButton(
+            btns,
+            text="? " + AppContext.t("Cancelar"),
+            font=self.font_sub,
+            fg_color="#FEE2E2",
+            text_color="#991B1B",
+            hover_color="#FECACA",
+            corner_radius=12,
+            height=55,
+            command=self.volver_a_tabla
+        )
 
         if self.is_compact:
             btn_cancelar.pack(fill="x", pady=(0, 10))
-            self.btn_guardar.pack(fill="x")
+            btn_guardar.pack(fill="x")
         else:
-            btn_cancelar.pack(side="left", expand=True, fill="x", padx=(0, 10))
-            self.btn_guardar.pack(side="left", expand=True, fill="x", padx=(10, 0))
+            btn_cancelar.pack(
+                side="left",
+                expand=True,
+                fill="x",
+                padx=(0, 10)
+            )
 
+            btn_guardar.pack(
+                side="left",
+                expand=True,
+                fill="x",
+                padx=(10, 0)
+            )
+            
     def create_section_card(self, master, title, fields):
         padx_form = 12 if self.is_compact else 60
         card = ctk.CTkFrame(master, fg_color=COLORS["card"], corner_radius=12, border_width=1, border_color=COLORS["border"])
@@ -639,6 +688,7 @@ class UserManagementView(ctk.CTkFrame):
             tipo_usuario = TIPOS_USUARIO_INV.get(self.rol_var.get().upper())
 
             carrera_seleccionada = self.carrera_var.get()
+            id_carrera = obtener_id_carrera_por_nombre(carrera_seleccionada)
             carreras_validas     = self.carreras_por_plantel.get(self.plantel_menu.get(), [])
             if carrera_seleccionada not in carreras_validas:
                 print("❌ Carrera inválida")
@@ -651,7 +701,7 @@ class UserManagementView(ctk.CTkFrame):
 
             if self.usuario_editando_id:
                 estado_valor = 1 if self.estado_var.get() else 0
-                actualizar_usuario(id_usuario, n, ap, am, cta, tipo_usuario, id_fac, em, estado_valor)
+                actualizar_usuario(id_usuario, n, ap, am, cta, tipo_usuario, id_fac, id_carrera, em, estado_valor)
                 if hasattr(self, "biometria_temp") and self.biometria_temp is not None:
                     print("Reemplazando biometría...")
                     eliminar_encoding(id_usuario)
@@ -666,7 +716,7 @@ class UserManagementView(ctk.CTkFrame):
 
                 usuario_id = None
                 try:
-                    usuario_id = crear_usuario(n, ap, am, tipo_usuario, id_fac, None, cta, em)
+                    usuario_id = crear_usuario(n, ap, am, tipo_usuario, id_fac, id_carrera, cta, em)
                     if not usuario_id:
                         self.label_estado.configure(text="❌ No se pudo crear el usuario", text_color="#EF4444")
                         return
@@ -723,7 +773,7 @@ class UserManagementView(ctk.CTkFrame):
                 print(f"Usuario {id_usuario} no encontrado")
                 return
             estado_valor = 1 if nuevo_estado else 0
-            actualizar_usuario(id_usuario, usuario["nombre"], usuario["a_paterno"], usuario["a_materno"], "", usuario["tipo_usuario"], usuario["id_facultad"], estado_valor)
+            actualizar_usuario(id_usuario, usuario["nombre"], usuario["a_paterno"], usuario["a_materno"], "", usuario["tipo_usuario"], usuario["id_facultad"], usuario["id_carrera"], estado_valor)
             print(f"✔ Estado del usuario {id_usuario} cambiado a: {'ACTIVO' if estado_valor else 'INACTIVO'}")
             self.refresh_data()
             self.render_table_content(self.all_users)
@@ -803,17 +853,57 @@ class UserManagementView(ctk.CTkFrame):
     def draw_tags(self):
         for w in self.filter_container.winfo_children():
             w.destroy()
+
         r1 = ctk.CTkFrame(self.filter_container, fg_color="transparent")
         r1.pack(fill="x", padx=20)
-        ctk.CTkLabel(r1, text="👤 Rol:", font=self.font_small, text_color=COLORS["text"], width=80).pack(side="left")
-        for t in ["Todos", "ESTUDIANTE", "DOCENTE", "TRABAJADOR"]:
-            act = self.filtro_rol_actual == t
-            ctk.CTkButton(
-                r1, text=t, height=28, corner_radius=10,
-                fg_color=COLORS["hover"] if act else "white",
-                text_color=COLORS["text"], border_color=COLORS["border"],
-                command=lambda v=t: self.aplicar_filtro_visual(v)
-            ).pack(side="left", padx=3)
+
+        # T�tulo
+        ctk.CTkLabel(
+            r1,
+            text="👤 Rol:",
+            font=self.font_small,
+            text_color=COLORS["text"]
+        ).pack(anchor="w", pady=(0, 8))
+
+        # Contenedor botones
+        btn_container = ctk.CTkFrame(r1, fg_color="transparent")
+        btn_container.pack(fill="x")
+
+        filtros = ["Todos", "ESTUDIANTE", "DOCENTE", "TRABAJADOR"]
+
+        # ?? MODO RESPONSIVE
+        if self.is_compact:
+
+            for t in filtros:
+                act = self.filtro_rol_actual == t
+
+                ctk.CTkButton(
+                    btn_container,
+                    text=t,
+                    height=35,
+                    corner_radius=10,
+                    fg_color=COLORS["hover"] if act else "white",
+                    text_color=COLORS["text"],
+                    border_color=COLORS["border"],
+                    command=lambda v=t: self.aplicar_filtro_visual(v)
+                ).pack(fill="x", pady=4)
+
+        # ?? MODO ESCRITORIO
+        else:
+
+            for t in filtros:
+                act = self.filtro_rol_actual == t
+
+                ctk.CTkButton(
+                    btn_container,
+                    text=t,
+                    height=28,
+                    corner_radius=10,
+                    fg_color=COLORS["hover"] if act else "white",
+                    text_color=COLORS["text"],
+                    border_color=COLORS["border"],
+                    command=lambda v=t: self.aplicar_filtro_visual(v)
+                ).pack(side="left", padx=3)
 
     def aplicar_filtro_visual(self, v):
         self.filtro_rol_actual = v

@@ -74,81 +74,118 @@ def find_best_match(
 
     return None, mejor_distancia
 
-def guardar_encoding(usuario, encoding, archivo="encodings.json"):
+def guardar_encoding(
+    usuario,
+    encoding,
+    archivo="encodings.json",
+    reemplazar=False
+):
 
-        if encoding is None:
-
-            return {
-                "ok": False,
-                "error": "No hay encoding facial"
-            }
-
-        encoding = np.array(encoding)
-
-        if len(encoding) != 128:
-
-            return {
-                "ok": False,
-                "error": "Encoding inválido"
-            }
-
-        datos_usuario = {
-            "usuario": usuario,
-            "encoding": encoding.tolist()
-        }
-
-        if os.path.exists(archivo):
-
-            with open(archivo, "r") as f:
-                datos = json.load(f)
-
-        else:
-            datos = []
-
-        for existente in datos:
-
-            if str(existente["usuario"]) == str(usuario):
-
-                return {
-                    "ok": False,
-                    "error": "usuario_duplicado"
-                }
-
-        for existente in datos:
-
-            encoding_existente = np.array(
-                existente["encoding"]
-            )
-
-            distancia = face_recognition.face_distance(
-                [encoding_existente],
-                encoding
-            )[0]
-
-            print(
-                f"Comparando con {existente['usuario']} "
-                f"-> distancia: {distancia}"
-            )
-
-            if distancia < 0.45:
-
-                return {
-                    "ok": False,
-                    "error": "rostro_duplicado",
-                    "usuario_duplicado": existente["usuario"],
-                    "distancia": float(distancia)
-                }
-
-        datos.append(datos_usuario)
-
-        with open(archivo, "w") as f:
-            json.dump(datos, f, indent=4)
-
-        print(f"✔ Encoding guardado como usuario {usuario}")
+    if encoding is None:
 
         return {
-            "ok": True
+            "ok": False,
+            "error": "No hay encoding facial"
         }
+
+    encoding = np.array(encoding)
+
+    if len(encoding) != 128:
+
+        return {
+            "ok": False,
+            "error": "Encoding inv�lido"
+        }
+
+    datos_usuario = {
+        "usuario": usuario,
+        "encoding": encoding.tolist()
+    }
+
+    if os.path.exists(archivo):
+
+        with open(archivo, "r") as f:
+            datos = json.load(f)
+
+    else:
+        datos = []
+
+    # ============================================
+    # VALIDAR USUARIO DUPLICADO
+    # ============================================
+
+    for existente in datos:
+
+        mismo_usuario = (
+            str(existente["usuario"]) == str(usuario)
+        )
+
+        # ? SOLO bloquear si NO estamos reemplazando
+        if mismo_usuario and not reemplazar:
+
+            return {
+                "ok": False,
+                "error": "usuario_duplicado"
+            }
+
+    # ============================================
+    # VALIDAR ROSTRO DUPLICADO
+    # ============================================
+
+    for existente in datos:
+
+        mismo_usuario = (
+            str(existente["usuario"]) == str(usuario)
+        )
+
+        # ? IGNORAR SU PROPIO ROSTRO
+        if mismo_usuario:
+            continue
+
+        encoding_existente = np.array(
+            existente["encoding"]
+        )
+
+        distancia = face_recognition.face_distance(
+            [encoding_existente],
+            encoding
+        )[0]
+
+        print(
+            f"Comparando con {existente['usuario']} "
+            f"-> distancia: {distancia}"
+        )
+
+        if distancia < 0.45:
+
+            return {
+                "ok": False,
+                "error": "rostro_duplicado",
+                "usuario_duplicado": existente["usuario"],
+                "distancia": float(distancia)
+            }
+
+    # ============================================
+    # REEMPLAZAR BIOMETR�A
+    # ============================================
+
+    if reemplazar:
+
+        datos = [
+            u for u in datos
+            if str(u["usuario"]) != str(usuario)
+        ]
+
+    datos.append(datos_usuario)
+
+    with open(archivo, "w") as f:
+        json.dump(datos, f, indent=4)
+
+    print(f"? Encoding guardado como usuario {usuario}")
+
+    return {
+        "ok": True
+    }
 
 def comparar_encodings(encoding_guardado, encoding_actual):
 

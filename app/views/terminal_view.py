@@ -14,9 +14,9 @@ from datetime import datetime
 from app.hardware.cerradura import Cerradura
 
 
-# ── Paleta ────────────────────────────────────────────────────────────────────
-BG_DEEP        = "#0b0b22"   # azul más claro/visible
-BG_PANEL       = "#10103a"   # panel azul más notorio
+# -- Paleta --------------------------------------------------------------------
+BG_DEEP        = "#0b0b22"
+BG_PANEL       = "#10103a"
 BG_BANNER      = "#13133d"
 BORDER_IDLE    = "#3d3880"
 ACCENT_PURPLE  = "#9b87ff"
@@ -38,8 +38,7 @@ TEMAS = {
         "dot":      ACCENT_AMBER,
         "status":   "ESCANEANDO",
         "st_color": ACCENT_AMBER,
-        "name":     "ANALIZANDO RASGOS BIOMÉTRICOS",
-        "badge":    "LEYENDO",
+        "name":     "ANALIZANDO RASGOS BIOM�TRICOS",
         "b_color":  ACCENT_AMBER,
     },
     "autorizado": {
@@ -50,7 +49,6 @@ TEMAS = {
         "status":   "ACCESO AUTORIZADO",
         "st_color": ACCENT_GREEN,
         "name":     "",
-        "badge":    "✓  OK",
         "b_color":  ACCENT_GREEN,
     },
     "negado": {
@@ -60,8 +58,7 @@ TEMAS = {
         "dot":      ACCENT_RED,
         "status":   "ACCESO DENEGADO",
         "st_color": ACCENT_RED,
-        "name":     "USUARIO NO AUTORIZADO",
-        "badge":    "✗  ERROR",
+        "name":     "USUARIO NO REGISTRADO",
         "b_color":  ACCENT_RED,
     },
     "inactivo": {
@@ -72,18 +69,16 @@ TEMAS = {
         "status":   "USUARIO INACTIVO",
         "st_color": ACCENT_RED,
         "name":     "",
-        "badge":    "🚫 BLOQUEADO",
         "b_color":  ACCENT_RED,
-},
+    },
     "multiples": {
         "border":   ACCENT_CYAN,
         "bar":      ACCENT_CYAN,
         "banner":   "#071520",
         "dot":      ACCENT_CYAN,
-        "status":   "MÚLTIPLES ROSTROS DETECTADOS",
+        "status":   "MULTIPLES ROSTROS DETECTADOS",
         "st_color": ACCENT_CYAN,
         "name":     "SOLO UN USUARIO A LA VEZ",
-        "badge":    "⚠  ALERTA",
         "b_color":  ACCENT_CYAN,
     },
     "sin_camara": {
@@ -91,10 +86,9 @@ TEMAS = {
         "bar":      ACCENT_RED,
         "banner":   "#1a0508",
         "dot":      ACCENT_RED,
-        "status":   "SIN CÁMARA",
+        "status":   "SIN CAMARA",
         "st_color": ACCENT_RED,
-        "name":     "NO SE DETECTÓ NINGÚN DISPOSITIVO",
-        "badge":    "✗  OFFLINE",
+        "name":     "NO SE DETECTO NINGUN DISPOSITIVO",
         "b_color":  ACCENT_RED,
     },
     "acercarse": {
@@ -102,10 +96,9 @@ TEMAS = {
         "bar":      ACCENT_AMBER,
         "banner":   "#1c1508",
         "dot":      ACCENT_AMBER,
-        "status":   "ACÉRQUESE A LA CÁMARA",
+        "status":   "ACERQUESE A LA CAMARA",
         "st_color": ACCENT_AMBER,
-        "name":     "ROSTRO DEMASIADO LEJOS O PEQUEÑO",
-        "badge":    "⚠  AJUSTE",
+        "name":     "ROSTRO DEMASIADO LEJOS O PEQUENO",
         "b_color":  ACCENT_AMBER,
     },
     "iluminacion": {
@@ -113,10 +106,9 @@ TEMAS = {
         "bar":      ACCENT_AMBER,
         "banner":   "#1c1508",
         "dot":      ACCENT_AMBER,
-        "status":   "MEJORE LA ILUMINACIÓN",
+        "status":   "MEJORE LA ILUMINACION",
         "st_color": ACCENT_AMBER,
-        "name":     "AMBIENTE MUY OSCURO — ENCIENDA UNA LUZ",
-        "badge":    "⚠  LUZ",
+        "name":     "AMBIENTE MUY OSCURO - ENCIENDA UNA LUZ",
         "b_color":  ACCENT_AMBER,
     },
     "vacio": {
@@ -126,18 +118,16 @@ TEMAS = {
         "dot":      ACCENT_PURPLE,
         "status":   "POSICIONE SU ROSTRO",
         "st_color": TEXT_PRIMARY,
-        "name":     "MIRANDO HACIA LA CÁMARA",
-        "badge":    "LISTO",
+        "name":     "MIRANDO HACIA LA CAMARA",
         "b_color":  ACCENT_PURPLE,
     },
 }
-
 
 class TerminalView(ctk.CTkFrame):
     def __init__(self, master, user_id=None, on_back=None, on_capture=None, modo="acceso"):
         super().__init__(master, fg_color=BG_DEEP)
         self.on_back = on_back
-        self.on_capture = on_capture  # 🔥 ESTE ES EL NUEVO
+        self.on_capture = on_capture
         self.modo = modo
         self.user_id = user_id
         self.cap = None
@@ -146,7 +136,6 @@ class TerminalView(ctk.CTkFrame):
         self.running = True
         self.cerradura = None
 
-        #  SOLO usar cerradura en modo acceso
         if self.modo != "registro":
             self.cerradura = Cerradura()
 
@@ -169,19 +158,15 @@ class TerminalView(ctk.CTkFrame):
         self._build_ui()
         self.iniciar_sistema()
 
-    # ══════════════════════════════════════════════════════════════════════════
-    # Construcción de la UI
-    # ══════════════════════════════════════════════════════════════════════════
-
     def _build_ui(self):
         ctk.CTkFrame(self, fg_color=ACCENT_PURPLE, height=2).pack(fill="x", side="top")
 
         hdr = ctk.CTkFrame(self, fg_color="transparent")
         hdr.pack(pady=(20, 4))
-        # 🔥 SOLO mostrar botón salir en modo normal
+
         if self.modo != "registro":
             self.btn_salir = ctk.CTkButton(
-                self, text="🚪", width=42, height=42,
+                self, text="??", width=42, height=42,
                 corner_radius=8,
                 fg_color=BG_PANEL, hover_color="#1e1860",
                 text_color=TEXT_SECONDARY,
@@ -190,11 +175,11 @@ class TerminalView(ctk.CTkFrame):
                 command=self.cerrar_y_volver,
             )
             self.btn_salir.place(relx=0.974, rely=0.046, anchor="ne")
-            # 🔥 BOTÓN CERRAR SOLO PARA MODO REGISTRO
+
         if self.modo == "registro":
             self.btn_cerrar = ctk.CTkButton(
                 self,
-                text="✖",
+                text="X",
                 width=40,
                 height=40,
                 corner_radius=10,
@@ -206,7 +191,6 @@ class TerminalView(ctk.CTkFrame):
                 border_color=BORDER_IDLE,
                 command=self.cerrar_y_volver
             )
-
             self.btn_cerrar.place(relx=0.974, rely=0.046, anchor="ne")
 
         ctk.CTkLabel(
@@ -217,12 +201,10 @@ class TerminalView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             hdr,
-            text=AppContext.t("▸  RECONOCIMIENTO FACIAL  ◂") if self.modo == "registro" else AppContext.t("▸  RECONOCIMIENTO FACIAL  ◂"),
+            text=AppContext.t("RECONOCIMIENTO FACIAL"),
             font=("Courier New", 23),
             text_color=TEXT_MUTED,
         ).pack(pady=(4, 0))
-
-        
 
         main = ctk.CTkFrame(self, fg_color="transparent")
         main.pack(expand=True, fill="both", padx=44, pady=(8, 28))
@@ -233,7 +215,7 @@ class TerminalView(ctk.CTkFrame):
         )
         self.video_container.pack(expand=True, fill="both")
 
-        # ── Banner ────────────────────────────────────────────────────────────
+        # -- Banner ------------------------------------------------------------
         self.data_banner = ctk.CTkFrame(
             self.video_container,
             fg_color=BG_BANNER,
@@ -255,7 +237,7 @@ class TerminalView(ctk.CTkFrame):
         row.pack(fill="x", padx=20, pady=(18, 0))
 
         self.dot_indicator = ctk.CTkLabel(
-            row, text="●", font=("Courier New", 14), text_color=ACCENT_PURPLE
+            row, text="?", font=("Courier New", 14), text_color=ACCENT_PURPLE
         )
         self.dot_indicator.pack(side="left", padx=(0, 10))
 
@@ -273,7 +255,7 @@ class TerminalView(ctk.CTkFrame):
 
         self.lbl_nombre = ctk.CTkLabel(
             center,
-            text=AppContext.t("ESPERANDO DETECCIÓN..."),
+            text=AppContext.t("ESPERANDO DETECCION..."),
             font=("Courier New", 20),
             text_color=TEXT_SECONDARY,
             anchor="w",
@@ -285,20 +267,10 @@ class TerminalView(ctk.CTkFrame):
         )
         self.accent_line.pack(side="bottom", fill="x")
 
-        # ── Badge esquina superior-derecha, sin cuadro de fondo ──────────────
-        self.badge_label = ctk.CTkLabel(
-            self.data_banner,
-            text=AppContext.t("LISTO"),
-            font=("Courier New", 19, "bold"),
-            text_color=ACCENT_PURPLE,
-            fg_color="transparent",   # sin cuadro
-        )
-        self.badge_label.place(relx=0.955, rely=0.23, anchor="ne")
-
-        # ── Área de video ────────────────────────────────────────────────────
+        # -- �rea de video ----------------------------------------------------
         self.video_display = ctk.CTkLabel(
             self.video_container,
-            text=AppContext.t("Iniciando cámara..."),
+            text=AppContext.t("Iniciando camara..."),
             text_color=TEXT_MUTED,
             font=("Courier New", 13),
         )
@@ -307,7 +279,11 @@ class TerminalView(ctk.CTkFrame):
         # Footer
         ctk.CTkLabel(
             self,
-            text=AppContext.t("Sistema Biométrico v2.0") + "  //  " + AppContext.t("Acceso Seguro") + "  //  " + AppContext.t("Cifrado AES-256"),
+            text=(
+                AppContext.t("Sistema Biometrico v2.0") + "  //  " +
+                AppContext.t("Acceso Seguro") + "  //  " +
+                AppContext.t("Cifrado AES-256")
+            ),
             font=("Courier New", 9),
             text_color=TEXT_MUTED,
         ).pack(side="bottom", pady=(0, 10))
@@ -325,46 +301,44 @@ class TerminalView(ctk.CTkFrame):
         self.estado_actual = estado
         t = TEMAS.get(estado, TEMAS["vacio"])
 
-        nombre = t["name"]
+        nombre = AppContext.t(t["name"])
         if estado == "autorizado":
-            nombre = f"BIENVENIDO:  {usuario}" if usuario else "ACCESO CONCEDIDO"
+            nombre = f"{AppContext.t('BIENVENIDO')}:  {usuario}" if usuario else AppContext.t("ACCESO CONCEDIDO")
         elif estado == "inactivo":
-            nombre = f"{usuario}\nUSUARIO INACTIVO" if usuario else "USUARIO INACTIVO"
+            nombre = f"{usuario}\n{AppContext.t('USUARIO INACTIVO')}" if usuario else AppContext.t("USUARIO INACTIVO")
 
         self.video_container.configure(border_color=t["border"])
         self.data_banner.configure(fg_color=t["banner"])
         self.accent_bar.configure(fg_color=t["bar"])
         self.accent_line.configure(fg_color=t["bar"])
         self.dot_indicator.configure(text_color=t["dot"])
-        self.status_label.configure(text=t["status"], text_color=t["st_color"])
+        self.status_label.configure(text=AppContext.t(t["status"]), text_color=t["st_color"])
         self.lbl_nombre.configure(text=nombre, text_color=t["b_color"])
-        self.badge_label.configure(text=t["badge"], text_color=t["b_color"])
-        # 🔥 MODO REGISTRO (sobrescribe textos)
+
+        # Override texts in registro mode
         if self.modo == "registro" and estado != "negado":
             self.status_label.configure(
-               text="REGISTRANDO BIOMETRÍA",
-               text_color=ACCENT_AMBER   # 🔥 amarillo
+                text=AppContext.t("REGISTRANDO BIOMETRIA"),
+                text_color=ACCENT_AMBER
             )
             self.lbl_nombre.configure(
-               text="COLOQUE SU ROSTRO FRENTE A LA CÁMARA",
-               text_color=ACCENT_AMBER   # 🔥 amarillo también
+                text=AppContext.t("COLOQUE SU ROSTRO FRENTE A LA CAMARA"),
+                text_color=ACCENT_AMBER
             )
-
+        
     def detectar_rostros(self, frame):
-        """Devuelve lista de todas las cajas detectadas."""
         gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
         faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
         return list(faces) if len(faces) > 0 else []
 
     def _rostro_principal(self, faces):
-        """Retorna caja del rostro más grande con padding."""
         x, y, w, h = max(faces, key=lambda r: r[2] * r[3])
         pad = 40
         return (max(0, x - pad), max(0, y - pad), w + pad * 2, h + pad * 2)
 
-    # ══════════════════════════════════════════════════════════════════════════
+    # --------------------------------------------------------------------------
     # Dibujo sobre frame
-    # ══════════════════════════════════════════════════════════════════════════
+    # --------------------------------------------------------------------------
 
     @staticmethod
     def _hex_to_bgr(hex_color):
@@ -396,7 +370,6 @@ class TerminalView(ctk.CTkFrame):
         cv2.line(frame, (fx, y + 1), (fx + fw, y + 1), c, 1)
 
     def _aplicar_vignette(self, frame):
-        # Normalizar a BGR 3 canales — fix del crash original
         if frame.ndim == 2:
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
         elif frame.shape[2] == 4:
@@ -408,10 +381,6 @@ class TerminalView(ctk.CTkFrame):
         vignette = np.clip((dist / np.sqrt(cx ** 2 + cy ** 2)) ** 2.2, 0, 1)
         overlay = np.repeat((vignette * 100).astype(np.uint8)[:, :, np.newaxis], 3, axis=2)
         return cv2.subtract(frame, overlay)
-
-    # ══════════════════════════════════════════════════════════════════════════
-    # Loop de video
-    # ══════════════════════════════════════════════════════════════════════════
 
     def _get_video_area(self):
         self.update_idletasks()
@@ -426,7 +395,6 @@ class TerminalView(ctk.CTkFrame):
 
     def actualizar_video(self):
 
-        # 🔴 Evitar errores si la vista ya fue destruida
         if not self.winfo_exists():
             return
 
@@ -436,10 +404,9 @@ class TerminalView(ctk.CTkFrame):
         if not self.video_container.winfo_exists():
             return
 
-
         if not self.cap:
             return
-        
+
         if not self.running:
             return
 
@@ -450,15 +417,14 @@ class TerminalView(ctk.CTkFrame):
             self.loop_id = self.after(16, self.actualizar_video)
             return
 
-        frame_dibujado, face_encoding, mensaje, usuario_id  = procesar_frame(frame)
+        frame_dibujado, face_encoding, mensaje, usuario_id = procesar_frame(frame)
         fh_orig, fw_orig = frame_dibujado.shape[:2]
 
-        # ── Detectar todos los rostros ────────────────────────────────────────
-        faces    = self.detectar_rostros(frame_dibujado)
+        faces     = self.detectar_rostros(frame_dibujado)
         num_caras = len(faces)
         ahora     = time.time()
 
-        # ── Reset tras 4 s ───────────────────────────────────────────────────
+        # -- Reset tras 4 s ---------------------------------------------------
         if self.esperando_reset and ahora - self.inicio_espera_reset > 4.0:
             self.esperando_reset = False
             self.escaneando = False
@@ -467,7 +433,7 @@ class TerminalView(ctk.CTkFrame):
             self.ultimo_rostro_visto = 0.0
             self.aplicar_estilo_visual("vacio")
 
-        # ── Múltiples rostros ─────────────────────────────────────────────────
+        # -- M�ltiples rostros -------------------------------------------------
         if num_caras > 1 and not self.esperando_reset:
             if self.escaneando:
                 self.escaneando = False
@@ -477,21 +443,18 @@ class TerminalView(ctk.CTkFrame):
                 self._dibujar_esquinas(frame_dibujado, x, y, w, h, ACCENT_CYAN)
             self.face_box = None
 
-        # ── Un solo rostro ────────────────────────────────────────────────────
         elif num_caras == 1:
             self.face_box = self._rostro_principal(faces)
             self.ultimo_rostro_visto = ahora
 
-            # ── Validar iluminación ───────────────────────────────────────────
             gris = cv2.cvtColor(frame_dibujado, cv2.COLOR_BGR2GRAY)
             brillo_medio = float(np.mean(gris))
-            muy_oscuro = brillo_medio < 40  # umbral: 0-255
+            muy_oscuro = brillo_medio < 40
 
-            # ── Validar tamaño del rostro (lejos/cerca) ───────────────────────
             fx0, fy0, fw0, fh0 = self.face_box
-            area_cara = fw0 * fh0
+            area_cara  = fw0 * fh0
             area_frame = frame_dibujado.shape[0] * frame_dibujado.shape[1]
-            muy_lejos = (area_cara / area_frame) < 0.04  # menos del 4% del frame
+            muy_lejos  = (area_cara / area_frame) < 0.04
 
             if not self.escaneando and not self.esperando_reset:
                 if muy_oscuro:
@@ -503,18 +466,13 @@ class TerminalView(ctk.CTkFrame):
                 elif self.estado_actual not in ("autorizado", "negado"):
                     self.escaneando = True
                     self.inicio_escaneo = ahora
-                    self.usuario_detectado = ""   # se irá llenando frame a frame
-                    if self.modo == "registro":
-                        self.aplicar_estilo_visual("escaneando")
-                    else:
-                        self.aplicar_estilo_visual("escaneando")
+                    self.usuario_detectado = ""
+                    self.aplicar_estilo_visual("escaneando")
 
             if self.escaneando and self.face_box is not None:
                 fx, fy, fw, fh = self.face_box
                 self._dibujar_linea_escaneo(frame_dibujado, fx, fy, fw, fh, ACCENT_AMBER)
 
-                # Actualizar usuario_detectado en cada frame mientras escaneamos.
-                # Se descarta cualquier mensaje genérico y se guarda solo el nombre real.
                 msg_actual = str(mensaje).upper().strip()
                 MENSAJES_GENERICOS = (
                     "CARA DETECTADA", "DETECTADA CORRECTAMENTE",
@@ -530,41 +488,27 @@ class TerminalView(ctk.CTkFrame):
                     self.esperando_reset = True
                     self.inicio_espera_reset = ahora
 
-                    # =========================================================
-                    # MODO REGISTRO
-                    # =========================================================
-
                     if self.modo == "registro":
 
                         if face_encoding is not None:
 
-                            
-                            # ?? Verificar si el rostro ya existe
                             match_id, distancia = find_best_match(
                                 face_encoding,
                                 cargar_encodings()[0],
                                 cargar_encodings()[1]
                             )
 
-                            # ? Rostro duplicado
                             if match_id is not None and distancia < 0.45:
 
                                 self.status_label.configure(
-                                    text="USUARIO YA REGISTRADO",
+                                    text=AppContext.t("USUARIO YA REGISTRADO"),
                                     text_color=ACCENT_RED
                                 )
-
                                 self.lbl_nombre.configure(
-                                    text="ESTE ROSTRO YA EXISTE EN EL SISTEMA",
+                                    text=AppContext.t("ESTE ROSTRO YA EXISTE EN EL SISTEMA"),
                                     text_color=ACCENT_RED
                                 )
 
-                                self.badge_label.configure(
-                                    text="? DUPLICADO",
-                                    text_color=ACCENT_RED
-                                )
-
-                                # ?? volver a permitir escaneo
                                 self.esperando_reset = False
                                 self.escaneando = False
                                 self.pos_linea = 0
@@ -572,120 +516,57 @@ class TerminalView(ctk.CTkFrame):
                                 self.loop_id = self.after(1500, self.actualizar_video)
                                 return
 
-
-                            # ? Rostro nuevo
                             self.running = False
 
                             if self.on_capture:
                                 self.on_capture(face_encoding)
 
                             return
-                        
-                        # =========================================================
-                        # MODO ACCESO / RECONOCIMIENTO
-                        # =========================================================
                     
                     else:
-                    
-                    # Si nunca se resolvió un nombre, usar el último mensaje disponible
+
                         if not self.usuario_detectado:
                             self.usuario_detectado = msg_actual
-                        
-                        # Usuario desconocido
+
                         if any(p in self.usuario_detectado for p in ("DESCONOCIDO", "ERROR", "NO REGISTRADO")):
 
                             self.aplicar_estilo_visual("negado")
-
-                            self.registrar_acceso_bd(
-                                usuario_id,
-                                0,
-                                None,
-                                "Acceso denegado"
-                            )
-
-                            # ?? mantener bloqueada
+                            self.registrar_acceso_bd(usuario_id, 0, None, "Acceso denegado")
                             if self.cerradura:
                                 self.cerradura.bloquear()
 
-####-
                         else:
 
-                            # Si nunca se resolvió un nombre, usar el último mensaje disponible
                             if not self.usuario_detectado:
                                 self.usuario_detectado = msg_actual
 
-                            # Usuario desconocido
                             if any(p in self.usuario_detectado for p in ("DESCONOCIDO", "ERROR", "NO REGISTRADO")):
 
                                 self.aplicar_estilo_visual("negado")
-
-                                self.registrar_acceso_bd(
-                                    None,
-                                    0,
-                                    None,
-                                    "Acceso denegado"
-                                )
-
+                                self.registrar_acceso_bd(None, 0, None, "Acceso denegado")
                                 if self.cerradura:
                                     self.cerradura.bloquear()
 
-                            # Usuario identificado
+                            elif usuario_id is None:
+
+                                self.aplicar_estilo_visual("negado")
+                                self.registrar_acceso_bd(None, 0, None, "Usuario no identificado")
+                                if self.cerradura:
+                                    self.cerradura.bloquear()
+
+                            elif usuario_activo(usuario_id):
+
+                                self.aplicar_estilo_visual("autorizado", usuario=self.usuario_detectado)
+                                self.registrar_acceso_bd(usuario_id, 1, None, "Acceso autorizado")
+                                if self.cerradura:
+                                    self.cerradura.desbloquear_temporal(2)
+
                             else:
 
-                                # USUARIO SIN ID
-                                if usuario_id is None:
-
-                                    self.aplicar_estilo_visual("negado")
-
-                                    self.registrar_acceso_bd(
-                                        None,
-                                        0,
-                                        None,
-                                        "Usuario no identificado"
-                                    )
-
-                                    if self.cerradura:
-                                        self.cerradura.bloquear()
-
-                                # USUARIO ACTIVO
-                                elif usuario_activo(usuario_id):
-
-                                    self.aplicar_estilo_visual(
-                                        "autorizado",
-                                        usuario=self.usuario_detectado
-                                    )
-
-                                    self.registrar_acceso_bd(
-                                        usuario_id,
-                                        1,
-                                        None,
-                                    "Acceso autorizado"
-                                    )
-
-                                    if self.cerradura:
-                                        self.cerradura.desbloquear_temporal(2)
-
-                                # USUARIO INACTIVO
-                                else:
-
-                                    self.aplicar_estilo_visual(
-                                        "inactivo",
-                                        usuario=self.usuario_detectado
-                                    )
-
-                                    self.registrar_acceso_bd(
-                                        usuario_id,
-                                        0,
-                                        None,
-                                        "Usuario inactivo"
-                                    )
-
-                                    if self.cerradura:
-                                        self.cerradura.bloquear() ##
-
-                                    
-
-####---
+                                self.aplicar_estilo_visual("inactivo", usuario=self.usuario_detectado)
+                                self.registrar_acceso_bd(usuario_id, 0, None, "Usuario inactivo")
+                                if self.cerradura:
+                                    self.cerradura.bloquear()
 
             if self.face_box is not None:
                 fx, fy, fw, fh = self.face_box
@@ -697,7 +578,6 @@ class TerminalView(ctk.CTkFrame):
                 )
                 self._dibujar_esquinas(frame_dibujado, fx, fy, fw, fh, color_esq)
 
-        # ── Sin cara ──────────────────────────────────────────────────────────
         else:
             if not self.escaneando and not self.esperando_reset:
                 if ahora - self.ultimo_rostro_visto > 0.8:
@@ -705,16 +585,13 @@ class TerminalView(ctk.CTkFrame):
                         self.aplicar_estilo_visual("vacio")
                     self.face_box = None
 
-        # ── Vignette ─────────────────────────────────────────────────────────
         frame_dibujado = self._aplicar_vignette(frame_dibujado)
-
 
         try:
             cw, ch = self._get_video_area()
-        except:
+        except Exception:
             return
-        # ── Renderizado ──────────────────────────────────────────────────────
-        
+
         img_ratio  = fw_orig / fh_orig
         cont_ratio = cw / ch
 
@@ -740,9 +617,9 @@ class TerminalView(ctk.CTkFrame):
         if self.running:
             self.loop_id = self.after(16, self.actualizar_video)
 
-    # ══════════════════════════════════════════════════════════════════════════
+    # --------------------------------------------------------------------------
     # Ciclo de vida
-    # ══════════════════════════════════════════════════════════════════════════
+    # --------------------------------------------------------------------------
 
     def iniciar_sistema(self):
         self.cap = iniciar_camara()
@@ -750,13 +627,14 @@ class TerminalView(ctk.CTkFrame):
             self.aplicar_estilo_visual("vacio")
             self.after(200, self.actualizar_video)
         else:
-            # Banner + área de video muestran el error
             self.aplicar_estilo_visual("sin_camara")
             self._flush_pending_style()
             self.video_display.configure(
-                text="⚠  ERROR: no se pudo acceder a la cámara\n\n"
-                    "Verifique que el dispositivo esté conectado\n"
-                    "y no esté en uso por otra aplicación.",
+                text=(
+                    "  ERROR: no se pudo acceder a la camara\n\n"
+                    "Verifique que el dispositivo este conectado\n"
+                    "y no este en uso por otra aplicacion."
+                ),
                 text_color=ACCENT_RED,
             )
 
@@ -777,10 +655,8 @@ class TerminalView(ctk.CTkFrame):
         if self.on_back:
             self.on_back()
 
-    
-        
     def on_close(self):
-        print("🛑 Cerrando terminal biométrica")
+        print("Cerrando terminal biometrica")
 
         self.running = False
 
@@ -789,21 +665,16 @@ class TerminalView(ctk.CTkFrame):
                 self.after_cancel(self.loop_id)
             except Exception:
                 pass
-
             self.loop_id = None
 
         try:
             from app.camara.camara import liberar_camara
             liberar_camara(self.cap)
-
         except Exception as e:
-            print("Error liberando cámara:", e)
+            print("Error liberando camara:", e)
 
         self.cap = None
-        
-    
-    
-    
+
     def registrar_acceso_bd(self, id_usuario, resultado, confianza=None, motivo=""):
         try:
             conn = get_connection()
@@ -824,7 +695,8 @@ class TerminalView(ctk.CTkFrame):
             conn.commit()
             conn.close()
 
-            print("✔ Acceso registrado en BD:", motivo)
+            print("Acceso registrado en BD:", motivo)
 
         except Exception as e:
-            print("❌ Error registrando acceso:", e)
+            print("Error registrando acceso:", e)
+            

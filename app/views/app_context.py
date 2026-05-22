@@ -323,20 +323,167 @@ TRADUCCIONES = {
     "Fecha:":                                       {"en": "Date:"},
 }
 
+TRADUCCIONES_UTF8 = {
+    "Panel de Control": {"en": "Control Panel"},
+    "Gestión de Usuarios": {"en": "User Management"},
+    "Gestion de Usuarios": {"en": "User Management"},
+    "Gestión de Facultades": {"en": "Faculty Management"},
+    "Gestion de Facultades": {"en": "Faculty Management"},
+    "Gestión de Carreras": {"en": "Career Management"},
+    "Gestion de Carreras": {"en": "Career Management"},
+    "Configuración": {"en": "Settings"},
+    "Configuración Cuenta": {"en": "Account Settings"},
+    "Cerrar Sesión": {"en": "Log Out"},
+    "Control Biométrico": {"en": "Biometric Control"},
+    "Resumen general y actividad reciente": {"en": "General overview and recent activity"},
+    "Total Registros": {"en": "Total Records"},
+    "Accesos Hoy": {"en": "Accesses Today"},
+    "Autorizados": {"en": "Authorized"},
+    "Denegados": {"en": "Denied"},
+    "Tendencia de Accesos por Hora": {"en": "Access Trend by Hour"},
+    "Fecha:": {"en": "Date:"},
+    "Registro de últimos accesos": {"en": "Latest access log"},
+    "Sin accesos registrados": {"en": "No access records found"},
+    "Sin accesos registrados en esta fecha": {"en": "No access records for this date"},
+    "Sin cuenta": {"en": "No account"},
+    "Sin correo": {"en": "No email"},
+    "Acceso autorizado": {"en": "Access authorized"},
+    "Acceso denegado": {"en": "Access denied"},
+    "AUTORIZADO": {"en": "AUTHORIZED"},
+    "DENEGADO": {"en": "DENIED"},
+    "USUARIO NO REGISTRADO": {"en": "UNREGISTERED USER"},
+    "Agregar Usuario": {"en": "Add User"},
+    "Buscar usuario...": {"en": "Search user..."},
+    "No hay usuarios registrados": {"en": "No registered users"},
+    "FOTOGRAFÍA": {"en": "PHOTOGRAPH"},
+    "INFORMACIÓN": {"en": "INFORMATION"},
+    "ESTADO": {"en": "STATUS"},
+    "ACCIONES": {"en": "ACTIONS"},
+    "Editar Registro": {"en": "Edit Record"},
+    "Nuevo Registro": {"en": "New Record"},
+    "Clasificación": {"en": "Classification"},
+    "Tipo de Usuario": {"en": "User Type"},
+    "Información Personal": {"en": "Personal Information"},
+    "Identificación": {"en": "Identification"},
+    "Estado del usuario": {"en": "User Status"},
+    "Usuario activo": {"en": "Active user"},
+    "Nombres": {"en": "First Name(s)"},
+    "Apellido Paterno": {"en": "Paternal Last Name"},
+    "Apellido Materno": {"en": "Maternal Last Name"},
+    "cuenta": {"en": "account"},
+    "correo": {"en": "email"},
+    "Registrar Biometría": {"en": "Register Biometrics"},
+    "Guardar Usuario": {"en": "Save User"},
+    "Biometría requerida": {"en": "Biometrics required"},
+    "Biometría registrada": {"en": "Biometrics registered"},
+    "Abriendo cámara...": {"en": "Opening camera..."},
+    "Corrige los datos primero": {"en": "Fix the data first"},
+    "¿Desactivar este usuario?": {"en": "Deactivate this user?"},
+    "El usuario perderá acceso al sistema.": {"en": "The user will lose system access."},
+    "¿Activar este usuario?": {"en": "Activate this user?"},
+    "El usuario recuperará acceso al sistema.": {"en": "The user will regain system access."},
+    "Rol:": {"en": "Role:"},
+    "Todos": {"en": "All"},
+    "Filtrar ⌵": {"en": "Filter ⌵"},
+    "Filtrar ︿": {"en": "Filter ︿"},
+    "Estudiante": {"en": "Student"},
+    "Docente": {"en": "Teacher"},
+    "Trabajador": {"en": "Worker"},
+    "ESTUDIANTE": {"en": "STUDENT"},
+    "DOCENTE": {"en": "TEACHER"},
+    "TRABAJADOR": {"en": "WORKER"},
+    "ACTIVO": {"en": "ACTIVE"},
+    "INACTIVO": {"en": "INACTIVE"},
+    "Administra las unidades académicas": {"en": "Manage academic units"},
+    "Administra las unidades académicas del sistema": {"en": "Manage the system's academic units"},
+    "Agregar Facultad": {"en": "Add Faculty"},
+    "Buscar facultad por nombre...": {"en": "Search faculty by name..."},
+    "No hay facultades registradas": {"en": "No registered faculties"},
+    "NOMBRE DE LA FACULTAD": {"en": "FACULTY NAME"},
+    "Editar Facultad": {"en": "Edit Faculty"},
+    "Crear Nueva Facultad": {"en": "Create New Faculty"},
+    "Nombre de la Facultad": {"en": "Faculty Name"},
+    "Guardar Facultad": {"en": "Save Faculty"},
+    "¿Desactivar esta facultad?": {"en": "Deactivate this faculty?"},
+    "La facultad dejará de estar disponible.": {"en": "The faculty will no longer be available."},
+    "¿Activar esta facultad?": {"en": "Activate this faculty?"},
+    "La facultad volverá a estar disponible.": {"en": "The faculty will be available again."},
+    "Activa": {"en": "Active"},
+    "Inactiva": {"en": "Inactive"},
+    "ACTIVA": {"en": "ACTIVE"},
+    "INACTIVA": {"en": "INACTIVE"},
+    "Agregar Carrera": {"en": "Add Career"},
+    "Buscar carrera por nombre...": {"en": "Search career by name..."},
+    "No hay carreras registradas": {"en": "No registered careers"},
+    "NOMBRE": {"en": "NAME"},
+    "FACULTAD": {"en": "FACULTY"},
+    "Editar Carrera": {"en": "Edit Career"},
+    "Nueva Carrera": {"en": "New Career"},
+    "Nombre de la Carrera": {"en": "Career Name"},
+    "Facultad": {"en": "Faculty"},
+    "Carrera": {"en": "Career"},
+    "Seleccionar facultad": {"en": "Select faculty"},
+    "Guardar Carrera": {"en": "Save Career"},
+    "¿Desactivar esta carrera?": {"en": "Deactivate this career?"},
+    "La carrera dejará de estar disponible.": {"en": "The career will no longer be available."},
+    "¿Activar esta carrera?": {"en": "Activate this career?"},
+    "La carrera volverá a estar disponible.": {"en": "The career will be available again."},
+    "Configura tu perfil y preferencias": {"en": "Configure your profile and preferences"},
+    "Editar": {"en": "Edit"},
+    "Editar Perfil": {"en": "Edit Profile"},
+    "Detalles de la Cuenta": {"en": "Account Details"},
+    "Correo": {"en": "Email"},
+    "Teléfono": {"en": "Phone"},
+    "Personalización": {"en": "Customization"},
+    "Idioma del Sistema": {"en": "System Language"},
+    "ADMINISTRADOR DEL SISTEMA": {"en": "SYSTEM ADMINISTRATOR"},
+    "Actualizar Foto": {"en": "Update Photo"},
+    "Editar Registro...": {"en": "Edit Record..."},
+    "Modifica tu información personal": {"en": "Modify your personal information"},
+    "Guardar Cambios": {"en": "Save Changes"},
+    "El nombre y correo son obligatorios.": {"en": "Name and email are required."},
+    "Cambios guardados correctamente.": {"en": "Changes saved successfully."},
+    "Sistema de Reconocimiento\nFacial": {"en": "Facial Recognition\nSystem"},
+    "Ingresa tus credenciales para continuar": {"en": "Enter your credentials to continue"},
+    "CORREO ELECTRÓNICO": {"en": "EMAIL ADDRESS"},
+    "Escribe tu correo": {"en": "Enter your email"},
+    "CONTRASEÑA": {"en": "PASSWORD"},
+    "Escribe tu contraseña": {"en": "Enter your password"},
+    "INICIAR SESIÓN": {"en": "LOG IN"},
+    "Credenciales incorrectas.": {"en": "Incorrect credentials."},
+    "Estado": {"en": "Status"},
+    "Desactivar": {"en": "Deactivate"},
+    "Activar": {"en": "Activate"},
+    "Cancelar": {"en": "Cancel"},
+    "Guardar": {"en": "Save"},
+}
+
+TRADUCCIONES.update(TRADUCCIONES_UTF8)
+
 class AppContext:
     idioma_actual = "es"
     traductor = None
 
     @classmethod
     def t(cls, texto: str) -> str:
-        """Devuelve la traducci�n del texto seg�n el idioma actual."""
+        """Devuelve la traduccion del texto segun el idioma actual."""
         if cls.idioma_actual == "es":
             return texto
-        entrada = TRADUCCIONES.get(texto)
+
+        texto = str(texto)
+        clave = texto.strip()
+        entrada = TRADUCCIONES.get(clave)
         if entrada:
-            return entrada.get(cls.idioma_actual, texto)
-        # Aviso en consola durante desarrollo � quitar en producci�n
-        print(f"[i18n] Sin traducci�n EN para: {repr(texto)}")
+            return entrada.get(cls.idioma_actual, clave)
+
+        partes = clave.split(maxsplit=1)
+        if len(partes) == 2 and not partes[0].replace("_", "").isalnum():
+            icono, resto = partes
+            entrada = TRADUCCIONES.get(resto)
+            if entrada:
+                return f"{icono} {entrada.get(cls.idioma_actual, resto)}"
+
+        print(f"[i18n] Sin traduccion EN para: {repr(texto)}")
         return texto
 
     @classmethod

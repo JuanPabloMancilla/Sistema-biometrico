@@ -31,7 +31,7 @@ class LoginView(ctk.CTkFrame):
         self.theme_control = ctk.CTkFrame(self.controls_wrapper, fg_color="#E2E8F0", corner_radius=20, width=110, height=38)
         self.theme_control.pack(side="left", padx=8)
         self.theme_control.pack_propagate(False)
-        self.theme_icon = ctk.CTkLabel(self.theme_control, text="??", font=("Inter", 16), text_color="black")
+        self.theme_icon = ctk.CTkLabel(self.theme_control, text="☀️", font=("Inter", 16), text_color="black")
         self.theme_icon.place(x=22, y=19, anchor="center")
         self.theme_switch = ctk.CTkSwitch(
             self.theme_control, text="", width=45,
@@ -43,7 +43,7 @@ class LoginView(ctk.CTkFrame):
         # 2. Selector de Idioma
         self.lang_control = ctk.CTkFrame(self.controls_wrapper, fg_color="#E2E8F0", corner_radius=20, height=38)
         self.lang_control.pack(side="left", padx=8)
-        ctk.CTkLabel(self.lang_control, text="??", font=("Inter", 16), text_color="black").pack(side="left", padx=(12, 5))
+        ctk.CTkLabel(self.lang_control, text="🌐", font=("Inter", 16), text_color="black").pack(side="left", padx=(12, 5))
 
         # Ambos botones se crean neutros; _sincronizar_botones_idioma pinta el correcto
         self.es_btn = ctk.CTkButton(
@@ -65,7 +65,7 @@ class LoginView(ctk.CTkFrame):
 
         # 3. Bot�n de C�mara
         self.btn_regresar_terminal = ctk.CTkButton(
-            self.controls_wrapper, text="??", width=45, height=38, corner_radius=15,
+            self.controls_wrapper, text="📷", width=45, height=38, corner_radius=15,
             fg_color="white", text_color="#1D1D1F", hover_color="#CBD5E1",
             border_width=1, border_color="#E2E8F0", font=("Inter", 18),
             command=self.regresar_a_terminal
@@ -131,9 +131,9 @@ class LoginView(ctk.CTkFrame):
             font=("Inter", 14), text_color="#8E8E93"
         ).pack(pady=(0, 25))
 
-        self.create_input_group(AppContext.t("CORREO ELECTR�NICO"), AppContext.t("Escribe tu correo"))
+        self.create_input_group(AppContext.t("CORREO ELECTRÓNICO"), AppContext.t("Escribe tu correo"))
         self.user_entry = self.last_entry
-        self.create_input_group(AppContext.t("CONTRASE�A"), AppContext.t("Escribe tu contrase�a"), is_password=True)
+        self.create_input_group(AppContext.t("CONTRASEÑA"), AppContext.t("Escribe tu contraseña"), is_password=True)
         self.pass_entry = self.last_entry
 
         self.error_label = ctk.CTkLabel(self.card, text="", text_color="#EF4444", font=("Inter", 13))
@@ -141,7 +141,7 @@ class LoginView(ctk.CTkFrame):
 
         self.login_btn = ctk.CTkButton(
             self.card,
-            text="?   " + AppContext.t("INICIAR SESI�N"),
+            text="🔐   " + AppContext.t("INICIAR SESIÓN"),
             fg_color="#000000", hover_color="#262626",
             width=350, height=55, corner_radius=12,
             font=("Inter", 15, "bold"), command=self.validar_login
@@ -164,10 +164,10 @@ class LoginView(ctk.CTkFrame):
 
     def actualizar_icono_tema(self):
         if self.theme_switch.get() == 1:
-            self.theme_icon.configure(text="??")
+            self.theme_icon.configure(text="🌙")
             ctk.set_appearance_mode("dark")
         else:
-            self.theme_icon.configure(text="??")
+            self.theme_icon.configure(text="☀️")
             ctk.set_appearance_mode("light")
         self.recargar_vista()
 
@@ -178,10 +178,10 @@ class LoginView(ctk.CTkFrame):
     def toggle_password_visibility(self):
         if self.pass_entry.cget("show") == "*":
             self.pass_entry.configure(show="")
-            self.eye_btn.configure(text="??")
+            self.eye_btn.configure(text="🙈")
         else:
             self.pass_entry.configure(show="*")
-            self.eye_btn.configure(text="??")
+            self.eye_btn.configure(text="👁️")
 
     def create_input_group(self, label_text, placeholder, is_password=False):
         group_frame = ctk.CTkFrame(self.card, fg_color="transparent")
@@ -200,7 +200,7 @@ class LoginView(ctk.CTkFrame):
             entry.configure(show="*")
             entry.pack(side="left", fill="both", expand=True, padx=(15, 0))
             self.eye_btn = ctk.CTkButton(
-                input_container, text="??", width=35, height=35,
+                input_container, text="👁️", width=35, height=35,
                 fg_color="transparent", text_color="black", hover_color="#CBD5E1",
                 command=self.toggle_password_visibility
             )

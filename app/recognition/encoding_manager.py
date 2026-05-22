@@ -94,7 +94,7 @@ def guardar_encoding(
 
         return {
             "ok": False,
-            "error": "Encoding inv�lido"
+            "error": "Encoding inválido"
         }
 
     datos_usuario = {
@@ -137,6 +137,9 @@ def guardar_encoding(
         mismo_usuario = (
             str(existente["usuario"]) == str(usuario)
         )
+
+        print("USUARIO ACTUAL:", usuario)
+        print("EXISTENTE:", existente["usuario"])
 
         # ? IGNORAR SU PROPIO ROSTRO
         if mismo_usuario:

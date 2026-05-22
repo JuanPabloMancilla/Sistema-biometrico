@@ -137,7 +137,7 @@ class TraductorOffline:
             "Sistema de Reconocimiento\nFacial": "Facial Recognition\nSystem",
             "Sistema de Reconocimiento Facial": "Facial Recognition System",
             "Ingresa tus credenciales para continuar": "Enter your credentials to continue",
-            "CORREO ELECTRÓNICO": "EMAIL ADDRESS",
+            "CORREO ÓNICO": "EMAIL ADDRESS",
             "Escribe tu correo": "Enter your email",
             "CONTRASEÑA": "PASSWORD",
             "Escribe tu contraseña": "Enter your password",

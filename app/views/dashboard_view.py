@@ -53,15 +53,15 @@ class DashboardView(ctk.CTkFrame):
         self.mostrar_panel_control()
     
     def construir_menu(self, parent):
-        self.crear_btn_overlay(parent, "?? " + AppContext.t("Panel de Control"),      self.mostrar_panel_control)
-        self.crear_btn_overlay(parent, "?? " + AppContext.t("Gestion de Usuarios"),   self.mostrar_gestion_usuarios)
-        self.crear_btn_overlay(parent, "?? " + AppContext.t("Gestion de Facultades"), self.mostrar_gestion_facultades)
-        self.crear_btn_overlay(parent, "?? " + AppContext.t("Gestion de Carreras"),   self.mostrar_gestion_carreras)
-        self.crear_btn_overlay(parent, "?? " + AppContext.t("Configuraci�n"),         self.mostrar_cuenta)
+        self.crear_btn_overlay(parent, "🏠" + AppContext.t("Panel de Control"),      self.mostrar_panel_control)
+        self.crear_btn_overlay(parent, "👥" + AppContext.t("Gestion de Usuarios"),   self.mostrar_gestion_usuarios)
+        self.crear_btn_overlay(parent, "🏫" + AppContext.t("Gestion de Facultades"), self.mostrar_gestion_facultades)
+        self.crear_btn_overlay(parent, "💼" + AppContext.t("Gestion de Carreras"),   self.mostrar_gestion_carreras)
+        self.crear_btn_overlay(parent, "⚙️" + AppContext.t("Configuración"),         self.mostrar_cuenta)
 
         ctk.CTkButton(
             parent,
-            text="?? " + AppContext.t("Cerrar Sesi�n"),
+            text="?? " + AppContext.t("Cerrar Sesión"),
             fg_color="transparent",
             text_color="#EF4444",
             command=self.on_back

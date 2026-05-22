@@ -1,7 +1,7 @@
 # app/context.py
 TRADUCCIONES = {
     
-        # Agregar en la secci�n TERMINAL BIOM�TRICA
+        # Agregar en la seccion TERMINAL BIOMoTRICA
     "ESCANEANDO":                           {"en": "SCANNING"},
     "ANALIZANDO RASGOS BIOMETRICOS":        {"en": "ANALYZING BIOMETRIC FEATURES"},
     "ACCESO AUTORIZADO":                    {"en": "ACCESS AUTHORIZED"},   # ya existe
@@ -14,7 +14,7 @@ TRADUCCIONES = {
     "ACERQUESE A LA CAMARA":                {"en": "MOVE CLOSER TO THE CAMERA"},
     "ROSTRO DEMASIADO LEJOS O PEQUENO":     {"en": "FACE TOO FAR OR SMALL"},
     "MEJORE LA ILUMINACION":                {"en": "IMPROVE LIGHTING"},
-    "AMBIENTE MUY OSCURO - ENCIENDA UNA LUZ": {"en": "TOO DARK � TURN ON A LIGHT"},
+    "AMBIENTE MUY OSCURO - ENCIENDA UNA LUZ": {"en": "TOO DARK - TURN ON A LIGHT"},
     "POSICIONE SU ROSTRO":                  {"en": "POSITION YOUR FACE"},
     "MIRANDO HACIA LA CAMARA":              {"en": "LOOKING AT THE CAMERA"},
     "BIENVENIDO":                           {"en": "WELCOME"},
@@ -28,10 +28,10 @@ TRADUCCIONES = {
     "Sistema Biometrico v2.0":              {"en": "Biometric System v2.0"},
     "RECONOCIMIENTO FACIAL":                {"en": "FACIAL RECOGNITION"},
     "ANALIZANDO RASGOS BIOMETRICOS":        {"en": "ANALYZING BIOMETRIC FEATURES"},
-    "ANALIZANDO RASGOS BIOM�TRICOS":        {"en": "ANALYZING BIOMETRIC FEATURES"},
+    "ANALIZANDO RASGOS BIOMETRICOS":        {"en": "ANALYZING BIOMETRIC FEATURES"},
 
     # --------------------------------------------------------------
-    # TABLA DE ACCESOS � motivos y resultados
+    # TABLA DE ACCESOS  motivos y resultados
     # --------------------------------------------------
     "Acceso denegado":              {"en": "Access denied"},
     "Usuario inactivo":             {"en": "Inactive user"},
@@ -39,7 +39,7 @@ TRADUCCIONES = {
     "AUTORIZADO":                   {"en": "AUTHORIZED"},
     "DENEGADO":                     {"en": "DENIED"},
 
-    # Tabla de accesos � textos faltantes
+    # Tabla de accesos  textos faltantes
     "Sin cuenta":                   {"en": "No account"},
     "Sin correo":                   {"en": "No email"},
     "USUARIO NO REGISTRADO":        {"en": "UNREGISTERED USER"},
@@ -64,26 +64,26 @@ TRADUCCIONES = {
     "Panel de Control":                             {"en": "Control Panel"},
     "??   Panel de Control":                        {"en": "??   Control Panel"},
     "?? Panel de Control":                          {"en": "?? Control Panel"},
-    "Gesti�n de Usuarios":                          {"en": "User Management"},
+    "Gestión de Usuarios":                          {"en": "User Management"},
     "Gestion de Usuarios":                          {"en": "User Management"},
-    "??   Gesti�n de Usuarios":                     {"en": "??   User Management"},
+    "??   Gestión de Usuarios":                     {"en": "??   User Management"},
     "?? Gestion de Usuarios":                       {"en": "?? User Management"},
-    "Gesti�n de Facultades":                        {"en": "Faculty Management"},
+    "Gestión de Facultades":                        {"en": "Faculty Management"},
     "Gestion de Facultades":                        {"en": "Faculty Management"},
-    "??   Gesti�n de Facultades":                   {"en": "??   Faculty Management"},
+    "??   Gestión de Facultades":                   {"en": "??   Faculty Management"},
     "?? Gestion de Facultades":                     {"en": "?? Faculty Management"},
-    "Gesti�n de Carreras":                          {"en": "Career Management"},
+    "Gestión de Carreras":                          {"en": "Career Management"},
     "Gestion de Carreras":                          {"en": "Career Management"},
-    "??   Gesti�n de Carreras":                     {"en": "??   Career Management"},
+    "??   Gestión de Carreras":                     {"en": "??   Career Management"},
     "?? Gestion de Carreras":                       {"en": "?? Career Management"},
-    "Configuraci�n":                                {"en": "Settings"},
-    "Configuraci�n Cuenta":                         {"en": "Account Settings"},
-    "??   Configuraci�n Cuenta":                    {"en": "??   Account Settings"},
-    "?? Configuraci�n Cuenta":                      {"en": "?? Account Settings"},
-    "Cerrar Sesi�n":                                {"en": "Log Out"},
-    "?? Cerrar Sesi�n":                             {"en": "?? Log Out"},
+    "Configuración":                                {"en": "Settings"},
+    "Configuración Cuenta":                         {"en": "Account Settings"},
+    "??   Configuración Cuenta":                    {"en": "??   Account Settings"},
+    "?? Configuración Cuenta":                      {"en": "?? Account Settings"},
+    "Cerrar Sesión":                                {"en": "Log Out"},
+    "?? Cerrar Sesión":                             {"en": "?? Log Out"},
     "ADMINISTRADOR":                                {"en": "ADMINISTRATOR"},
-    "Control Biom�trico":                           {"en": "Biometric Control"},
+    "Control Biométrico":                           {"en": "Biometric Control"},
 
     # --------------------------------------------------------------
     # DASHBOARD � encabezado y stats
@@ -102,7 +102,7 @@ TRADUCCIONES = {
     "Sin accesos registrados en esta fecha":        {"en": "No access records for this date"},
 
     # DASHBOARD � tabla �ltimos accesos
-    "Registro de �ltimos accesos":                  {"en": "Latest access log"},
+    "Registro de últimos accesos":                  {"en": "Latest access log"},
     "Sin accesos registrados":                      {"en": "No access records found"},
 
     # DASHBOARD � filtro roles
@@ -117,13 +117,13 @@ TRADUCCIONES = {
     # --------------------------------------------------------------
     # GESTI�N DE USUARIOS � tabla
     # --------------------------------------------------------------
-    "?? Gesti�n de Usuarios":                       {"en": "?? User Management"},
+    "?? Gestión de Usuarios":                       {"en": "?? User Management"},
     "Agregar Usuario":                              {"en": "Add User"},
     "? Agregar Usuario":                           {"en": "? Add User"},
     "Buscar usuario...":                            {"en": "Search user..."},
     "No hay usuarios registrados":                  {"en": "No registered users"},
-    "FOTOGRAF�A":                                   {"en": "PHOTO"},
-    "INFORMACI�N":                                  {"en": "INFORMATION"},
+    "FOTOGRAFA":                                   {"en": "PHOTO"},
+    "INFORMACIÓN":                                  {"en": "INFORMATION"},
     "ESTADO":                                       {"en": "STATUS"},
     "ACCIONES":                                     {"en": "ACTIONS"},
 
@@ -132,10 +132,10 @@ TRADUCCIONES = {
     "?? Editar Registro":                           {"en": "?? Edit Record"},
     "Nuevo Registro":                               {"en": "New Record"},
     "? Nuevo Registro":                            {"en": "? New Record"},
-    "?? Informaci�n Personal":                      {"en": "?? Personal Information"},
-    "Informaci�n Personal":                         {"en": "Personal Information"},
-    "?? Identificaci�n":                            {"en": "?? Identification"},
-    "Identificaci�n":                               {"en": "Identification"},
+    "?? Información Personal":                      {"en": "?? Personal Information"},
+    "Información Personal":                         {"en": "Personal Information"},
+    "?? Identificación":                            {"en": "?? Identification"},
+    "Identificación":                               {"en": "Identification"},
     "?? Estado del usuario":                        {"en": "?? User Status"},
     "Usuario activo":                               {"en": "Active user"},
 
@@ -147,24 +147,24 @@ TRADUCCIONES = {
     "correo":                                       {"en": "email"},
 
     # GESTI�N DE USUARIOS � biometr�a
-    "Registrar Biometr�a":                          {"en": "Register Biometrics"},
-    "?? Registrar Biometr�a":                       {"en": "?? Register Biometrics"},
-    "Abriendo c�mara...":                           {"en": "Opening camera..."},
-    "?? Abriendo c�mara...":                        {"en": "?? Opening camera..."},
-    "Biometr�a registrada":                         {"en": "Biometrics registered"},
-    "? Biometr�a registrada":                       {"en": "? Biometrics registered"},
-    "Biometr�a requerida":                          {"en": "Biometrics required"},
-    "? Biometr�a requerida":                        {"en": "? Biometrics required"},
+    "Registrar Biometría":                          {"en": "Register Biometrics"},
+    "?? Registrar Biometría":                       {"en": "?? Register Biometrics"},
+    "Abriendo cámara...":                           {"en": "Opening camera..."},
+    "?? Abriendo cámara...":                        {"en": "?? Opening camera..."},
+    "Biometría registrada":                         {"en": "Biometrics registered"},
+    "? Biometría registrada":                       {"en": "? Biometrics registered"},
+    "Biometría requerida":                          {"en": "Biometrics required"},
+    "? Biometría requerida":                        {"en": "? Biometrics required"},
     "Corrige los datos primero":                    {"en": "Fix the data first"},
     "? Corrige los datos primero":                  {"en": "? Fix the data first"},
 
     # GESTI�N DE USUARIOS � modal
-    "�Desactivar este usuario?":                    {"en": "Desactivate this user?"},
-    "El usuario perder� acceso al sistema.":        {"en": "The user will lose system access."},
+    "🗑️Desactivar este usuario?":                    {"en": "Desactivate this user?"},
+    "El usuario perderá acceso al sistema.":        {"en": "The user will lose system access."},
     "Desactivar":                                   {"en": "Desactivate"},
     "??? Desactivar":                                {"en": "??? Desactivate"},
-    "�Activar este usuario?":                       {"en": "Activate this user?"},
-    "El usuario recuperar� acceso al sistema.":     {"en": "The user will regain system access."},
+    "🔄Activar este usuario?":                       {"en": "Activate this user?"},
+    "El usuario recuperará acceso al sistema.":     {"en": "The user will regain system access."},
     "Activar":                                      {"en": "Activate"},
     "?? Activar":                                   {"en": "?? Activate"},
     "Cancelar":                                     {"en": "Cancel"},
@@ -173,10 +173,10 @@ TRADUCCIONES = {
     # --------------------------------------------------------------
     # GESTI�N DE FACULTADES � tabla
     # --------------------------------------------------------------
-    "?? Gesti�n de Facultades":                     {"en": "?? Faculty Management"},
-    "??   Gesti�n de Facultades":                   {"en": "??   Faculty Management"},
-    "Administra las unidades acad�micas":           {"en": "Manage academic units"},
-    "Administra las unidades acad�micas del sistema": {"en": "Manage the system's academic units"},
+    "?? Gestión de Facultades":                     {"en": "?? Faculty Management"},
+    "??   Gestión de Facultades":                   {"en": "??   Faculty Management"},
+    "Administra las unidades académicas":           {"en": "Manage academic units"},
+    "Administra las unidades académicas del sistema": {"en": "Manage the system's academic units"},
     "Agregar Facultad":                             {"en": "Add Faculty"},
     "? Agregar Facultad":                          {"en": "? Add Faculty"},
     "Buscar facultad por nombre...":                {"en": "Search faculty by name..."},
@@ -186,10 +186,10 @@ TRADUCCIONES = {
     "INACTIVA":                                     {"en": "INACTIVE"},
 
     # GESTI�N DE FACULTADES � modal
-    "�Desactivar esta facultad?":                   {"en": "Desactivate this faculty?"},
-    "La facultad dejar� de estar disponible.":      {"en": "The faculty will no longer be available."},
-    "�Activar esta facultad?":                      {"en": "Activate this faculty?"},
-    "La facultad volver� a estar disponible.":      {"en": "The faculty will be available again."},
+    "🗑️Desactivar esta facultad?":                   {"en": "Desactivate this faculty?"},
+    "La facultad dejará de estar disponible.":      {"en": "The faculty will no longer be available."},
+    "Activar esta facultad?":                      {"en": "Activate this faculty?"},
+    "La facultad volver a estar disponible.":      {"en": "The faculty will be available again."},
 
     # GESTI�N DE FACULTADES � formulario
     "Editar Facultad":                              {"en": "Edit Faculty"},
@@ -208,8 +208,8 @@ TRADUCCIONES = {
     # --------------------------------------------------------------
     # GESTI�N DE CARRERAS � tabla
     # --------------------------------------------------------------
-    "?? Gesti�n de Carreras":                       {"en": "?? Career Management"},
-    "??   Gesti�n de Carreras":                     {"en": "??   Career Management"},
+    "?? Gestión de Carreras":                       {"en": "?? Career Management"},
+    "??   Gestión de Carreras":                     {"en": "??   Career Management"},
     "Agregar Carrera":                              {"en": "Add Career"},
     "? Agregar Carrera":                           {"en": "? Add Career"},
     "Buscar carrera por nombre...":                 {"en": "Search career by name..."},
@@ -218,10 +218,10 @@ TRADUCCIONES = {
     "FACULTAD":                                     {"en": "FACULTY"},
 
     # GESTI�N DE CARRERAS � modal
-    "�Desactivar esta carrera?":                    {"en": "Desactivate this career?"},
-    "La carrera dejar� de estar disponible.":       {"en": "The career will no longer be available."},
-    "�Activar esta carrera?":                       {"en": "Activate this career?"},
-    "La carrera volver� a estar disponible.":       {"en": "The career will be available again."},
+    "Desactivar esta carrera?":                    {"en": "Desactivate this career?"},
+    "La carrera dejar de estar disponible.":       {"en": "The career will no longer be available."},
+    "🔄Activar esta carrera?":                       {"en": "Activate this career?"},
+    "La carrera volverá a estar disponible.":       {"en": "The career will be available again."},
 
     # GESTI�N DE CARRERAS � formulario
     "Editar Carrera":                               {"en": "Edit Career"},
@@ -247,15 +247,15 @@ TRADUCCIONES = {
     "Detalles de la Cuenta":                        {"en": "Account Details"},
     "?? Detalles de la Cuenta":                     {"en": "?? Account Details"},
     "Correo":                                       {"en": "Email"},
-    "Tel�fono":                                     {"en": "Phone"},
-    "?? Personalizaci�n":                           {"en": "?? Customization"},
-    "Personalizaci�n":                              {"en": "Customization"},
+    "Telofono":                                     {"en": "Phone"},
+    "?? Personalizacin":                           {"en": "?? Customization"},
+    "Personalización":                              {"en": "Customization"},
     "Idioma del Sistema":                           {"en": "System Language"},
     "?? Idioma del Sistema":                        {"en": "?? System Language"},
     "ADMINISTRADOR DEL SISTEMA":                    {"en": "SYSTEM ADMINISTRATOR"},
     "??   Editar Registro":                         {"en": "??   Edit Record"},
-    "Modifica tu informaci�n personal":             {"en": "Modify your personal information"},
-    "?? Informaci�n Personal":                      {"en": "?? Personal Information"},
+    "Modifica tu información personal":             {"en": "Modify your personal information"},
+    "?? Información Personal":                      {"en": "?? Personal Information"},
     "Guardar Cambios":                              {"en": "Save Changes"},
     "?? Guardar Cambios":                           {"en": "?? Save Changes"},
     "El nombre y correo son obligatorios.":         {"en": "Name and email are required."},
@@ -269,11 +269,11 @@ TRADUCCIONES = {
     # --------------------------------------------------------------
     "Sistema de Reconocimiento\nFacial":            {"en": "Facial Recognition\nSystem"},
     "Ingresa tus credenciales para continuar":      {"en": "Enter your credentials to continue"},
-    "CORREO ELECTR�NICO":                           {"en": "EMAIL ADDRESS"},
+    "CORREO ÓNICO":                           {"en": "EMAIL ADDRESS"},
     "Escribe tu correo":                            {"en": "Enter your email"},
-    "CONTRASE�A":                                   {"en": "PASSWORD"},
-    "Escribe tu contrase�a":                        {"en": "Enter your password"},
-    "INICIAR SESI�N":                               {"en": "LOG IN"},
+    "CONTRASEÑA":                                   {"en": "PASSWORD"},
+    "Escribe tu contraseña":                        {"en": "Enter your password"},
+    "INICIAR SESIÓN":                               {"en": "LOG IN"},
     "Credenciales incorrectas.":                    {"en": "Incorrect credentials."},
 
     # --------------------------------------------------------------
@@ -281,10 +281,10 @@ TRADUCCIONES = {
     # --------------------------------------------------------------
     "?  RECONOCIMIENTO FACIAL  ?":                  {"en": "?  FACIAL RECOGNITION  ?"},
     "SISTEMA ACTIVO":                               {"en": "SYSTEM ACTIVE"},
-    "ESPERANDO DETECCI�N...":                       {"en": "WAITING FOR DETECTION..."},
+    "ESPERANDO DETECCIÓN...":                       {"en": "WAITING FOR DETECTION..."},
     "LISTO":                                        {"en": "READY"},
-    "Iniciando c�mara...":                          {"en": "Starting camera..."},
-    "Sistema Biom�trico v2.0":                      {"en": "Biometric System v2.0"},
+    "Iniciando cámara...":                          {"en": "Starting camera..."},
+    "Sistema Biométrico v2.0":                      {"en": "Biometric System v2.0"},
     "Acceso Seguro":                                {"en": "Secure Access"},
     "Cifrado AES-256":                              {"en": "AES-256 Encryption"},
 
@@ -297,18 +297,18 @@ TRADUCCIONES = {
     "ACCESO AUTORIZADO":                            {"en": "ACCESS AUTHORIZED"},
     "ACCESO DENEGADO":                              {"en": "ACCESS DENIED"},
     "USUARIO INACTIVO":                             {"en": "INACTIVE USER"},
-    "SIN DETECCI�N":                                {"en": "NO DETECTION"},
-    "C�MARA NO DISPONIBLE":                         {"en": "CAMERA NOT AVAILABLE"},
-    "ERROR DE C�MARA":                              {"en": "CAMERA ERROR"},
-    "C�mara no disponible":                         {"en": "Camera not available"},
-    "Error al iniciar c�mara":                      {"en": "Error starting camera"},
-    "Biometr�a no encontrada":                      {"en": "Biometrics not found"},
+    "SIN DETECCIÓN":                                {"en": "NO DETECTION"},
+    "CÁMARA NO DISPONIBLE":                         {"en": "CAMERA NOT AVAILABLE"},
+    "ERROR DE CÁMARA":                              {"en": "CAMERA ERROR"},
+    "Cámara no disponible":                         {"en": "Camera not available"},
+    "Error al iniciar cámara":                      {"en": "Error starting camera"},
+    "Biometría no encontrada":                      {"en": "Biometrics not found"},
     "REGISTRANDO ROSTRO":                           {"en": "REGISTERING FACE"},
     "REGISTRO EXITOSO":                             {"en": "REGISTRATION SUCCESSFUL"},
-    "MANT�N EL ROSTRO EN EL CENTRO":               {"en": "KEEP YOUR FACE IN THE CENTER"},
+    "MANTÉN EL ROSTRO EN EL CENTRO":               {"en": "KEEP YOUR FACE IN THE CENTER"},
     "ROSTRO MUY LEJOS":                             {"en": "FACE TOO FAR"},
     "ROSTRO MUY CERCA":                             {"en": "FACE TOO CLOSE"},
-    "ILUMINACI�N INSUFICIENTE":                     {"en": "INSUFFICIENT LIGHTING"},
+    "ILUMINACIÓN INSUFICIENTE":                     {"en": "INSUFFICIENT LIGHTING"},
     "Volver":                                       {"en": "Back"},
     "? Volver":                                     {"en": "? Back"},
     "CANCELAR":                                     {"en": "CANCEL"},
@@ -329,14 +329,14 @@ class AppContext:
 
     @classmethod
     def t(cls, texto: str) -> str:
-        """Devuelve la traducci�n del texto seg�n el idioma actual."""
+        """Devuelve la traducción del texto según el idioma actual."""
         if cls.idioma_actual == "es":
             return texto
         entrada = TRADUCCIONES.get(texto)
         if entrada:
             return entrada.get(cls.idioma_actual, texto)
         # Aviso en consola durante desarrollo � quitar en producci�n
-        print(f"[i18n] Sin traducci�n EN para: {repr(texto)}")
+        print(f"[i18n] Sin traducción EN para: {repr(texto)}")
         return texto
 
     @classmethod

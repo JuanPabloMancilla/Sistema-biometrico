@@ -114,8 +114,7 @@ class UserManagementView(ctk.CTkFrame):
         texto = texto.strip()
         if len(texto) < 2:
             return False
-        return bool(re.match(r"^[A-Za-z������������\s]+$", texto))
-
+        return bool(re.match(r"^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$", texto))
     def _on_resize(self, event):
         nuevo_compact = event.width < 700
         if nuevo_compact != self.is_compact:
@@ -260,12 +259,12 @@ class UserManagementView(ctk.CTkFrame):
 
             ctk.CTkLabel(
                 table_head,
-                text="?? " + AppContext.t("FOTOGRAF�A"),
+                text="?? " + AppContext.t("FOTOGRAFÍA"),
                 font=self.font_small, text_color=COLORS["subtext"], width=ancho_foto
             ).pack(side="left")
             ctk.CTkLabel(
                 table_head,
-                text="?? " + AppContext.t("INFORMACI�N"),
+                text="?? " + AppContext.t("INFORMACIÓN"),
                 font=self.font_small, text_color=COLORS["subtext"], width=ancho_info, anchor="w"
             ).pack(side="left")
             ctk.CTkLabel(
@@ -394,7 +393,7 @@ class UserManagementView(ctk.CTkFrame):
         else:
             icono     = "??"
             titulo    = AppContext.t("�Activar este usuario?")
-            sub       = AppContext.t("El usuario recuperar� acceso al sistema.")
+            sub       = AppContext.t("El usuario recuperará acceso al sistema.")
             btn_txt   = AppContext.t("Activar")
             btn_color = "#10B981"
             btn_hover = "#059669"
@@ -526,12 +525,12 @@ class UserManagementView(ctk.CTkFrame):
                 self.update_carreras_dinamicas(nombres_f[0])
                 
         # -- Secciones del formulario ------------------------------
-        self.create_section_card(self.form_container, AppContext.t("?? Informaci�n Personal"), [
+        self.create_section_card(self.form_container, AppContext.t("?? Información Personal"), [
             ("Nombres",          usuario["nombre_solo"] if usuario else ""),
             ("Apellido Paterno", usuario["ap"]          if usuario else ""),
             ("Apellido Materno", usuario["am"]          if usuario else "")
         ])
-        self.create_section_card(self.form_container, AppContext.t("?? Identificaci�n"), [
+        self.create_section_card(self.form_container, AppContext.t("?? Identificación"), [
             ("cuenta", str(usuario["cuenta"]) if usuario and usuario["cuenta"] else ""),
             ("correo", str(usuario["correo"]) if usuario and usuario["correo"] else "")
         ])
@@ -563,7 +562,7 @@ class UserManagementView(ctk.CTkFrame):
 
         self.btn_biometria = ctk.CTkButton(
             self.form_container,
-            text="?? " + AppContext.t("Registrar Biometr�a"),
+            text="?? " + AppContext.t("Registrar Biometría"),
             height=50, fg_color="#0EA5E9", text_color="white",
             font=self.font_sub, command=self.abrir_terminal_biometrica
         )
@@ -652,9 +651,9 @@ class UserManagementView(ctk.CTkFrame):
 
         if not self.usuario_editando_id:
             if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
-                print("? Debes registrar biometr�a primero")
+                print("? Debes registrar biometría primero")
                 self.btn_biometria.configure(
-                    text="? " + AppContext.t("Biometr�a requerida"),
+                    text="? " + AppContext.t("Biometría requerida"),
                     fg_color="#EF4444", hover_color="#DC2626"
                 )
                 return
@@ -673,10 +672,10 @@ class UserManagementView(ctk.CTkFrame):
             self._mostrar_error("cuenta", "La cuenta es obligatoria")
             hay_error = True
         elif not cta.isdigit():
-            self._mostrar_error("cuenta", "La cuenta solo debe contener n�meros")
+            self._mostrar_error("cuenta", "La cuenta solo debe contener números")
             hay_error = True
         elif len(cta) != 8:
-            self._mostrar_error("cuenta", f"La cuenta debe tener 8 d�gitos (actualmente tiene {len(cta)})")
+            self._mostrar_error("cuenta", f"La cuenta debe tener 8 dígitos (actualmente tiene {len(cta)})")
             hay_error = True
 
         if em and "@" not in em:
@@ -687,11 +686,11 @@ class UserManagementView(ctk.CTkFrame):
             return
 
         if existe_cuenta(cta, self.usuario_editando_id):
-            self._mostrar_error("cuenta", "La cuenta ya est� registrada")
+            self._mostrar_error("cuenta", "La cuenta ya está registrada")
             return
         
         if em and existe_correo(em, self.usuario_editando_id):
-            self._mostrar_error("correo", "El correo ya est� registrado")
+            self._mostrar_error("correo", "El correo ya está registrado")
             return
 
         try:
@@ -703,7 +702,7 @@ class UserManagementView(ctk.CTkFrame):
 
             if em:
                 if not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", em):
-                    self._mostrar_error("correo", "Correo inv�lido")
+                    self._mostrar_error("correo", "Correo inválido")
                     return
 
             if not self.usuario_editando_id and len(cta) != 8:
@@ -713,13 +712,13 @@ class UserManagementView(ctk.CTkFrame):
             am = self.inputs_apellidos["Apellido Materno"].get().strip()
 
             if not self.validar_texto_real(n):
-                self._mostrar_error("Nombres", "Nombre inv�lido")
+                self._mostrar_error("Nombres", "Nombre inválido")
                 return
             if not self.validar_texto_real(ap):
-                self._mostrar_error("Apellido Paterno", "Apellido paterno inv�lido")
+                self._mostrar_error("Apellido Paterno", "Apellido paterno inválido")
                 return
             if am and not self.validar_texto_real(am):
-                self._mostrar_error("Apellido Materno", "Apellido materno inv�lido")
+                self._mostrar_error("Apellido Materno", "Apellido materno inválido")
                 return
 
             n  = n.title()
@@ -733,19 +732,19 @@ class UserManagementView(ctk.CTkFrame):
             id_carrera = obtener_id_carrera_por_nombre(carrera_seleccionada)
             carreras_validas     = self.carreras_por_plantel.get(self.plantel_menu.get(), [])
             if carrera_seleccionada not in carreras_validas:
-                print("? Carrera inv�lida")
+                print("? Carrera inválida")
                 return
 
             id_fac = obtener_id_facultad_por_nombre(self.plantel_menu.get())
             if not id_fac or not tipo_usuario:
-                print("Error: tipo_usuario o id_fac inv�lido", tipo_usuario, id_fac)
+                print("Error: tipo_usuario o id_fac inválido", tipo_usuario, id_fac)
                 return
 
             if self.usuario_editando_id:
                 estado_valor = 1 if self.estado_var.get() else 0
                 actualizar_usuario(id_usuario, n, ap, am, cta, tipo_usuario, id_fac, id_carrera, em, estado_valor)
                 if hasattr(self, "biometria_temp") and self.biometria_temp is not None:
-                    print("Reemplazando biometr�a...")
+                    print("Reemplazando biometría...")
                     resultado = guardar_encoding(
                     id_usuario,
                     self.biometria_temp,
@@ -755,7 +754,7 @@ class UserManagementView(ctk.CTkFrame):
                 if not resultado["ok"]:
 
                     self.label_estado.configure(
-                        text="? Error al actualizar biometr�a",
+                        text="? Error al actualizar biometría",
                         text_color="#EF4444"
                     )
 
@@ -766,7 +765,7 @@ class UserManagementView(ctk.CTkFrame):
             else:
                 if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
                     self.label_estado.configure(
-                        text="? Debes registrar biometr�a antes de guardar",
+                        text="? Debes registrar biometría antes de guardar",
                         text_color="#EF4444"
                     )
                     return
@@ -799,12 +798,12 @@ class UserManagementView(ctk.CTkFrame):
                             )
                         elif error == "usuario_duplicado":
                             self.label_estado.configure(
-                                text="? Este usuario ya tiene biometr�a",
+                                text="? Este usuario ya tiene biometría",
                                 text_color="#EF4444"
                             )
                         else:
                             self.label_estado.configure(
-                                text="? Error al guardar biometr�a",
+                                text="? Error al guardar biometra",
                                 text_color="#EF4444"
                             )
 
@@ -814,10 +813,10 @@ class UserManagementView(ctk.CTkFrame):
 
                     encodings_db[:], usuarios_db[:] = cargar_encodings()
                     self.biometria_temp = None
-                    print("? Usuario y biometr�a guardados correctamente")
+                    print("? Usuario y biometría guardados correctamente")
 
                 except Exception as e:
-                    print("ERROR al guardar usuario/biometr�a:", e)
+                    print("ERROR al guardar usuario/biometría:", e)
                     if usuario_id:
                         from app.database.database import get_connection
                         conn = get_connection()
@@ -825,7 +824,7 @@ class UserManagementView(ctk.CTkFrame):
                         conn.commit()
                         conn.close()
                     self.label_estado.configure(
-                        text="? Error al guardar. No se registr� el usuario.",
+                        text="? Error al guardar. No se registró el usuario.",
                         text_color="#EF4444"
                     )
                     return
@@ -869,7 +868,7 @@ class UserManagementView(ctk.CTkFrame):
         if self.is_compact:
             ctk.CTkLabel(
                 h,
-                text="?? " + AppContext.t("Gesti�n de Usuarios"),
+                text="?? " + AppContext.t("Gestión de Usuarios"),
                 font=("Inter", 30, "bold"),
                 text_color=COLORS["text"]
             ).pack(anchor="center", pady=(0, 12))
@@ -883,7 +882,7 @@ class UserManagementView(ctk.CTkFrame):
         else:
             ctk.CTkLabel(
                 h,
-                text="?? " + AppContext.t("Gesti�n de Usuarios"),
+                text="?? " + AppContext.t("Gestión de Usuarios"),
                 font=self.font_header,
                 text_color=COLORS["text"]
             ).pack(side="left")
@@ -1004,22 +1003,22 @@ class UserManagementView(ctk.CTkFrame):
             self._mostrar_error("Nombres", "El nombre solo debe contener letras")
             hay_error = True
         if not self.validar_texto_real(ap):
-            self._mostrar_error("Apellido Paterno", "Apellido paterno inv�lido")
+            self._mostrar_error("Apellido Paterno", "Apellido paterno inválido")
             hay_error = True
         if am and not self.validar_texto_real(am):
-            self._mostrar_error("Apellido Materno", "Apellido materno inv�lido")
+            self._mostrar_error("Apellido Materno", "Apellido materno inválido")
             hay_error = True
         if not cuenta:
             self._mostrar_error("cuenta", "La cuenta es obligatoria")
             hay_error = True
         elif not cuenta.isdigit():
-            self._mostrar_error("cuenta", "La cuenta solo debe contener n�meros")
+            self._mostrar_error("cuenta", "La cuenta solo debe contener números")
             hay_error = True
         elif len(cuenta) != 8:
-            self._mostrar_error("cuenta", "La cuenta debe tener exactamente 8 n�meros")
+            self._mostrar_error("cuenta", "La cuenta debe tener exactamente 8 números")
             hay_error = True
         if correo and not re.match(r"^[\w\.-]+@[\w\.-]+\.\w+$", correo):
-            self._mostrar_error("correo", "Correo electr�nico inv�lido")
+            self._mostrar_error("correo", "Correo electrónico inválido")
             hay_error = True
 
         if hay_error:
@@ -1030,7 +1029,7 @@ class UserManagementView(ctk.CTkFrame):
             return
 
         self.btn_biometria.configure(
-            text="?? " + AppContext.t("Abriendo c�mara..."),
+            text="?? " + AppContext.t("Abriendo cámara..."),
             fg_color="#0EA5E9"
         )
         self.form_base.pack_forget()
@@ -1060,7 +1059,7 @@ class UserManagementView(ctk.CTkFrame):
 
         if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
             self.btn_biometria.configure(
-                text="?? " + AppContext.t("Registrar Biometr�a"),
+                text="?? " + AppContext.t("Registrar Biometría"),
                 fg_color="#0EA5E9",
                 hover_color="#0284C7"
             )
@@ -1071,7 +1070,7 @@ class UserManagementView(ctk.CTkFrame):
 
         if hasattr(self, "btn_biometria"):
             self.btn_biometria.configure(
-                text="? " + AppContext.t("Biometr�a registrada"),
+                text="? " + AppContext.t("Biometría registrada"),
                 fg_color="#10B981",
                 hover_color="#059669"
             )

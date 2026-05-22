@@ -17,7 +17,7 @@ _DEFAULTS = {
     "nombre":   "ADMINISTRADOR DEL SISTEMA",
     "correo":   "admin@universidad.edu.mx",
     "tel":      "5512345678",
-    "facultad": "ADMINISTRACI�N CENTRAL",
+    "facultad": "ADMINISTRACIÓN CENTRAL",
     "foto":     None,
 }
 def _cargar_datos() -> dict:
@@ -42,7 +42,7 @@ def _guardar_datos(datos: dict) -> None:
 
 
 class AccountView(ctk.CTkFrame):
-    def __init__(self, master, on_logout, on_profile_updated=None):  # ? NUEVO par�metro
+    def __init__(self, master, on_logout, on_profile_updated=None):  # ? NUEVO parometro
         super().__init__(master, fg_color=COLORS["bg"])
         self.on_logout = on_logout
         self.on_profile_updated = on_profile_updated  # ? NUEVO
@@ -182,7 +182,7 @@ class AccountView(ctk.CTkFrame):
     def _seleccionar_foto(self):
         ruta_origen = filedialog.askopenfilename(
             title="Seleccionar foto de perfil",
-            filetypes=[("Im�genes", "*.png *.jpg *.jpeg *.webp *.bmp *.gif")]
+            filetypes=[("Imágenes", "*.png *.jpg *.jpeg *.webp *.bmp *.gif")]
         )
         if not ruta_origen:
             return
@@ -204,9 +204,9 @@ class AccountView(ctk.CTkFrame):
 
         self._pack_header(
             self,
-            AppContext.t("?? Configuraci�n Cuenta") if self.is_compact else AppContext.t("??   Configuraci�n Cuenta"),
+            AppContext.t("⚙️ Configuración Cuenta") if self.is_compact else AppContext.t("⚙️   Configuración Cuenta"),
             AppContext.t("Configura tu perfil y preferencias"),
-            "?? " + AppContext.t("Editar" if self.is_compact else "Editar Perfil"),
+            "✏️ " + AppContext.t("Editar" if self.is_compact else "Editar Perfil"),
             self.abrir_formulario_edicion,
         )
 
@@ -218,19 +218,19 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.container,
-            text="?? " + AppContext.t("Detalles de la Cuenta"),
+            text=" " + AppContext.t("Detalles de la Cuenta"),
             font=self.font_sub,
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=l["card_pad"], pady=(14, 8))
 
         self.create_read_only_field(AppContext.t("Nombres"),  self.datos["nombre"],   "??")
         self.create_read_only_field(AppContext.t("Correo"),   self.datos["correo"],   "??")
-        self.create_read_only_field(AppContext.t("Tel�fono"), self.datos["tel"],      "??")
+        self.create_read_only_field(AppContext.t("Telófono"), self.datos["tel"],      "??")
         self.create_read_only_field(AppContext.t("Facultad"), self.datos["facultad"], "???")
 
         ctk.CTkButton(
             self.container,
-            text="?? " + AppContext.t("Cerrar Sesi�n"),
+            text="?? " + AppContext.t("Cerrar Sesión"),
             fg_color="#FFF1F2",
             text_color="#E11D48",
             hover_color="#FEE2E2",
@@ -276,7 +276,7 @@ class AccountView(ctk.CTkFrame):
             avatar_frame = ctk.CTkFrame(card, width=avatar_size, height=avatar_size, corner_radius=avatar_size // 2, fg_color=COLORS["hover"])
             avatar_frame.place(x=avatar_x, rely=0.5, anchor="w")
             avatar_frame.pack_propagate(False)
-            ctk.CTkLabel(avatar_frame, text="??", font=("Inter", 32 if self.is_compact else 40)).place(relx=0.5, rely=0.5, anchor="center")
+            ctk.CTkLabel(avatar_frame, text="", font=("Inter", 32 if self.is_compact else 40)).place(relx=0.5, rely=0.5, anchor="center")
 
         if is_editing:
             ctk.CTkLabel(
@@ -290,7 +290,7 @@ class AccountView(ctk.CTkFrame):
 
             ctk.CTkButton(
                 card,
-                text="?? " + AppContext.t("Actualizar Foto"),
+                text=" " + AppContext.t("Actualizar Foto"),
                 font=("Inter", 9 if self.is_compact else 10, "bold"),
                 fg_color="#38BDF8",
                 text_color="#082736",
@@ -326,7 +326,7 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             card,
-            text="?? " + AppContext.t("Personalizaci�n"),
+            text="?? " + AppContext.t("Personalización"),
             font=self.font_sub,
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=16, pady=(14, 8))
@@ -484,7 +484,7 @@ class AccountView(ctk.CTkFrame):
         self._pack_header(
             self,
             AppContext.t("?? Editar Registro") if self.is_compact else AppContext.t("??   Editar Registro"),
-            AppContext.t("Modifica tu informaci�n personal"),
+            AppContext.t("Modifica tu información personal"),
         )
 
         form_scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
@@ -500,7 +500,7 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             form_scroll,
-            text="?? " + AppContext.t("Informaci�n Personal"),
+            text="?? " + AppContext.t("Información Personal"),
             font=self.font_sub,
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=l["card_pad"], pady=(14, 8))
@@ -509,14 +509,14 @@ class AccountView(ctk.CTkFrame):
 
         if self.is_compact:
             self.create_edit_field(form_scroll, AppContext.t("Correo"), "??", "correo@dominio.com", self.var_correo)
-            self.create_edit_field(form_scroll, AppContext.t("Tel�fono"), "??", "10 d�gitos", self.var_tel)
+            self.create_edit_field(form_scroll, AppContext.t("Telófono"), "??", "10 dígitos", self.var_tel)
         else:
             row2 = ctk.CTkFrame(form_scroll, fg_color="transparent")
             row2.pack(fill="x", padx=l["card_pad"], pady=0)
             row2.columnconfigure(0, weight=1)
             row2.columnconfigure(1, weight=1)
             self.create_edit_field_grid(row2, AppContext.t("Correo"), "??", "correo@dominio.com", self.var_correo, col=0)
-            self.create_edit_field_grid(row2, AppContext.t("Tel�fono"), "??", "10 d�gitos", self.var_tel, col=1)
+            self.create_edit_field_grid(row2, AppContext.t("Telófono"), "??", "10 dígitos", self.var_tel, col=1)
 
         self.create_edit_field(form_scroll, AppContext.t("Facultad"), "???", "Nombre de la facultad", self.var_facultad)
 

@@ -131,9 +131,9 @@ class LoginView(ctk.CTkFrame):
             font=("Inter", 14), text_color="#8E8E93"
         ).pack(pady=(0, 25))
 
-        self.create_input_group(AppContext.t("CORREO ELECTR�NICO"), AppContext.t("Escribe tu correo"))
+        self.create_input_group(AppContext.t("CORREO ELECTRÓNICO"), AppContext.t("Escribe tu correo"))
         self.user_entry = self.last_entry
-        self.create_input_group(AppContext.t("CONTRASE�A"), AppContext.t("Escribe tu contrase�a"), is_password=True)
+        self.create_input_group(AppContext.t("CONTRASEÑA"), AppContext.t("Escribe tu contraseña"), is_password=True)
         self.pass_entry = self.last_entry
 
         self.error_label = ctk.CTkLabel(self.card, text="", text_color="#EF4444", font=("Inter", 13))
@@ -141,7 +141,7 @@ class LoginView(ctk.CTkFrame):
 
         self.login_btn = ctk.CTkButton(
             self.card,
-            text="?   " + AppContext.t("INICIAR SESI�N"),
+            text="?   " + AppContext.t("INICIAR SESIÓN"),
             fg_color="#000000", hover_color="#262626",
             width=350, height=55, corner_radius=12,
             font=("Inter", 15, "bold"), command=self.validar_login
@@ -149,7 +149,7 @@ class LoginView(ctk.CTkFrame):
         self.login_btn.pack(pady=(25, 20))
 
     def _sincronizar_botones_idioma(self):
-        """Pinta el bot�n activo seg�n AppContext.idioma_actual."""
+        """Pinta el botón activo según AppContext.idioma_actual."""
         if AppContext.idioma_actual == "es":
             self.es_btn.configure(fg_color="#1D1D1F", text_color="white", hover_color="#3E3E3F")
             self.en_btn.configure(fg_color="transparent", text_color="#4A4A4A", hover_color="#CBD5E1")

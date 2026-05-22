@@ -216,6 +216,10 @@ dataset/
 # Archivos temporales del sistema
 *.sqlite3
 
+# Datos sensibles generados localmente
+encodings.json
+logs_accesos.json
+
 # entornos virtuales
 venv/
 venv311/

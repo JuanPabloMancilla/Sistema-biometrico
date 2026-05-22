@@ -42,7 +42,7 @@ def _guardar_datos(datos: dict) -> None:
 
 
 class AccountView(ctk.CTkFrame):
-    def __init__(self, master, on_logout, on_profile_updated=None):  # ? NUEVO par�metro
+    def __init__(self, master, on_logout, on_profile_updated=None):  # ? NUEVO parometro
         super().__init__(master, fg_color=COLORS["bg"])
         self.on_logout = on_logout
         self.on_profile_updated = on_profile_updated  # ? NUEVO
@@ -204,7 +204,11 @@ class AccountView(ctk.CTkFrame):
 
         self._pack_header(
             self,
+<<<<<<< HEAD
             "⚙️ " + AppContext.t("Configuración Cuenta") if self.is_compact else "⚙️   " + AppContext.t("Configuración Cuenta"),
+=======
+            AppContext.t("⚙️ Configuración Cuenta") if self.is_compact else AppContext.t("⚙️   Configuración Cuenta"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             AppContext.t("Configura tu perfil y preferencias"),
             "✏️ " + AppContext.t("Editar" if self.is_compact else "Editar Perfil"),
             self.abrir_formulario_edicion,
@@ -218,11 +222,16 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.container,
+<<<<<<< HEAD
             text="📋 " + AppContext.t("Detalles de la Cuenta"),
+=======
+            text=" " + AppContext.t("Detalles de la Cuenta"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             font=self.font_sub,
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=l["card_pad"], pady=(14, 8))
 
+<<<<<<< HEAD
         self.create_read_only_field(AppContext.t("Nombres"),  self.datos["nombre"],   "👤")
         self.create_read_only_field(AppContext.t("Correo"),   self.datos["correo"],   "✉️")
         self.create_read_only_field(AppContext.t("Teléfono"), self.datos["tel"],      "📞")
@@ -231,6 +240,16 @@ class AccountView(ctk.CTkFrame):
         ctk.CTkButton(
             self.container,
             text="🚪 " + AppContext.t("Cerrar Sesión"),
+=======
+        self.create_read_only_field(AppContext.t("Nombres"),  self.datos["nombre"],   "??")
+        self.create_read_only_field(AppContext.t("Correo"),   self.datos["correo"],   "??")
+        self.create_read_only_field(AppContext.t("Telófono"), self.datos["tel"],      "??")
+        self.create_read_only_field(AppContext.t("Facultad"), self.datos["facultad"], "???")
+
+        ctk.CTkButton(
+            self.container,
+            text="?? " + AppContext.t("Cerrar Sesión"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             fg_color="#FFF1F2",
             text_color="#E11D48",
             hover_color="#FEE2E2",
@@ -276,7 +295,11 @@ class AccountView(ctk.CTkFrame):
             avatar_frame = ctk.CTkFrame(card, width=avatar_size, height=avatar_size, corner_radius=avatar_size // 2, fg_color=COLORS["hover"])
             avatar_frame.place(x=avatar_x, rely=0.5, anchor="w")
             avatar_frame.pack_propagate(False)
+<<<<<<< HEAD
             ctk.CTkLabel(avatar_frame, text="👤", font=("Inter", 32 if self.is_compact else 40)).place(relx=0.5, rely=0.5, anchor="center")
+=======
+            ctk.CTkLabel(avatar_frame, text="", font=("Inter", 32 if self.is_compact else 40)).place(relx=0.5, rely=0.5, anchor="center")
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
 
         if is_editing:
             ctk.CTkLabel(
@@ -290,7 +313,11 @@ class AccountView(ctk.CTkFrame):
 
             ctk.CTkButton(
                 card,
+<<<<<<< HEAD
                 text="📷 " + AppContext.t("Actualizar Foto"),
+=======
+                text=" " + AppContext.t("Actualizar Foto"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                 font=("Inter", 9 if self.is_compact else 10, "bold"),
                 fg_color="#38BDF8",
                 text_color="#082736",
@@ -326,7 +353,11 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             card,
+<<<<<<< HEAD
             text="🎨 " + AppContext.t("Personalización"),
+=======
+            text="?? " + AppContext.t("Personalización"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             font=self.font_sub,
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=16, pady=(14, 8))
@@ -483,7 +514,11 @@ class AccountView(ctk.CTkFrame):
 
         self._pack_header(
             self,
+<<<<<<< HEAD
             "✏️ " + AppContext.t("Editar Registro") if self.is_compact else "✏️   " + AppContext.t("Editar Registro"),
+=======
+            AppContext.t("?? Editar Registro") if self.is_compact else AppContext.t("??   Editar Registro"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             AppContext.t("Modifica tu información personal"),
         )
 
@@ -500,7 +535,11 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             form_scroll,
+<<<<<<< HEAD
             text="👤 " + AppContext.t("Información Personal"),
+=======
+            text="?? " + AppContext.t("Información Personal"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             font=self.font_sub,
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=l["card_pad"], pady=(14, 8))
@@ -508,15 +547,25 @@ class AccountView(ctk.CTkFrame):
         self.create_edit_field(form_scroll, AppContext.t("Nombres"), "👤", "Nombre completo", self.var_nombre)
 
         if self.is_compact:
+<<<<<<< HEAD
             self.create_edit_field(form_scroll, AppContext.t("Correo"), "✉️", "correo@dominio.com", self.var_correo)
             self.create_edit_field(form_scroll, AppContext.t("Teléfono"), "📞", "10 dígitos", self.var_tel)
+=======
+            self.create_edit_field(form_scroll, AppContext.t("Correo"), "??", "correo@dominio.com", self.var_correo)
+            self.create_edit_field(form_scroll, AppContext.t("Telófono"), "??", "10 dígitos", self.var_tel)
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
         else:
             row2 = ctk.CTkFrame(form_scroll, fg_color="transparent")
             row2.pack(fill="x", padx=l["card_pad"], pady=0)
             row2.columnconfigure(0, weight=1)
             row2.columnconfigure(1, weight=1)
+<<<<<<< HEAD
             self.create_edit_field_grid(row2, AppContext.t("Correo"), "✉️", "correo@dominio.com", self.var_correo, col=0)
             self.create_edit_field_grid(row2, AppContext.t("Teléfono"), "📞", "10 dígitos", self.var_tel, col=1)
+=======
+            self.create_edit_field_grid(row2, AppContext.t("Correo"), "??", "correo@dominio.com", self.var_correo, col=0)
+            self.create_edit_field_grid(row2, AppContext.t("Telófono"), "??", "10 dígitos", self.var_tel, col=1)
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
 
         self.create_edit_field(form_scroll, AppContext.t("Facultad"), "🏫", "Nombre de la facultad", self.var_facultad)
 

@@ -114,8 +114,12 @@ class UserManagementView(ctk.CTkFrame):
         texto = texto.strip()
         if len(texto) < 2:
             return False
+<<<<<<< HEAD
         return bool(re.match(r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$", texto))
 
+=======
+        return bool(re.match(r"^[A-Za-zÁÉÍÓÚáéíóúñÑ\s]+$", texto))
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
     def _on_resize(self, event):
         nuevo_compact = event.width < 700
         if nuevo_compact != self.is_compact:
@@ -260,12 +264,20 @@ class UserManagementView(ctk.CTkFrame):
 
             ctk.CTkLabel(
                 table_head,
+<<<<<<< HEAD
                 text="👤 " + AppContext.t("FOTOGRAFÍA"),
+=======
+                text="?? " + AppContext.t("FOTOGRAFÍA"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                 font=self.font_small, text_color=COLORS["subtext"], width=ancho_foto
             ).pack(side="left")
             ctk.CTkLabel(
                 table_head,
+<<<<<<< HEAD
                 text="🆔 " + AppContext.t("INFORMACIÓN"),
+=======
+                text="?? " + AppContext.t("INFORMACIÓN"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                 font=self.font_small, text_color=COLORS["subtext"], width=ancho_info, anchor="w"
             ).pack(side="left")
             ctk.CTkLabel(
@@ -392,8 +404,13 @@ class UserManagementView(ctk.CTkFrame):
             btn_color = "#EF4444"
             btn_hover = "#DC2626"
         else:
+<<<<<<< HEAD
             icono     = "🔄"
             titulo    = AppContext.t("¿Activar este usuario?")
+=======
+            icono     = "??"
+            titulo    = AppContext.t("�Activar este usuario?")
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             sub       = AppContext.t("El usuario recuperará acceso al sistema.")
             btn_txt   = AppContext.t("Activar")
             btn_color = "#10B981"
@@ -557,13 +574,23 @@ class UserManagementView(ctk.CTkFrame):
         else:
             if nombres_f:
                 self.update_carreras_dinamicas(nombres_f[0])
+<<<<<<< HEAD
 
         self.create_section_card(self.form_container, "👤 " + AppContext.t("Información Personal"), [
+=======
+                
+        # -- Secciones del formulario ------------------------------
+        self.create_section_card(self.form_container, AppContext.t("?? Información Personal"), [
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             ("Nombres",          usuario["nombre_solo"] if usuario else ""),
             ("Apellido Paterno", usuario["ap"]          if usuario else ""),
             ("Apellido Materno", usuario["am"]          if usuario else "")
         ])
+<<<<<<< HEAD
         self.create_section_card(self.form_container, "🆔 " + AppContext.t("Identificación"), [
+=======
+        self.create_section_card(self.form_container, AppContext.t("?? Identificación"), [
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             ("cuenta", str(usuario["cuenta"]) if usuario and usuario["cuenta"] else ""),
             ("correo", str(usuario["correo"]) if usuario and usuario["correo"] else "")
         ])
@@ -595,7 +622,11 @@ class UserManagementView(ctk.CTkFrame):
 
         self.btn_biometria = ctk.CTkButton(
             self.form_container,
+<<<<<<< HEAD
             text="📷 " + AppContext.t("Registrar Biometría"),
+=======
+            text="?? " + AppContext.t("Registrar Biometría"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             height=50, fg_color="#0EA5E9", text_color="white",
             font=self.font_sub, command=self.abrir_terminal_biometrica
         )
@@ -699,9 +730,15 @@ class UserManagementView(ctk.CTkFrame):
 
         if not self.usuario_editando_id:
             if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
+<<<<<<< HEAD
                 print("❌ Debes registrar biometría primero")
                 self.btn_biometria.configure(
                     text="❌ " + AppContext.t("Biometría requerida"),
+=======
+                print("? Debes registrar biometría primero")
+                self.btn_biometria.configure(
+                    text="? " + AppContext.t("Biometría requerida"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                     fg_color="#EF4444", hover_color="#DC2626"
                 )
                 return
@@ -780,7 +817,11 @@ class UserManagementView(ctk.CTkFrame):
             id_carrera = obtener_id_carrera_por_nombre(carrera_seleccionada)
             carreras_validas     = self.carreras_por_plantel.get(self.plantel_menu.get(), [])
             if carrera_seleccionada not in carreras_validas:
+<<<<<<< HEAD
                 print("❌ Carrera inválida")
+=======
+                print("? Carrera inválida")
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                 return
 
             id_fac = obtener_id_facultad_por_nombre(self.plantel_menu.get())
@@ -794,9 +835,22 @@ class UserManagementView(ctk.CTkFrame):
                 if hasattr(self, "biometria_temp") and self.biometria_temp is not None:
                     print("Reemplazando biometría...")
                     resultado = guardar_encoding(
+<<<<<<< HEAD
                         id_usuario,
                         self.biometria_temp,
                         reemplazar=True
+=======
+                    id_usuario,
+                    self.biometria_temp,
+                    reemplazar=True
+                )
+
+                if not resultado["ok"]:
+
+                    self.label_estado.configure(
+                        text="? Error al actualizar biometría",
+                        text_color="#EF4444"
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                     )
 
                     if not resultado["ok"]:
@@ -812,7 +866,11 @@ class UserManagementView(ctk.CTkFrame):
             else:
                 if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
                     self.label_estado.configure(
+<<<<<<< HEAD
                         text="❌ Debes registrar biometría antes de guardar",
+=======
+                        text="? Debes registrar biometría antes de guardar",
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                         text_color="#EF4444"
                     )
                     return
@@ -845,12 +903,20 @@ class UserManagementView(ctk.CTkFrame):
                             )
                         elif error == "usuario_duplicado":
                             self.label_estado.configure(
+<<<<<<< HEAD
                                 text="❌ Este usuario ya tiene biometría",
+=======
+                                text="? Este usuario ya tiene biometría",
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                                 text_color="#EF4444"
                             )
                         else:
                             self.label_estado.configure(
+<<<<<<< HEAD
                                 text="❌ Error al guardar biometría",
+=======
+                                text="? Error al guardar biometra",
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                                 text_color="#EF4444"
                             )
 
@@ -860,7 +926,11 @@ class UserManagementView(ctk.CTkFrame):
 
                     encodings_db[:], usuarios_db[:] = cargar_encodings()
                     self.biometria_temp = None
+<<<<<<< HEAD
                     print("✔ Usuario y biometría guardados correctamente")
+=======
+                    print("? Usuario y biometría guardados correctamente")
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
 
                 except Exception as e:
                     print("ERROR al guardar usuario/biometría:", e)
@@ -871,7 +941,11 @@ class UserManagementView(ctk.CTkFrame):
                         conn.commit()
                         conn.close()
                     self.label_estado.configure(
+<<<<<<< HEAD
                         text="❌ Error al guardar. No se registró el usuario.",
+=======
+                        text="? Error al guardar. No se registró el usuario.",
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                         text_color="#EF4444"
                     )
                     return
@@ -915,7 +989,11 @@ class UserManagementView(ctk.CTkFrame):
         if self.is_compact:
             ctk.CTkLabel(
                 h,
+<<<<<<< HEAD
                 text="👥 " + AppContext.t("Gestión de Usuarios"),
+=======
+                text="?? " + AppContext.t("Gestión de Usuarios"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                 font=("Inter", 30, "bold"),
                 text_color=COLORS["text"]
             ).pack(anchor="center", pady=(0, 12))
@@ -929,7 +1007,11 @@ class UserManagementView(ctk.CTkFrame):
         else:
             ctk.CTkLabel(
                 h,
+<<<<<<< HEAD
                 text="👥 " + AppContext.t("Gestión de Usuarios"),
+=======
+                text="?? " + AppContext.t("Gestión de Usuarios"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                 font=self.font_header,
                 text_color=COLORS["text"]
             ).pack(side="left")
@@ -1076,7 +1158,11 @@ class UserManagementView(ctk.CTkFrame):
             return
 
         self.btn_biometria.configure(
+<<<<<<< HEAD
             text="📷 " + AppContext.t("Abriendo cámara..."),
+=======
+            text="?? " + AppContext.t("Abriendo cámara..."),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             fg_color="#0EA5E9"
         )
         self.form_base.pack_forget()
@@ -1106,7 +1192,11 @@ class UserManagementView(ctk.CTkFrame):
 
         if not hasattr(self, "biometria_temp") or self.biometria_temp is None:
             self.btn_biometria.configure(
+<<<<<<< HEAD
                 text="📷 " + AppContext.t("Registrar Biometría"),
+=======
+                text="?? " + AppContext.t("Registrar Biometría"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                 fg_color="#0EA5E9",
                 hover_color="#0284C7"
             )
@@ -1117,7 +1207,11 @@ class UserManagementView(ctk.CTkFrame):
 
         if hasattr(self, "btn_biometria"):
             self.btn_biometria.configure(
+<<<<<<< HEAD
                 text="✔ " + AppContext.t("Biometría registrada"),
+=======
+                text="? " + AppContext.t("Biometría registrada"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
                 fg_color="#10B981",
                 hover_color="#059669"
             )

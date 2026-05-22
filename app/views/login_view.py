@@ -141,7 +141,11 @@ class LoginView(ctk.CTkFrame):
 
         self.login_btn = ctk.CTkButton(
             self.card,
+<<<<<<< HEAD
             text="🔐   " + AppContext.t("INICIAR SESIÓN"),
+=======
+            text="?   " + AppContext.t("INICIAR SESIÓN"),
+>>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
             fg_color="#000000", hover_color="#262626",
             width=350, height=55, corner_radius=12,
             font=("Inter", 15, "bold"), command=self.validar_login
@@ -149,7 +153,7 @@ class LoginView(ctk.CTkFrame):
         self.login_btn.pack(pady=(25, 20))
 
     def _sincronizar_botones_idioma(self):
-        """Pinta el bot�n activo seg�n AppContext.idioma_actual."""
+        """Pinta el botón activo según AppContext.idioma_actual."""
         if AppContext.idioma_actual == "es":
             self.es_btn.configure(fg_color="#1D1D1F", text_color="white", hover_color="#3E3E3F")
             self.en_btn.configure(fg_color="transparent", text_color="#4A4A4A", hover_color="#CBD5E1")

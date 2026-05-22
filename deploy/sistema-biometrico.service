@@ -1,0 +1,18 @@
+[Unit]
+Description=Sistema Biometrico
+Wants=graphical.target
+After=network.target graphical.target
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/home/pi/sistema-biometrico
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/pi/.Xauthority
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/home/pi/sistema-biometrico/venv/bin/python /home/pi/sistema-biometrico/main.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

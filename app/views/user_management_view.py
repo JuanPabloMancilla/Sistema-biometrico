@@ -457,21 +457,66 @@ class UserManagementView(ctk.CTkFrame):
         # Clasificación
         c_clasi = ctk.CTkFrame(self.form_container, fg_color=COLORS["card"], corner_radius=12, border_width=1, border_color=COLORS["border"])
         c_clasi.pack(fill="x", padx=padx_form, pady=10)
+
+        ctk.CTkLabel(
+            c_clasi,
+            text="📋 " + AppContext.t("Clasificación"),
+            font=self.font_sub,
+            text_color=COLORS["text"]
+        ).pack(anchor="w", padx=20, pady=(15, 5))
+
         grid = ctk.CTkFrame(c_clasi, fg_color="transparent")
-        grid.pack(fill="x", padx=20, pady=20)
+        grid.pack(fill="x", padx=20, pady=(0, 20))
 
-        self.rol_menu = ctk.CTkOptionMenu(grid, values=["ESTUDIANTE", "DOCENTE", "TRABAJADOR"], variable=self.rol_var, height=40, text_color=COLORS["text"], fg_color=COLORS["hover"], button_color=COLORS["border"])
-        self.plantel_menu = ctk.CTkOptionMenu(grid, values=nombres_f, command=self.update_carreras_dinamicas, height=40, text_color=COLORS["text"], fg_color=COLORS["hover"], button_color=COLORS["border"])
-        self.carrera_menu = ctk.CTkOptionMenu(grid, variable=self.carrera_var, values=[], height=40, text_color=COLORS["text"], fg_color=COLORS["hover"], button_color=COLORS["border"])
+        def crear_campo_menu(titulo):
+            campo = ctk.CTkFrame(grid, fg_color="transparent")
+            if self.is_compact:
+                campo.pack(fill="x", pady=6)
+            else:
+                campo.pack(side="left", expand=True, fill="x", padx=5)
+            ctk.CTkLabel(
+                campo,
+                text=titulo,
+                font=self.font_small,
+                text_color=COLORS["subtext"]
+            ).pack(anchor="w")
+            return campo
 
-        if self.is_compact:
-            self.rol_menu.pack(fill="x", pady=5)
-            self.plantel_menu.pack(fill="x", pady=5)
-            self.carrera_menu.pack(fill="x", pady=5)
-        else:
-            self.rol_menu.pack(side="left", expand=True, fill="x", padx=5)
-            self.plantel_menu.pack(side="left", expand=True, fill="x", padx=5)
-            self.carrera_menu.pack(side="left", expand=True, fill="x", padx=5)
+        campo_rol = crear_campo_menu("👤 " + AppContext.t("Tipo de Usuario"))
+        self.rol_menu = ctk.CTkOptionMenu(
+            campo_rol,
+            values=["ESTUDIANTE", "DOCENTE", "TRABAJADOR"],
+            variable=self.rol_var,
+            height=40,
+            text_color=COLORS["text"],
+            fg_color=COLORS["hover"],
+            button_color=COLORS["border"]
+        )
+        self.rol_menu.pack(fill="x", pady=(5, 0))
+
+        campo_facultad = crear_campo_menu("🏫 " + AppContext.t("Facultad"))
+        self.plantel_menu = ctk.CTkOptionMenu(
+            campo_facultad,
+            values=nombres_f,
+            command=self.update_carreras_dinamicas,
+            height=40,
+            text_color=COLORS["text"],
+            fg_color=COLORS["hover"],
+            button_color=COLORS["border"]
+        )
+        self.plantel_menu.pack(fill="x", pady=(5, 0))
+
+        campo_carrera = crear_campo_menu("🎓 " + AppContext.t("Carrera"))
+        self.carrera_menu = ctk.CTkOptionMenu(
+            campo_carrera,
+            variable=self.carrera_var,
+            values=[],
+            height=40,
+            text_color=COLORS["text"],
+            fg_color=COLORS["hover"],
+            button_color=COLORS["border"]
+        )
+        self.carrera_menu.pack(fill="x", pady=(5, 0))
 
         if usuario:
             facultad_actual = usuario.get("facultad", "")
@@ -529,18 +574,18 @@ class UserManagementView(ctk.CTkFrame):
 
         btn_guardar = ctk.CTkButton(
             btns,
-            text="?? " + AppContext.t("Guardar Usuario"),
+            text="💾 " + AppContext.t("Guardar Usuario"),
             font=self.font_sub,
-            fg_color="#10B981",
-            text_color="white",
-            hover_color="#059669",
+            fg_color="#D1FAE5",
+            text_color="#065F46",
+            hover_color="#BBF7D0",
             corner_radius=12,
             height=55,
             command=self.guardar_usuario
         )      
         btn_cancelar = ctk.CTkButton(
             btns,
-            text="? " + AppContext.t("Cancelar"),
+            text="❌ " + AppContext.t("Cancelar"),
             font=self.font_sub,
             fg_color="#FEE2E2",
             text_color="#991B1B",
@@ -550,7 +595,14 @@ class UserManagementView(ctk.CTkFrame):
             command=self.volver_a_tabla
         )
 
-        if self.is_compact:
+        ancho_actual = self.winfo_width()
+        if ancho_actual <= 1 and self.master:
+            ancho_actual = self.master.winfo_width()
+        if ancho_actual <= 1:
+            ancho_actual = self.winfo_toplevel().winfo_width()
+        apilar_botones = self.is_compact and 1 < ancho_actual < 520
+
+        if apilar_botones:
             btn_cancelar.pack(fill="x", pady=(0, 10))
             btn_guardar.pack(fill="x")
         else:
@@ -765,6 +817,32 @@ class UserManagementView(ctk.CTkFrame):
 
         except Exception as e:
             print("ERROR AL GUARDAR:", e)
+
+    def guardar_usuario(self):
+        """Compatibilidad con botones antiguos: delega en `validar_y_guardar`."""
+        return self.validar_y_guardar()
+
+    def volver_a_tabla(self):
+        """Compatibilidad con botones de cancelar: cierra el formulario y vuelve a la tabla."""
+        # Reuse existing cerrar_formulario if present
+        try:
+            return self.cerrar_formulario()
+        except Exception:
+            # Fallback: ensure the form is destroyed and table shown
+            if hasattr(self, "form_base"):
+                try:
+                    self.form_base.destroy()
+                except Exception:
+                    pass
+            if hasattr(self, "vista_tabla"):
+                try:
+                    self.vista_tabla.pack(fill="both", expand=True)
+                except Exception:
+                    pass
+            try:
+                self.render_table_content(self.all_users)
+            except Exception:
+                pass
 
     def cambiar_estado_usuario(self, id_usuario, nuevo_estado):
         try:

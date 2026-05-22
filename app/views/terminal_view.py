@@ -3,6 +3,7 @@ import cv2
 import numpy as np
 from PIL import Image
 import time
+from app.hardware import buzzer
 from app.recognition.encoding_manager import cargar_encodings
 from app.detection.detector_rostro import find_best_match
 from app.views.app_context import AppContext
@@ -606,6 +607,7 @@ class TerminalView(ctk.CTkFrame):
                             # ?? mantener bloqueada
                             if self.cerradura:
                                 self.cerradura.bloquear()
+                            self._activar_buzzer("denegado")
 
 ####-
                         else:
@@ -628,6 +630,7 @@ class TerminalView(ctk.CTkFrame):
 
                                 if self.cerradura:
                                     self.cerradura.bloquear()
+                                self._activar_buzzer("denegado")
 
                             # Usuario identificado
                             else:
@@ -646,6 +649,7 @@ class TerminalView(ctk.CTkFrame):
 
                                     if self.cerradura:
                                         self.cerradura.bloquear()
+                                    self._activar_buzzer("denegado")
 
                                 # USUARIO ACTIVO
                                 elif usuario_activo(usuario_id):
@@ -663,7 +667,8 @@ class TerminalView(ctk.CTkFrame):
                                     )
 
                                     if self.cerradura:
-                                        self.cerradura.desbloquear_temporal(2)
+                                        self.cerradura.desbloquear_temporal()
+                                    self._activar_buzzer("autorizado")
 
                                 # USUARIO INACTIVO
                                 else:
@@ -682,6 +687,7 @@ class TerminalView(ctk.CTkFrame):
 
                                     if self.cerradura:
                                         self.cerradura.bloquear() ##
+                                    self._activar_buzzer("inactivo")
 
                                     
 
@@ -760,6 +766,34 @@ class TerminalView(ctk.CTkFrame):
                 text_color=ACCENT_RED,
             )
 
+    def _activar_buzzer(self, tipo):
+        if self.modo == "registro":
+            return
+
+        duraciones = {
+            "autorizado": 0.08,
+            "denegado": 0.18,
+            "inactivo": 0.25,
+        }
+
+        try:
+            buzzer.buzz_async(duraciones.get(tipo, 0.15))
+        except Exception:
+            pass
+
+    def _cerrar_hardware(self):
+        if self.cerradura:
+            try:
+                self.cerradura.cerrar()
+            except Exception:
+                pass
+            self.cerradura = None
+
+        try:
+            buzzer.close()
+        except Exception:
+            pass
+
     def cerrar_y_volver(self):
         self.running = False
 
@@ -773,6 +807,8 @@ class TerminalView(ctk.CTkFrame):
         if self.cap:
             liberar_camara(self.cap)
             self.cap = None
+
+        self._cerrar_hardware()
 
         if self.on_back:
             self.on_back()
@@ -800,6 +836,7 @@ class TerminalView(ctk.CTkFrame):
             print("Error liberando cámara:", e)
 
         self.cap = None
+        self._cerrar_hardware()
         
     
     

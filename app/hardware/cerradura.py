@@ -1,14 +1,12 @@
 from threading import Thread
 from time import sleep
+import logging
 
-try:
-    from gpiozero import OutputDevice
-    GPIO_OK = True
-except Exception as e:
-    GPIO_OK = False
-    print("GPIO no disponible:", e)
+from .gpio_backend import BackendOutputDevice, get_backend_info
+from app.config import PIN_RELEVADOR, UNLOCK_TIMEOUT
 
-PIN_RELEVADOR = 22
+
+logger = logging.getLogger(__name__)
 
 
 class Cerradura:
@@ -16,34 +14,50 @@ class Cerradura:
     def __init__(self):
 
         self.rele = None
+        self._desbloqueo_id = 0
 
-        if GPIO_OK:
-
-            self.rele = OutputDevice(
+        info = get_backend_info()
+        try:
+            self.rele = BackendOutputDevice(
                 PIN_RELEVADOR,
                 active_high=True,
-                initial_value=False
+                initial_value=False,
             )
-
             self.bloquear()
 
-            print("?? Cerradura lista")
+            modo = "GPIO real" if info.get("gpio_ok") else "simulación/mock"
+            logger.info("Cerradura lista (%s) en pin %s", modo, PIN_RELEVADOR)
+        except Exception:
+            logger.exception("Error iniciando dispositivo para cerradura")
 
     def desbloquear(self):
 
         if self.rele:
-            self.rele.on()
+            try:
+                self.rele.on()
+            except Exception:
+                logger.exception("Error al activar rele")
 
-        print("?? LED ENCENDIDO")
+        logger.info("Cerradura: desbloqueada")
 
     def bloquear(self):
 
         if self.rele:
-            self.rele.off()
+            try:
+                self.rele.off()
+            except Exception:
+                logger.exception("Error al desactivar rele")
 
-        print("? LED APAGADO")
+        logger.info("Cerradura: bloqueada")
 
-    def desbloquear_temporal(self, segundos=2):
+    def desbloquear_temporal(self, segundos=UNLOCK_TIMEOUT):
+        self._desbloqueo_id += 1
+        desbloqueo_id = self._desbloqueo_id
+
+        if segundos is None:
+            self.desbloquear()
+            logger.warning("Cerradura desbloqueada sin temporizador")
+            return
 
         def tarea():
 
@@ -51,6 +65,20 @@ class Cerradura:
 
             sleep(segundos)
 
-            self.bloquear()
+            if desbloqueo_id == self._desbloqueo_id:
+                self.bloquear()
 
         Thread(target=tarea, daemon=True).start()
+
+    def cerrar(self):
+        if not self.rele:
+            return
+
+        try:
+            self.bloquear()
+            if hasattr(self.rele, "close"):
+                self.rele.close()
+        except Exception:
+            logger.exception("Error cerrando dispositivo de cerradura")
+        finally:
+            self.rele = None

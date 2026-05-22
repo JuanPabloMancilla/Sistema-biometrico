@@ -173,3 +173,57 @@ Si quieres una base de datos con datos de prueba ya incluidos (facultades, carre
 ---
 
 **¡Con esta guía tienes todo lo necesario para configurar y usar el sistema biométrico!** 🎉
+
+## 🔌 Conexión de hardware (Raspberry Pi)
+
+Estas indicaciones asumen que usarás una fuente externa de 12V para la cerradura y la Raspberry Pi alimentada por su propia fuente. Nunca alimentes la cerradura desde la Pi.
+
+- **Relé y cerradura (12V)**:
+	- Conecta la cerradura a la fuente de 12V (VCC y GND de la fuente externa).
+	- Conecta el contacto COM/NO del relé en serie con la alimentación de la cerradura según el diagrama del relé.
+	- Conecta la entrada del relé (IN) a un pin GPIO de la Raspberry Pi (por defecto `PIN_RELEVADOR = 22`).
+	- Conecta el GND de la Raspberry Pi al GND de la fuente de 12V para tener referencia común.
+
+- **Buzzer**:
+	- Conecta el pin de control del buzzer a `PIN_BUZZER = 18` (o al pin que configures en `app/config.py`).
+	- Si el buzzer requiere más corriente, usa un transistor o un módulo con alimentación separada (3.3V/5V) y activa la señal desde la Pi.
+
+- **PIR (sensor de movimiento)**:
+	- Conecta VCC a 3.3V (si el sensor lo requiere), GND común y la salida al pin `PIN_PIR = 17`.
+	- Implementa debounce en software (el proyecto incluye una prueba simple en `app/hardware/test_hardware.py`).
+
+- **Advertencias eléctricas**:
+	- Usa un fusible en la línea de la cerradura y añade diodos de protección / flyback según el tipo de carga.
+	- Si la cerradura es inductiva (solenoide), coloca diodos o usa un relé con protección y alimentación separada.
+
+## 🖥️ Despliegue en Raspberry Pi (systemd)
+
+Ya existe una plantilla de servicio `deploy/sistema-biometrico.service` y un script `scripts/install_service.sh` para instalarlo en la Pi. El servicio está pensado para Raspberry Pi OS con escritorio, porque la aplicación abre una interfaz gráfica con CustomTkinter.
+
+Pasos rápidos:
+```bash
+# En la Raspberry Pi, desde la carpeta del proyecto
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+pip install gpiozero pigpio
+
+# Instalar y arrancar el servicio (ejecutar como root)
+sudo bash scripts/install_service.sh
+sudo systemctl status sistema-biometrico.service
+```
+
+El servicio se ejecutará usando el intérprete dentro de `venv`, intentará usar la sesión gráfica `DISPLAY=:0` del usuario `pi` y reiniciará automáticamente si hay fallos. Si tu usuario o ruta del proyecto son distintos, ajusta `User`, `WorkingDirectory`, `XAUTHORITY` y `ExecStart` en `deploy/sistema-biometrico.service`.
+
+## 🧪 Pruebas de hardware
+
+Usa `app/hardware/test_hardware.py` para probar el relé, buzzer y PIR (funciona en modo simulación si `gpiozero` no está instalado).
+
+```bash
+python app/hardware/test_hardware.py
+```
+
+## 📝 Notas finales
+- Configura `app/config.py` (o mediante variables de entorno) para ajustar pines y el modo de simulación `SIMULATE_HARDWARE`.
+- Puedes ajustar el tiempo de apertura con `UNLOCK_TIMEOUT` en segundos. Usa `UNLOCK_TIMEOUT=none` solo si quieres abrir la cerradura sin cierre automático.
+- Asegúrate de compartir GND entre la Pi y la fuente de la cerradura.

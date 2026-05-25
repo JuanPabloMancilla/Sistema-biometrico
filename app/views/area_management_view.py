@@ -1,8 +1,8 @@
-import customtkinter as ctk
+﻿import customtkinter as ctk
 import re
 from app.services.theme import COLORS
 from app.views.app_context import AppContext
-from app.services.facultad_service import (
+from app.services.area_service import (
     obtener_todas_facultades,
     crear_facultad,
     actualizar_facultad,
@@ -11,7 +11,7 @@ from app.services.facultad_service import (
     obtener_facultad_por_id
 )
 
-class FacultadManagementView(ctk.CTkFrame):
+class AreaManagementView(ctk.CTkFrame):
     def __init__(self, master):
         super().__init__(master, fg_color=COLORS["bg"])
 
@@ -28,9 +28,9 @@ class FacultadManagementView(ctk.CTkFrame):
 
         self.crear_vista_tabla()
 
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # RESIZE
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _on_resize(self, event):
         nuevo_compact = event.width < 700
         if nuevo_compact != self.is_compact:
@@ -39,9 +39,9 @@ class FacultadManagementView(ctk.CTkFrame):
                 self.vista_tabla.destroy()
             self.crear_vista_tabla()
 
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # VISTA TABLA
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def crear_vista_tabla(self):
         self.vista_tabla = ctk.CTkFrame(self, fg_color="transparent")
         self.vista_tabla.pack(fill="both", expand=True)
@@ -49,7 +49,7 @@ class FacultadManagementView(ctk.CTkFrame):
         padx_main = 20 if self.is_compact else 40
         pady_top  = 10 if self.is_compact else 40
 
-        # ── Header ──
+        # â”€â”€ Header â”€â”€
         header = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
         header.pack(fill="x", padx=padx_main, pady=(pady_top, 20))
 
@@ -59,51 +59,51 @@ class FacultadManagementView(ctk.CTkFrame):
             title_cont.pack(fill="x")
             ctk.CTkLabel(
                 title_cont,
-                text="🏫 " + AppContext.t("Gestión de Facultades"),
+                text=AppContext.t("Áreas"),
                 font=("Inter", 22, "bold"),
                 text_color=COLORS["text"]
             ).pack(anchor="center", pady=(0, 6))
             ctk.CTkLabel(
                 title_cont,
-                text=AppContext.t("Administra las unidades académicas"),
+                text=AppContext.t("Administra las unidades acadÃ©micas"),
                 font=("Inter", 12),
                 text_color=COLORS["subtext"]
             ).pack(anchor="center", pady=(0, 10))
             ctk.CTkButton(
                 header,
-                text="➕ " + AppContext.t("Agregar Facultad"),
-                fg_color="#000000",
+                text=AppContext.t("Nueva área"),
+                fg_color=COLORS["primary"],
                 font=self.font_sub,
-                height=45, corner_radius=12,
+                height=45, corner_radius=8,
                 command=self.abrir_formulario
             ).pack(fill="x", padx=10)
         else:
             title_cont.pack(side="left")
             ctk.CTkLabel(
                 title_cont,
-                text="🏫   " + AppContext.t("Gestión de Facultades"),
+                text=AppContext.t("Áreas"),
                 font=self.font_header, text_color=COLORS["text"]
             ).pack(anchor="w")
             ctk.CTkLabel(
                 title_cont,
-                text=AppContext.t("Administra las unidades académicas del sistema"),
+                text=AppContext.t("Administra las unidades acadÃ©micas del sistema"),
                 font=self.font_normal, text_color=COLORS["subtext"]
             ).pack(anchor="w")
             ctk.CTkButton(
                 header,
-                text="➕ " + AppContext.t("Agregar Facultad"),
+                text=AppContext.t("Nueva área"),
                 fg_color=COLORS["text"], hover_color=COLORS["hover"],
                 text_color=COLORS["bg"], font=self.font_sub,
-                height=50, corner_radius=12,
+                height=50, corner_radius=8,
                 command=self.abrir_formulario
             ).pack(side="right", anchor="n")
 
-        # ── Barra de búsqueda ──
+        # â”€â”€ Barra de bÃºsqueda â”€â”€
         bar = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
         bar.pack(fill="x", padx=padx_main, pady=(0, 10))
         self.entry_busqueda = ctk.CTkEntry(
             bar,
-            placeholder_text="🔍 " + AppContext.t("Buscar facultad por nombre..."),
+            placeholder_text=AppContext.t("Buscar facultad por nombre..."),
             height=42, corner_radius=10,
             fg_color=COLORS["hover"], border_width=1,
             border_color=COLORS["border"], text_color=COLORS["text"]
@@ -111,10 +111,10 @@ class FacultadManagementView(ctk.CTkFrame):
         self.entry_busqueda.pack(fill="x", expand=True)
         self.entry_busqueda.bind("<KeyRelease>", self._on_search)
 
-        # ── Card principal ──
+        # â”€â”€ Card principal â”€â”€
         self.main_card = ctk.CTkFrame(
             self.vista_tabla, fg_color=COLORS["card"],
-            corner_radius=15, border_width=1, border_color=COLORS["border"]
+            corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
         self.main_card.pack(fill="both", expand=True, padx=padx_main, pady=(0, pady_top))
 
@@ -123,9 +123,9 @@ class FacultadManagementView(ctk.CTkFrame):
     def _on_search(self, event=None):
         self.render_table_content()
 
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # TABLA
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def render_table_content(self):
         for w in self.main_card.winfo_children():
             w.destroy()
@@ -150,21 +150,21 @@ class FacultadManagementView(ctk.CTkFrame):
             ).pack(pady=40)
             return
 
-        # ── VISTA COMPACTA ──────────────────────────────────────
+        # â”€â”€ VISTA COMPACTA â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         if self.is_compact:
             for f in facultades:
                 es_activa = f.get("estado", 1) == 1
 
                 card = ctk.CTkFrame(
                     scroll, fg_color=COLORS["card"],
-                    corner_radius=14, border_width=1, border_color=COLORS["border"]
+                    corner_radius=8, border_width=1, border_color=COLORS["border"]
                 )
                 card.pack(fill="x", padx=2, pady=8)
 
                 top = ctk.CTkFrame(card, fg_color="transparent")
                 top.pack(fill="x", padx=14, pady=(14, 8))
 
-                ctk.CTkLabel(top, text="🏫", font=("Inter", 26)).pack(side="left", padx=(0, 10))
+                ctk.CTkLabel(top, text="", font=("Inter", 26)).pack(side="left", padx=(0, 10))
 
                 info = ctk.CTkFrame(top, fg_color="transparent")
                 info.pack(side="left", fill="x", expand=True)
@@ -175,7 +175,7 @@ class FacultadManagementView(ctk.CTkFrame):
                     anchor="w", wraplength=260, justify="left"
                 ).pack(anchor="w", fill="x")
                 ctk.CTkLabel(
-                    info, text=f"ID Facultad: {f['id']}",
+                    info, text=f"ID {AppContext.t('Facultad')}: {f['id']}",
                     font=("Inter", 10), text_color=COLORS["subtext"]
                 ).pack(anchor="w")
 
@@ -184,12 +184,12 @@ class FacultadManagementView(ctk.CTkFrame):
                 badge_est = ctk.CTkFrame(
                     badge_wrap,
                     fg_color="#D1FAE5" if es_activa else "#FEE2E2",
-                    corner_radius=20
+                    corner_radius=8
                 )
                 badge_est.pack(side="left")
                 ctk.CTkLabel(
                     badge_est,
-                    text="● ACTIVA" if es_activa else "● INACTIVA",
+                    text=AppContext.t("ACTIVA") if es_activa else AppContext.t("INACTIVA"),
                     font=("Inter", 9, "bold"),
                     text_color="#065F46" if es_activa else "#991B1B"
                 ).pack(padx=10, pady=4)
@@ -198,25 +198,28 @@ class FacultadManagementView(ctk.CTkFrame):
                 actions.pack(fill="x", padx=14, pady=(0, 14))
 
                 ctk.CTkButton(
-                    actions, text="✏️ Editar", height=36,
+                    actions, text="✎", height=36,
                     fg_color=COLORS["hover"], text_color=COLORS["text"],
+                    font=("Segoe UI Symbol", 14, "bold"),
                     command=lambda id_f=f["id"]: self.abrir_formulario(id_f)
                 ).pack(side="left", expand=True, fill="x", padx=(0, 6))
 
                 if es_activa:
                     ctk.CTkButton(
-                        actions, text="🗑️ Desactivar", height=36,
+                        actions, text="⊘", height=36,
                         fg_color="#FFF1F2", text_color="#E11D48",
+                        font=("Segoe UI Symbol", 14, "bold"),
                         command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_cambio_estado(id_f, n, desactivar=True)
                     ).pack(side="left", expand=True, fill="x", padx=(6, 0))
                 else:
                     ctk.CTkButton(
-                        actions, text="🔄 Activar", height=36,
+                        actions, text="✓", height=36,
                         fg_color="#10B981", text_color="white",
+                        font=("Segoe UI Symbol", 14, "bold"),
                         command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_cambio_estado(id_f, n, desactivar=False)
                     ).pack(side="left", expand=True, fill="x", padx=(6, 0))
 
-        # ── VISTA ESCRITORIO ────────────────────────────────────
+        # â”€â”€ VISTA ESCRITORIO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
         else:
             tabla = ctk.CTkFrame(scroll, fg_color="transparent")
             tabla.pack(fill="both", expand=True)
@@ -226,8 +229,8 @@ class FacultadManagementView(ctk.CTkFrame):
             tabla.columnconfigure(2, weight=1)
 
             HEADERS = [
-                ("🏛️ " + AppContext.t("NOMBRE DE LA FACULTAD"), "w"),
-                ("⚙️ " + AppContext.t("ESTADO"),                 "center"),
+                (AppContext.t("NOMBRE DE LA FACULTAD"), "w"),
+                (AppContext.t("ESTADO"),                 "center"),
                 (AppContext.t("ACCIONES"),                        "center"),
             ]
             for col, (text, anchor) in enumerate(HEADERS):
@@ -257,12 +260,12 @@ class FacultadManagementView(ctk.CTkFrame):
                 badge = ctk.CTkFrame(
                     badge_outer,
                     fg_color="#D1FAE5" if es_activa else "#FEE2E2",
-                    corner_radius=20
+                    corner_radius=8
                 )
                 badge.grid(row=0, column=0)
                 ctk.CTkLabel(
                     badge,
-                    text="● " + (AppContext.t("ACTIVA") if es_activa else AppContext.t("INACTIVA")),
+                    text="" + (AppContext.t("ACTIVA") if es_activa else AppContext.t("INACTIVA")),
                     font=("Inter", 9, "bold"),
                     text_color="#065F46" if es_activa else "#991B1B"
                 ).pack(padx=12, pady=4)
@@ -276,23 +279,23 @@ class FacultadManagementView(ctk.CTkFrame):
                 btns.grid(row=0, column=0)
 
                 ctk.CTkButton(
-                    btns, text="✏️", width=34, height=34,
-                    font=("Inter", 14), fg_color=COLORS["hover"],
+                    btns, text="✎", width=34, height=34,
+                    font=("Segoe UI Symbol", 14, "bold"), fg_color=COLORS["hover"],
                     hover_color=COLORS["border"], text_color=COLORS["text"],
                     command=lambda id_f=f["id"]: self.abrir_formulario(id_f)
                 ).pack(side="left", padx=3)
 
                 if es_activa:
                     ctk.CTkButton(
-                        btns, text="🗑️", width=34, height=34,
-                        font=("Inter", 14), fg_color="#FFF1F2",
+                        btns, text="⊘", width=34, height=34,
+                        font=("Segoe UI Symbol", 14, "bold"), fg_color="#FFF1F2",
                         hover_color="#FEE2E2", text_color="#E11D48",
                         command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_cambio_estado(id_f, n, desactivar=True)
                     ).pack(side="left", padx=3)
                 else:
                     ctk.CTkButton(
-                        btns, text="🔄", width=34, height=34,
-                        font=("Inter", 11, "bold"), fg_color="#10B981",
+                        btns, text="✓", width=34, height=34,
+                        font=("Segoe UI Symbol", 14, "bold"), fg_color="#10B981",
                         hover_color="#059669", text_color="white",
                         command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_cambio_estado(id_f, n, desactivar=False)
                     ).pack(side="left", padx=3)
@@ -301,31 +304,31 @@ class FacultadManagementView(ctk.CTkFrame):
                     row=sep_row, column=0, columnspan=3, sticky="ew"
                 )
 
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # MODAL UNIFICADO ACTIVAR / DESACTIVAR
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def confirmar_cambio_estado(self, id_facultad, nombre, desactivar=True):
         self.overlay = ctk.CTkFrame(self, fg_color="transparent")
         self.overlay.place(relx=0, rely=0, relwidth=1, relheight=1)
 
         modal = ctk.CTkFrame(
-            self.overlay, fg_color=COLORS["card"], corner_radius=20,
+            self.overlay, fg_color=COLORS["card"], corner_radius=8,
             width=420, height=250, border_width=2, border_color="#CBD5E1"
         )
         modal.place(relx=0.5, rely=0.5, anchor="center")
         modal.pack_propagate(False)
 
         if desactivar:
-            icono     = "🏛️"
-            titulo    = AppContext.t("¿Desactivar esta facultad?")
-            sub       = AppContext.t("La facultad dejará de estar disponible.")
+            icono     = ""
+            titulo    = AppContext.t("Â¿Desactivar esta facultad?")
+            sub       = AppContext.t("La facultad dejarÃ¡ de estar disponible.")
             btn_txt   = AppContext.t("Desactivar")
             btn_color = "#EF4444"
             btn_hover = "#DC2626"
         else:
-            icono     = "🔄"
-            titulo    = AppContext.t("¿Activar esta facultad?")
-            sub       = AppContext.t("La facultad volverá a estar disponible.")
+            icono     = ""
+            titulo    = AppContext.t("Â¿Activar esta facultad?")
+            sub       = AppContext.t("La facultad volverÃ¡ a estar disponible.")
             btn_txt   = AppContext.t("Activar")
             btn_color = "#10B981"
             btn_hover = "#059669"
@@ -364,9 +367,9 @@ class FacultadManagementView(ctk.CTkFrame):
         if hasattr(self, "overlay"):
             self.overlay.destroy()
 
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # FORMULARIO
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def abrir_formulario(self, id_facultad=None):
         self.vista_tabla.pack_forget()
 
@@ -374,12 +377,12 @@ class FacultadManagementView(ctk.CTkFrame):
             self.modo_edicion       = True
             self.facultad_actual_id = id_facultad
             facultad   = obtener_facultad_por_id(id_facultad)
-            titulo     = "✏️ " + AppContext.t("Editar Facultad")
+            titulo     = AppContext.t("Editar Facultad")
             nombre_ini = facultad["nombre"] if facultad else ""
             estado_ini = AppContext.t("Activa") if facultad and facultad["estado"] == 1 else AppContext.t("Inactiva")
         else:
             self.modo_edicion = False
-            titulo     = "➕ " + AppContext.t("Crear Nueva Facultad")
+            titulo     = AppContext.t("Crear Nueva Facultad")
             nombre_ini = ""
             estado_ini = AppContext.t("Activa")
 
@@ -394,12 +397,12 @@ class FacultadManagementView(ctk.CTkFrame):
 
         form_card = ctk.CTkFrame(
             self.form_base, fg_color=COLORS["card"],
-            corner_radius=15, border_width=1, border_color=COLORS["border"]
+            corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
         form_card.pack(fill="x", padx=padx_form, pady=10)
 
         ctk.CTkLabel(
-            form_card, text="🏛️ " + AppContext.t("Nombre de la Facultad"),
+            form_card, text=AppContext.t("Nombre de la Facultad"),
             font=self.font_small, text_color=COLORS["subtext"]
         ).pack(anchor="w", padx=25, pady=(25, 5))
         self.input_nombre = ctk.CTkEntry(
@@ -410,7 +413,7 @@ class FacultadManagementView(ctk.CTkFrame):
         self.input_nombre.pack(fill="x", padx=25, pady=(0, 20))
 
         ctk.CTkLabel(
-            form_card, text="⚙️ " + AppContext.t("Estado"),
+            form_card, text=AppContext.t("Estado"),
             font=self.font_small, text_color=COLORS["subtext"]
         ).pack(anchor="w", padx=25, pady=(0, 5))
         self.combo_estado = ctk.CTkOptionMenu(
@@ -427,12 +430,12 @@ class FacultadManagementView(ctk.CTkFrame):
         btns.pack(fill="x", padx=padx_form, pady=30)
 
         btn_cancelar = ctk.CTkButton(
-            btns, text="❌ " + AppContext.t("Cancelar"),
+            btns, text=AppContext.t("Cancelar"),
             font=self.font_sub, fg_color="#FEE2E2", text_color="#991B1B",
             height=55, command=self.volver_a_tabla
         )
         btn_guardar = ctk.CTkButton(
-            btns, text="💾 " + AppContext.t("Guardar Facultad"),
+            btns, text=AppContext.t("Guardar Facultad"),
             font=self.font_sub, fg_color="#10B981", text_color="white",
             height=55, command=self.guardar_facultad
         )
@@ -444,9 +447,9 @@ class FacultadManagementView(ctk.CTkFrame):
             btn_cancelar.pack(side="left", expand=True, fill="x", padx=(0, 10))
             btn_guardar.pack(side="left", expand=True, fill="x", padx=(10, 0))
 
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # HELPERS
-    # ─────────────────────────────────────────────────────────────
+    # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def facultad_existe(self, nombre):
         todas = obtener_todas_facultades()
         return any(
@@ -460,14 +463,14 @@ class FacultadManagementView(ctk.CTkFrame):
 
         if not nombre:
             return
-        if not re.match(r"^[A-Za-zÁÉÍÓÚáéíóúÑñ\s]+$", nombre):
-            print("❌ Nombre de facultad inválido")
+        if not re.match(r"^[A-Za-zÃÃ‰ÃÃ“ÃšÃ¡Ã©Ã­Ã³ÃºÃ‘Ã±\s]+$", nombre):
+            print("Error: Nombre de facultad invÃ¡lido")
             return
         if len(nombre) < 5:
-            print("❌ Facultad demasiado corta")
+            print("Error: Facultad demasiado corta")
             return
         if self.facultad_existe(nombre) and not self.modo_edicion:
-            print("❌ Facultad duplicada")
+            print("Error: Facultad duplicada")
             return
 
         if self.modo_edicion:

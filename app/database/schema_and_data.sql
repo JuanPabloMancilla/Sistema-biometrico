@@ -1,4 +1,4 @@
-BEGIN TRANSACTION;
+﻿BEGIN TRANSACTION;
 
 -- 1. TABLA DE ROLES
 CREATE TABLE IF NOT EXISTS "usuario_rol" (
@@ -40,7 +40,7 @@ CREATE TABLE IF NOT EXISTS "usuario" (
     FOREIGN KEY("id_facultad") REFERENCES "facultad"("id_facultad")
 );
 
--- 5. TABLA DE BIOMETRÍA
+-- 5. TABLA DE BIOMETRÃA
 CREATE TABLE IF NOT EXISTS "biometria" (
     "id_biometria" INTEGER PRIMARY KEY AUTOINCREMENT,
     "id_usuario" INTEGER NOT NULL,
@@ -68,23 +68,21 @@ CREATE TABLE IF NOT EXISTS "registro_acceso" (
 -- ROLES
 INSERT OR IGNORE INTO "usuario_rol" VALUES (1,'admin','Administrador del sistema');
 
--- FACULTADES
-INSERT OR IGNORE INTO "facultad" VALUES (1,'Facultad de Ciencias Marinas (FACIMAR)',1);
-INSERT OR IGNORE INTO "facultad" VALUES (2,'Facultad de Contabilidad y Administración (FCAM)',1);
-INSERT OR IGNORE INTO "facultad" VALUES (3,'Escuela de Enfermería',1);
-INSERT OR IGNORE INTO "facultad" VALUES (4,'Facultad de Ingeniería Electromecánica (FIE)',1);
+-- AREAS DE TRABAJO
+INSERT OR IGNORE INTO "facultad" VALUES (1,'Dirección Operativa',1);
+INSERT OR IGNORE INTO "facultad" VALUES (2,'Recursos Humanos',1);
+INSERT OR IGNORE INTO "facultad" VALUES (3,'Seguridad y Accesos',1);
+INSERT OR IGNORE INTO "facultad" VALUES (4,'Tecnologías de Información',1);
 
--- CARRERAS
-INSERT OR IGNORE INTO "carrera" VALUES (1,'Ingeniería Oceánica',1,1);
-INSERT OR IGNORE INTO "carrera" VALUES (2,'Licenciatura en Sustentabilidad Marina',1,1);
-INSERT OR IGNORE INTO "carrera" VALUES (3,'Contador Público',2,1);
-INSERT OR IGNORE INTO "carrera" VALUES (4,'Licenciatura en Administración',2,1);
-INSERT OR IGNORE INTO "carrera" VALUES (5,'Licenciatura en Negocios Digitales',2,1);
-INSERT OR IGNORE INTO "carrera" VALUES (6,'Licenciatura en Enfermería',3,1);
-INSERT OR IGNORE INTO "carrera" VALUES (7,'Ingeniero Mecánico Electricista (IME)',4,1);
-INSERT OR IGNORE INTO "carrera" VALUES (8,'Ingeniería en Tecnologías Electrónicas (ITE)',4,1);
-INSERT OR IGNORE INTO "carrera" VALUES (9,'Ingeniería en Mecatrónica (IMT)',4,1);
-INSERT OR IGNORE INTO "carrera" VALUES (10,'Ingeniería de Software (IS)',4,1);
+-- PUESTOS
+INSERT OR IGNORE INTO "carrera" VALUES (1,'Operador de Planta',1,1);
+INSERT OR IGNORE INTO "carrera" VALUES (2,'Supervisor de Turno',1,1);
+INSERT OR IGNORE INTO "carrera" VALUES (3,'Analista de Recursos Humanos',2,1);
+INSERT OR IGNORE INTO "carrera" VALUES (4,'Coordinador de Personal',2,1);
+INSERT OR IGNORE INTO "carrera" VALUES (5,'Guardia de Seguridad',3,1);
+INSERT OR IGNORE INTO "carrera" VALUES (6,'Monitor de Accesos',3,1);
+INSERT OR IGNORE INTO "carrera" VALUES (7,'Soporte Técnico',4,1);
+INSERT OR IGNORE INTO "carrera" VALUES (8,'Administrador de Sistemas',4,1);
 
 
 COMMIT;

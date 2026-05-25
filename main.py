@@ -4,11 +4,13 @@ from app.views.dashboard_view import DashboardView
 from app.views.terminal_view import TerminalView
 from app.database.database import inicializar_bd
 
+ctk.set_appearance_mode("light")
+
 class AppPrincipal(ctk.CTk):
     def __init__(self):
         super().__init__()
 
-        self.title("SISTEMA BIOMÉTRICO")
+        self.title("SECUREWORK")
         self.geometry("1100x800")
         self.configure(fg_color="white")
 

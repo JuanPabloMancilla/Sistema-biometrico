@@ -1,4 +1,4 @@
-# app/context.py
+﻿# app/context.py
 TRADUCCIONES = {
     
         # Agregar en la seccion TERMINAL BIOMoTRICA
@@ -44,7 +44,7 @@ TRADUCCIONES = {
     "Sin correo":                   {"en": "No email"},
     "USUARIO NO REGISTRADO":        {"en": "UNREGISTERED USER"},
 
-    # Cat�logo usuarios � badges de rol
+    # Catï¿½logo usuarios ï¿½ badges de rol
     "Estudiante":                   {"en": "Student"},
     "Docente":                      {"en": "Teacher"},
     "Trabajador":                   {"en": "Worker"},
@@ -52,41 +52,41 @@ TRADUCCIONES = {
     "DOCENTE":                      {"en": "TEACHER"},
     "TRABAJADOR":                   {"en": "WORKER"},
 
-    # Cat�logo usuarios � estado
+    # Catï¿½logo usuarios ï¿½ estado
     "? ACTIVO":                     {"en": "? ACTIVE"},
     "? INACTIVO":                   {"en": "? INACTIVE"},
     "ACTIVO":                       {"en": "ACTIVE"},
     "INACTIVO":                     {"en": "INACTIVE"},
 
      # --------------------------------------------------------------
-    # NAVEGACI�N / SIDEBAR
+    # NAVEGACIï¿½N / SIDEBAR
     # --------------------------------------------------------------
     "Panel de Control":                             {"en": "Control Panel"},
     "??   Panel de Control":                        {"en": "??   Control Panel"},
     "?? Panel de Control":                          {"en": "?? Control Panel"},
-    "Gestión de Usuarios":                          {"en": "User Management"},
+    "GestiÃ³n de Usuarios":                          {"en": "User Management"},
     "Gestion de Usuarios":                          {"en": "User Management"},
-    "??   Gestión de Usuarios":                     {"en": "??   User Management"},
+    "??   GestiÃ³n de Usuarios":                     {"en": "??   User Management"},
     "?? Gestion de Usuarios":                       {"en": "?? User Management"},
-    "Gestión de Facultades":                        {"en": "Faculty Management"},
+    "GestiÃ³n de Facultades":                        {"en": "Faculty Management"},
     "Gestion de Facultades":                        {"en": "Faculty Management"},
-    "??   Gestión de Facultades":                   {"en": "??   Faculty Management"},
+    "??   GestiÃ³n de Facultades":                   {"en": "??   Faculty Management"},
     "?? Gestion de Facultades":                     {"en": "?? Faculty Management"},
-    "Gestión de Carreras":                          {"en": "Career Management"},
+    "GestiÃ³n de Carreras":                          {"en": "Career Management"},
     "Gestion de Carreras":                          {"en": "Career Management"},
-    "??   Gestión de Carreras":                     {"en": "??   Career Management"},
+    "??   GestiÃ³n de Carreras":                     {"en": "??   Career Management"},
     "?? Gestion de Carreras":                       {"en": "?? Career Management"},
-    "Configuración":                                {"en": "Settings"},
-    "Configuración Cuenta":                         {"en": "Account Settings"},
-    "??   Configuración Cuenta":                    {"en": "??   Account Settings"},
-    "?? Configuración Cuenta":                      {"en": "?? Account Settings"},
-    "Cerrar Sesión":                                {"en": "Log Out"},
-    "?? Cerrar Sesión":                             {"en": "?? Log Out"},
+    "ConfiguraciÃ³n":                                {"en": "Settings"},
+    "ConfiguraciÃ³n Cuenta":                         {"en": "Account Settings"},
+    "??   ConfiguraciÃ³n Cuenta":                    {"en": "??   Account Settings"},
+    "?? ConfiguraciÃ³n Cuenta":                      {"en": "?? Account Settings"},
+    "Cerrar SesiÃ³n":                                {"en": "Log Out"},
+    "?? Cerrar SesiÃ³n":                             {"en": "?? Log Out"},
     "ADMINISTRADOR":                                {"en": "ADMINISTRATOR"},
-    "Control Biométrico":                           {"en": "Biometric Control"},
+    "Control BiomÃ©trico":                           {"en": "Biometric Control"},
 
     # --------------------------------------------------------------
-    # DASHBOARD � encabezado y stats
+    # DASHBOARD ï¿½ encabezado y stats
     # --------------------------------------------------------------
     "??  Panel de Control":                         {"en": "??  Control Panel"},
     "Resumen general y actividad reciente":         {"en": "General summary and recent activity"},
@@ -95,17 +95,17 @@ TRADUCCIONES = {
     "Autorizados":                                  {"en": "Authorized"},
     "Denegados":                                    {"en": "Denied"},
 
-    # DASHBOARD � gr�fica
+    # DASHBOARD ï¿½ grï¿½fica
     "?? Tendencia de Accesos por Hora":             {"en": "?? Access Trend by Hour"},
     "Fecha:":                                       {"en": "Date:"},
     "Accesos por hora":                             {"en": "Access by hour"},
     "Sin accesos registrados en esta fecha":        {"en": "No access records for this date"},
 
-    # DASHBOARD � tabla �ltimos accesos
-    "Registro de últimos accesos":                  {"en": "Latest access log"},
+    # DASHBOARD ï¿½ tabla ï¿½ltimos accesos
+    "Registro de Ãºltimos accesos":                  {"en": "Latest access log"},
     "Sin accesos registrados":                      {"en": "No access records found"},
 
-    # DASHBOARD � filtro roles
+    # DASHBOARD ï¿½ filtro roles
     "?? Rol:":                                      {"en": "?? Role:"},
     "Todos":                                        {"en": "All"},
     "?? Filtrar ?":                                 {"en": "?? Filter ?"},
@@ -115,68 +115,68 @@ TRADUCCIONES = {
 
 
     # --------------------------------------------------------------
-    # GESTI�N DE USUARIOS � tabla
+    # GESTIï¿½N DE USUARIOS ï¿½ tabla
     # --------------------------------------------------------------
-    "?? Gestión de Usuarios":                       {"en": "?? User Management"},
+    "?? GestiÃ³n de Usuarios":                       {"en": "?? User Management"},
     "Agregar Usuario":                              {"en": "Add User"},
     "? Agregar Usuario":                           {"en": "? Add User"},
     "Buscar usuario...":                            {"en": "Search user..."},
     "No hay usuarios registrados":                  {"en": "No registered users"},
     "FOTOGRAFA":                                   {"en": "PHOTO"},
-    "INFORMACIÓN":                                  {"en": "INFORMATION"},
+    "INFORMACIÃ“N":                                  {"en": "INFORMATION"},
     "ESTADO":                                       {"en": "STATUS"},
     "ACCIONES":                                     {"en": "ACTIONS"},
 
-    # GESTI�N DE USUARIOS � formulario secciones
+    # GESTIï¿½N DE USUARIOS ï¿½ formulario secciones
     "Editar Registro":                              {"en": "Edit Record"},
     "?? Editar Registro":                           {"en": "?? Edit Record"},
     "Nuevo Registro":                               {"en": "New Record"},
     "? Nuevo Registro":                            {"en": "? New Record"},
-    "?? Información Personal":                      {"en": "?? Personal Information"},
-    "Información Personal":                         {"en": "Personal Information"},
-    "?? Identificación":                            {"en": "?? Identification"},
-    "Identificación":                               {"en": "Identification"},
+    "?? InformaciÃ³n Personal":                      {"en": "?? Personal Information"},
+    "InformaciÃ³n Personal":                         {"en": "Personal Information"},
+    "?? IdentificaciÃ³n":                            {"en": "?? Identification"},
+    "IdentificaciÃ³n":                               {"en": "Identification"},
     "?? Estado del usuario":                        {"en": "?? User Status"},
     "Usuario activo":                               {"en": "Active user"},
 
-    # GESTI�N DE USUARIOS � labels de campos
+    # GESTIï¿½N DE USUARIOS ï¿½ labels de campos
     "Nombres":                                      {"en": "First Name(s)"},
     "Apellido Paterno":                             {"en": "Last Name"},
     "Apellido Materno":                             {"en": "Second Last Name"},
     "cuenta":                                       {"en": "account"},
     "correo":                                       {"en": "email"},
 
-    # GESTI�N DE USUARIOS � biometr�a
-    "Registrar Biometría":                          {"en": "Register Biometrics"},
-    "?? Registrar Biometría":                       {"en": "?? Register Biometrics"},
-    "Abriendo cámara...":                           {"en": "Opening camera..."},
-    "?? Abriendo cámara...":                        {"en": "?? Opening camera..."},
-    "Biometría registrada":                         {"en": "Biometrics registered"},
-    "? Biometría registrada":                       {"en": "? Biometrics registered"},
-    "Biometría requerida":                          {"en": "Biometrics required"},
-    "? Biometría requerida":                        {"en": "? Biometrics required"},
+    # GESTIï¿½N DE USUARIOS ï¿½ biometrï¿½a
+    "Registrar BiometrÃ­a":                          {"en": "Register Biometrics"},
+    "?? Registrar BiometrÃ­a":                       {"en": "?? Register Biometrics"},
+    "Abriendo cÃ¡mara...":                           {"en": "Opening camera..."},
+    "?? Abriendo cÃ¡mara...":                        {"en": "?? Opening camera..."},
+    "BiometrÃ­a registrada":                         {"en": "Biometrics registered"},
+    "? BiometrÃ­a registrada":                       {"en": "? Biometrics registered"},
+    "BiometrÃ­a requerida":                          {"en": "Biometrics required"},
+    "? BiometrÃ­a requerida":                        {"en": "? Biometrics required"},
     "Corrige los datos primero":                    {"en": "Fix the data first"},
     "? Corrige los datos primero":                  {"en": "? Fix the data first"},
 
-    # GESTI�N DE USUARIOS � modal
-    "🗑️Desactivar este usuario?":                    {"en": "Desactivate this user?"},
-    "El usuario perderá acceso al sistema.":        {"en": "The user will lose system access."},
+    # GESTIï¿½N DE USUARIOS ï¿½ modal
+    "ðŸ—‘ï¸Desactivar este usuario?":                    {"en": "Desactivate this user?"},
+    "El usuario perderÃ¡ acceso al sistema.":        {"en": "The user will lose system access."},
     "Desactivar":                                   {"en": "Desactivate"},
     "??? Desactivar":                                {"en": "??? Desactivate"},
-    "🔄Activar este usuario?":                       {"en": "Activate this user?"},
-    "El usuario recuperará acceso al sistema.":     {"en": "The user will regain system access."},
+    "ðŸ”„Activar este usuario?":                       {"en": "Activate this user?"},
+    "El usuario recuperarÃ¡ acceso al sistema.":     {"en": "The user will regain system access."},
     "Activar":                                      {"en": "Activate"},
     "?? Activar":                                   {"en": "?? Activate"},
     "Cancelar":                                     {"en": "Cancel"},
     "? Cancelar":                                  {"en": "? Cancel"},
 
     # --------------------------------------------------------------
-    # GESTI�N DE FACULTADES � tabla
+    # GESTIï¿½N DE FACULTADES ï¿½ tabla
     # --------------------------------------------------------------
-    "?? Gestión de Facultades":                     {"en": "?? Faculty Management"},
-    "??   Gestión de Facultades":                   {"en": "??   Faculty Management"},
-    "Administra las unidades académicas":           {"en": "Manage academic units"},
-    "Administra las unidades académicas del sistema": {"en": "Manage the system's academic units"},
+    "?? GestiÃ³n de Facultades":                     {"en": "?? Faculty Management"},
+    "??   GestiÃ³n de Facultades":                   {"en": "??   Faculty Management"},
+    "Administra las unidades acadÃ©micas":           {"en": "Manage academic units"},
+    "Administra las unidades acadÃ©micas del sistema": {"en": "Manage the system's academic units"},
     "Agregar Facultad":                             {"en": "Add Faculty"},
     "? Agregar Facultad":                          {"en": "? Add Faculty"},
     "Buscar facultad por nombre...":                {"en": "Search faculty by name..."},
@@ -185,13 +185,13 @@ TRADUCCIONES = {
     "ACTIVA":                                       {"en": "ACTIVE"},
     "INACTIVA":                                     {"en": "INACTIVE"},
 
-    # GESTI�N DE FACULTADES � modal
-    "🗑️Desactivar esta facultad?":                   {"en": "Desactivate this faculty?"},
-    "La facultad dejará de estar disponible.":      {"en": "The faculty will no longer be available."},
+    # GESTIï¿½N DE FACULTADES ï¿½ modal
+    "ðŸ—‘ï¸Desactivar esta facultad?":                   {"en": "Desactivate this faculty?"},
+    "La facultad dejarÃ¡ de estar disponible.":      {"en": "The faculty will no longer be available."},
     "Activar esta facultad?":                      {"en": "Activate this faculty?"},
     "La facultad volver a estar disponible.":      {"en": "The faculty will be available again."},
 
-    # GESTI�N DE FACULTADES � formulario
+    # GESTIï¿½N DE FACULTADES ï¿½ formulario
     "Editar Facultad":                              {"en": "Edit Faculty"},
     "?? Editar Facultad":                           {"en": "?? Edit Faculty"},
     "Crear Nueva Facultad":                         {"en": "Create New Faculty"},
@@ -206,10 +206,10 @@ TRADUCCIONES = {
     "?? Guardar Facultad":                          {"en": "?? Save Faculty"},
 
     # --------------------------------------------------------------
-    # GESTI�N DE CARRERAS � tabla
+    # GESTIï¿½N DE CARRERAS ï¿½ tabla
     # --------------------------------------------------------------
-    "?? Gestión de Carreras":                       {"en": "?? Career Management"},
-    "??   Gestión de Carreras":                     {"en": "??   Career Management"},
+    "?? GestiÃ³n de Carreras":                       {"en": "?? Career Management"},
+    "??   GestiÃ³n de Carreras":                     {"en": "??   Career Management"},
     "Agregar Carrera":                              {"en": "Add Career"},
     "? Agregar Carrera":                           {"en": "? Add Career"},
     "Buscar carrera por nombre...":                 {"en": "Search career by name..."},
@@ -217,13 +217,13 @@ TRADUCCIONES = {
     "NOMBRE":                                       {"en": "NAME"},
     "FACULTAD":                                     {"en": "FACULTY"},
 
-    # GESTI�N DE CARRERAS � modal
+    # GESTIï¿½N DE CARRERAS ï¿½ modal
     "Desactivar esta carrera?":                    {"en": "Desactivate this career?"},
     "La carrera dejar de estar disponible.":       {"en": "The career will no longer be available."},
-    "🔄Activar esta carrera?":                       {"en": "Activate this career?"},
-    "La carrera volverá a estar disponible.":       {"en": "The career will be available again."},
+    "ðŸ”„Activar esta carrera?":                       {"en": "Activate this career?"},
+    "La carrera volverÃ¡ a estar disponible.":       {"en": "The career will be available again."},
 
-    # GESTI�N DE CARRERAS � formulario
+    # GESTIï¿½N DE CARRERAS ï¿½ formulario
     "Editar Carrera":                               {"en": "Edit Career"},
     "?? Editar Carrera":                            {"en": "?? Edit Career"},
     "Nueva Carrera":                                {"en": "New Career"},
@@ -249,13 +249,13 @@ TRADUCCIONES = {
     "Correo":                                       {"en": "Email"},
     "Telofono":                                     {"en": "Phone"},
     "?? Personalizacin":                           {"en": "?? Customization"},
-    "Personalización":                              {"en": "Customization"},
+    "PersonalizaciÃ³n":                              {"en": "Customization"},
     "Idioma del Sistema":                           {"en": "System Language"},
     "?? Idioma del Sistema":                        {"en": "?? System Language"},
     "ADMINISTRADOR DEL SISTEMA":                    {"en": "SYSTEM ADMINISTRATOR"},
     "??   Editar Registro":                         {"en": "??   Edit Record"},
-    "Modifica tu información personal":             {"en": "Modify your personal information"},
-    "?? Información Personal":                      {"en": "?? Personal Information"},
+    "Modifica tu informaciÃ³n personal":             {"en": "Modify your personal information"},
+    "?? InformaciÃ³n Personal":                      {"en": "?? Personal Information"},
     "Guardar Cambios":                              {"en": "Save Changes"},
     "?? Guardar Cambios":                           {"en": "?? Save Changes"},
     "El nombre y correo son obligatorios.":         {"en": "Name and email are required."},
@@ -269,26 +269,26 @@ TRADUCCIONES = {
     # --------------------------------------------------------------
     "Sistema de Reconocimiento\nFacial":            {"en": "Facial Recognition\nSystem"},
     "Ingresa tus credenciales para continuar":      {"en": "Enter your credentials to continue"},
-    "CORREO ÓNICO":                           {"en": "EMAIL ADDRESS"},
+    "CORREO Ã“NICO":                           {"en": "EMAIL ADDRESS"},
     "Escribe tu correo":                            {"en": "Enter your email"},
-    "CONTRASEÑA":                                   {"en": "PASSWORD"},
-    "Escribe tu contraseña":                        {"en": "Enter your password"},
-    "INICIAR SESIÓN":                               {"en": "LOG IN"},
+    "CONTRASEÃ‘A":                                   {"en": "PASSWORD"},
+    "Escribe tu contraseÃ±a":                        {"en": "Enter your password"},
+    "INICIAR SESIÃ“N":                               {"en": "LOG IN"},
     "Credenciales incorrectas.":                    {"en": "Incorrect credentials."},
 
     # --------------------------------------------------------------
-    # TERMINAL BIOM�TRICA
+    # TERMINAL BIOMï¿½TRICA
     # --------------------------------------------------------------
     "?  RECONOCIMIENTO FACIAL  ?":                  {"en": "?  FACIAL RECOGNITION  ?"},
     "SISTEMA ACTIVO":                               {"en": "SYSTEM ACTIVE"},
-    "ESPERANDO DETECCIÓN...":                       {"en": "WAITING FOR DETECTION..."},
+    "ESPERANDO DETECCIÃ“N...":                       {"en": "WAITING FOR DETECTION..."},
     "LISTO":                                        {"en": "READY"},
-    "Iniciando cámara...":                          {"en": "Starting camera..."},
-    "Sistema Biométrico v2.0":                      {"en": "Biometric System v2.0"},
+    "Iniciando cÃ¡mara...":                          {"en": "Starting camera..."},
+    "Sistema BiomÃ©trico v2.0":                      {"en": "Biometric System v2.0"},
     "Acceso Seguro":                                {"en": "Secure Access"},
     "Cifrado AES-256":                              {"en": "AES-256 Encryption"},
 
-    # Terminal � mensajes de detecci�n y estado
+    # Terminal ï¿½ mensajes de detecciï¿½n y estado
     "ROSTRO DETECTADO":                             {"en": "FACE DETECTED"},
     "PROCESANDO...":                                {"en": "PROCESSING..."},
     "CAPTURANDO...":                                {"en": "CAPTURING..."},
@@ -297,18 +297,18 @@ TRADUCCIONES = {
     "ACCESO AUTORIZADO":                            {"en": "ACCESS AUTHORIZED"},
     "ACCESO DENEGADO":                              {"en": "ACCESS DENIED"},
     "USUARIO INACTIVO":                             {"en": "INACTIVE USER"},
-    "SIN DETECCIÓN":                                {"en": "NO DETECTION"},
-    "CÁMARA NO DISPONIBLE":                         {"en": "CAMERA NOT AVAILABLE"},
-    "ERROR DE CÁMARA":                              {"en": "CAMERA ERROR"},
-    "Cámara no disponible":                         {"en": "Camera not available"},
-    "Error al iniciar cámara":                      {"en": "Error starting camera"},
-    "Biometría no encontrada":                      {"en": "Biometrics not found"},
+    "SIN DETECCIÃ“N":                                {"en": "NO DETECTION"},
+    "CÃMARA NO DISPONIBLE":                         {"en": "CAMERA NOT AVAILABLE"},
+    "ERROR DE CÃMARA":                              {"en": "CAMERA ERROR"},
+    "CÃ¡mara no disponible":                         {"en": "Camera not available"},
+    "Error al iniciar cÃ¡mara":                      {"en": "Error starting camera"},
+    "BiometrÃ­a no encontrada":                      {"en": "Biometrics not found"},
     "REGISTRANDO ROSTRO":                           {"en": "REGISTERING FACE"},
     "REGISTRO EXITOSO":                             {"en": "REGISTRATION SUCCESSFUL"},
-    "MANTÉN EL ROSTRO EN EL CENTRO":               {"en": "KEEP YOUR FACE IN THE CENTER"},
+    "MANTÃ‰N EL ROSTRO EN EL CENTRO":               {"en": "KEEP YOUR FACE IN THE CENTER"},
     "ROSTRO MUY LEJOS":                             {"en": "FACE TOO FAR"},
     "ROSTRO MUY CERCA":                             {"en": "FACE TOO CLOSE"},
-    "ILUMINACIÓN INSUFICIENTE":                     {"en": "INSUFFICIENT LIGHTING"},
+    "ILUMINACIÃ“N INSUFICIENTE":                     {"en": "INSUFFICIENT LIGHTING"},
     "Volver":                                       {"en": "Back"},
     "? Volver":                                     {"en": "? Back"},
     "CANCELAR":                                     {"en": "CANCEL"},
@@ -325,16 +325,16 @@ TRADUCCIONES = {
 
 TRADUCCIONES_UTF8 = {
     "Panel de Control": {"en": "Control Panel"},
-    "Gestión de Usuarios": {"en": "User Management"},
+    "GestiÃ³n de Usuarios": {"en": "User Management"},
     "Gestion de Usuarios": {"en": "User Management"},
-    "Gestión de Facultades": {"en": "Faculty Management"},
+    "GestiÃ³n de Facultades": {"en": "Faculty Management"},
     "Gestion de Facultades": {"en": "Faculty Management"},
-    "Gestión de Carreras": {"en": "Career Management"},
+    "GestiÃ³n de Carreras": {"en": "Career Management"},
     "Gestion de Carreras": {"en": "Career Management"},
-    "Configuración": {"en": "Settings"},
-    "Configuración Cuenta": {"en": "Account Settings"},
-    "Cerrar Sesión": {"en": "Log Out"},
-    "Control Biométrico": {"en": "Biometric Control"},
+    "ConfiguraciÃ³n": {"en": "Settings"},
+    "ConfiguraciÃ³n Cuenta": {"en": "Account Settings"},
+    "Cerrar SesiÃ³n": {"en": "Log Out"},
+    "Control BiomÃ©trico": {"en": "Biometric Control"},
     "Resumen general y actividad reciente": {"en": "General overview and recent activity"},
     "Total Registros": {"en": "Total Records"},
     "Accesos Hoy": {"en": "Accesses Today"},
@@ -342,7 +342,7 @@ TRADUCCIONES_UTF8 = {
     "Denegados": {"en": "Denied"},
     "Tendencia de Accesos por Hora": {"en": "Access Trend by Hour"},
     "Fecha:": {"en": "Date:"},
-    "Registro de últimos accesos": {"en": "Latest access log"},
+    "Registro de Ãºltimos accesos": {"en": "Latest access log"},
     "Sin accesos registrados": {"en": "No access records found"},
     "Sin accesos registrados en esta fecha": {"en": "No access records for this date"},
     "Sin cuenta": {"en": "No account"},
@@ -355,16 +355,16 @@ TRADUCCIONES_UTF8 = {
     "Agregar Usuario": {"en": "Add User"},
     "Buscar usuario...": {"en": "Search user..."},
     "No hay usuarios registrados": {"en": "No registered users"},
-    "FOTOGRAFÍA": {"en": "PHOTOGRAPH"},
-    "INFORMACIÓN": {"en": "INFORMATION"},
+    "FOTOGRAFÃA": {"en": "PHOTOGRAPH"},
+    "INFORMACIÃ“N": {"en": "INFORMATION"},
     "ESTADO": {"en": "STATUS"},
     "ACCIONES": {"en": "ACTIONS"},
     "Editar Registro": {"en": "Edit Record"},
     "Nuevo Registro": {"en": "New Record"},
-    "Clasificación": {"en": "Classification"},
+    "ClasificaciÃ³n": {"en": "Classification"},
     "Tipo de Usuario": {"en": "User Type"},
-    "Información Personal": {"en": "Personal Information"},
-    "Identificación": {"en": "Identification"},
+    "InformaciÃ³n Personal": {"en": "Personal Information"},
+    "IdentificaciÃ³n": {"en": "Identification"},
     "Estado del usuario": {"en": "User Status"},
     "Usuario activo": {"en": "Active user"},
     "Nombres": {"en": "First Name(s)"},
@@ -372,20 +372,20 @@ TRADUCCIONES_UTF8 = {
     "Apellido Materno": {"en": "Maternal Last Name"},
     "cuenta": {"en": "account"},
     "correo": {"en": "email"},
-    "Registrar Biometría": {"en": "Register Biometrics"},
+    "Registrar BiometrÃ­a": {"en": "Register Biometrics"},
     "Guardar Usuario": {"en": "Save User"},
-    "Biometría requerida": {"en": "Biometrics required"},
-    "Biometría registrada": {"en": "Biometrics registered"},
-    "Abriendo cámara...": {"en": "Opening camera..."},
+    "BiometrÃ­a requerida": {"en": "Biometrics required"},
+    "BiometrÃ­a registrada": {"en": "Biometrics registered"},
+    "Abriendo cÃ¡mara...": {"en": "Opening camera..."},
     "Corrige los datos primero": {"en": "Fix the data first"},
-    "¿Desactivar este usuario?": {"en": "Deactivate this user?"},
-    "El usuario perderá acceso al sistema.": {"en": "The user will lose system access."},
-    "¿Activar este usuario?": {"en": "Activate this user?"},
-    "El usuario recuperará acceso al sistema.": {"en": "The user will regain system access."},
+    "Â¿Desactivar este usuario?": {"en": "Deactivate this user?"},
+    "El usuario perderÃ¡ acceso al sistema.": {"en": "The user will lose system access."},
+    "Â¿Activar este usuario?": {"en": "Activate this user?"},
+    "El usuario recuperarÃ¡ acceso al sistema.": {"en": "The user will regain system access."},
     "Rol:": {"en": "Role:"},
     "Todos": {"en": "All"},
-    "Filtrar ⌵": {"en": "Filter ⌵"},
-    "Filtrar ︿": {"en": "Filter ︿"},
+    "Filtrar âŒµ": {"en": "Filter âŒµ"},
+    "Filtrar ï¸¿": {"en": "Filter ï¸¿"},
     "Estudiante": {"en": "Student"},
     "Docente": {"en": "Teacher"},
     "Trabajador": {"en": "Worker"},
@@ -394,8 +394,8 @@ TRADUCCIONES_UTF8 = {
     "TRABAJADOR": {"en": "WORKER"},
     "ACTIVO": {"en": "ACTIVE"},
     "INACTIVO": {"en": "INACTIVE"},
-    "Administra las unidades académicas": {"en": "Manage academic units"},
-    "Administra las unidades académicas del sistema": {"en": "Manage the system's academic units"},
+    "Administra las unidades acadÃ©micas": {"en": "Manage academic units"},
+    "Administra las unidades acadÃ©micas del sistema": {"en": "Manage the system's academic units"},
     "Agregar Facultad": {"en": "Add Faculty"},
     "Buscar facultad por nombre...": {"en": "Search faculty by name..."},
     "No hay facultades registradas": {"en": "No registered faculties"},
@@ -404,10 +404,10 @@ TRADUCCIONES_UTF8 = {
     "Crear Nueva Facultad": {"en": "Create New Faculty"},
     "Nombre de la Facultad": {"en": "Faculty Name"},
     "Guardar Facultad": {"en": "Save Faculty"},
-    "¿Desactivar esta facultad?": {"en": "Deactivate this faculty?"},
-    "La facultad dejará de estar disponible.": {"en": "The faculty will no longer be available."},
-    "¿Activar esta facultad?": {"en": "Activate this faculty?"},
-    "La facultad volverá a estar disponible.": {"en": "The faculty will be available again."},
+    "Â¿Desactivar esta facultad?": {"en": "Deactivate this faculty?"},
+    "La facultad dejarÃ¡ de estar disponible.": {"en": "The faculty will no longer be available."},
+    "Â¿Activar esta facultad?": {"en": "Activate this faculty?"},
+    "La facultad volverÃ¡ a estar disponible.": {"en": "The faculty will be available again."},
     "Activa": {"en": "Active"},
     "Inactiva": {"en": "Inactive"},
     "ACTIVA": {"en": "ACTIVE"},
@@ -424,32 +424,32 @@ TRADUCCIONES_UTF8 = {
     "Carrera": {"en": "Career"},
     "Seleccionar facultad": {"en": "Select faculty"},
     "Guardar Carrera": {"en": "Save Career"},
-    "¿Desactivar esta carrera?": {"en": "Deactivate this career?"},
-    "La carrera dejará de estar disponible.": {"en": "The career will no longer be available."},
-    "¿Activar esta carrera?": {"en": "Activate this career?"},
-    "La carrera volverá a estar disponible.": {"en": "The career will be available again."},
+    "Â¿Desactivar esta carrera?": {"en": "Deactivate this career?"},
+    "La carrera dejarÃ¡ de estar disponible.": {"en": "The career will no longer be available."},
+    "Â¿Activar esta carrera?": {"en": "Activate this career?"},
+    "La carrera volverÃ¡ a estar disponible.": {"en": "The career will be available again."},
     "Configura tu perfil y preferencias": {"en": "Configure your profile and preferences"},
     "Editar": {"en": "Edit"},
     "Editar Perfil": {"en": "Edit Profile"},
     "Detalles de la Cuenta": {"en": "Account Details"},
     "Correo": {"en": "Email"},
-    "Teléfono": {"en": "Phone"},
-    "Personalización": {"en": "Customization"},
+    "TelÃ©fono": {"en": "Phone"},
+    "PersonalizaciÃ³n": {"en": "Customization"},
     "Idioma del Sistema": {"en": "System Language"},
     "ADMINISTRADOR DEL SISTEMA": {"en": "SYSTEM ADMINISTRATOR"},
     "Actualizar Foto": {"en": "Update Photo"},
     "Editar Registro...": {"en": "Edit Record..."},
-    "Modifica tu información personal": {"en": "Modify your personal information"},
+    "Modifica tu informaciÃ³n personal": {"en": "Modify your personal information"},
     "Guardar Cambios": {"en": "Save Changes"},
     "El nombre y correo son obligatorios.": {"en": "Name and email are required."},
     "Cambios guardados correctamente.": {"en": "Changes saved successfully."},
     "Sistema de Reconocimiento\nFacial": {"en": "Facial Recognition\nSystem"},
     "Ingresa tus credenciales para continuar": {"en": "Enter your credentials to continue"},
-    "CORREO ELECTRÓNICO": {"en": "EMAIL ADDRESS"},
+    "CORREO ELECTRÃ“NICO": {"en": "EMAIL ADDRESS"},
     "Escribe tu correo": {"en": "Enter your email"},
-    "CONTRASEÑA": {"en": "PASSWORD"},
-    "Escribe tu contraseña": {"en": "Enter your password"},
-    "INICIAR SESIÓN": {"en": "LOG IN"},
+    "CONTRASEÃ‘A": {"en": "PASSWORD"},
+    "Escribe tu contraseÃ±a": {"en": "Enter your password"},
+    "INICIAR SESIÃ“N": {"en": "LOG IN"},
     "Credenciales incorrectas.": {"en": "Incorrect credentials."},
     "Estado": {"en": "Status"},
     "Desactivar": {"en": "Deactivate"},
@@ -460,25 +460,226 @@ TRADUCCIONES_UTF8 = {
 
 TRADUCCIONES.update(TRADUCCIONES_UTF8)
 
+ALIAS_EMPRESA = {
+    "Sistema de Reconocimiento\nFacial": "SECUREWORK\nControl de Acceso",
+    "CORREO CORPORATIVO": "CORREO CORPORATIVO",
+    "CONTRASENA": "CONTRASEÑA",
+    "Escribe tu contrasena": "Escribe tu contraseña",
+    "Sistema Biometrico v2.0": "BioAccess Empresarial v2.0",
+    "RECONOCIMIENTO FACIAL": "CONTROL BIOMÉTRICO EMPRESARIAL",
+    "CONTROL DE ACCESO": "CONTROL DE ACCESO",
+    "Panel de Control": "Panel Ejecutivo",
+    "Inicio": "Inicio",
+    "Personal": "Personal",
+    "Nuevo trabajador": "Nuevo trabajador",
+    "Áreas": "Áreas",
+    "Puestos": "Puestos",
+    "Nueva área": "Nueva área",
+    "Nuevo puesto": "Nuevo puesto",
+    "Ajustes": "Ajustes",
+    "Perfil administrativo y preferencias del sistema": "Perfil administrativo y preferencias del sistema",
+    "Resumen operativo de accesos, personal y alertas": "Resumen operativo de accesos, personal y alertas",
+    "Personal activo": "Personal activo",
+    "Eventos de hoy": "Eventos de hoy",
+    "Accesos validos": "Accesos válidos",
+    "Alertas": "Alertas",
+    "Resumen general y actividad reciente": "Resumen de accesos y actividad laboral",
+    "Total Registros": "Trabajadores Registrados",
+    "Registro de Ãºltimos accesos": "Registro de últimos accesos",
+    "ConfiguraciÃ³n": "Configuración",
+    "Cerrar SesiÃ³n": "Cerrar Sesión",
+    "FOTOGRAFÃA": "FOTOGRAFIA",
+    "INFORMACIÃ“N": "INFORMACION",
+    "PersonalizaciÃ³n": "Personalización",
+    "TelÃ©fono": "Teléfono",
+    "Modifica tu informaciÃ³n personal": "Modifica tu información personal",
+    "GestiÃ³n de Usuarios": "Gestión de Trabajadores",
+    "Gestion de Usuarios": "Gestión de Trabajadores",
+    "Agregar Usuario": "Agregar Trabajador",
+    "Buscar usuario...": "Buscar trabajador...",
+    "Rol:": "Personal:",
+    "cuenta": "Número de empleado",
+    "correo": "Correo corporativo",
+    "Tipo de Usuario": "Tipo de Personal",
+    "Estado del usuario": "Estado del trabajador",
+    "Usuario activo": "Trabajador activo",
+    "IdentificaciÃ³n": "Identificación Laboral",
+    "InformaciÃ³n Personal": "Información Personal",
+    "ClasificaciÃ³n": "Clasificación Laboral",
+    "Registrar BiometrÃ­a": "Registrar Biometría",
+    "BiometrÃ­a requerida": "Biometría requerida",
+    "No hay usuarios registrados": "No hay trabajadores registrados",
+    "GestiÃ³n de Facultades": "Gestión de Áreas",
+    "Gestion de Facultades": "Gestión de Áreas",
+    "Agregar Facultad": "Agregar Área",
+    "Nueva Facultad": "Nueva Área",
+    "Nombre de la Facultad": "Nombre del Área",
+    "NOMBRE DE LA FACULTAD": "NOMBRE DEL ÁREA",
+    "Facultad": "Área de Trabajo",
+    "FACULTAD": "ÁREA",
+    "Seleccionar facultad": "Seleccionar área",
+    "Buscar facultad por nombre...": "Buscar área por nombre...",
+    "Administra las unidades acadÃ©micas": "Administra las áreas de trabajo",
+    "Administra las unidades acadÃ©micas del sistema": "Administra las áreas operativas de la empresa",
+    "No hay facultades registradas": "No hay áreas registradas",
+    "GestiÃ³n de Carreras": "Gestión de Puestos",
+    "Gestion de Carreras": "Gestión de Puestos",
+    "Agregar Carrera": "Agregar Puesto",
+    "Nueva Carrera": "Nuevo Puesto",
+    "Nombre de la Carrera": "Nombre del Puesto",
+    "Carrera": "Puesto",
+    "CARRERA": "PUESTO",
+    "Buscar carrera por nombre...": "Buscar puesto por nombre...",
+    "No hay carreras registradas": "No hay puestos registrados",
+    "La carrera dejarÃ¡ de estar disponible.": "El puesto dejará de estar disponible.",
+    "La carrera volverÃ¡ a estar disponible.": "El puesto volverá a estar disponible.",
+    "Â¿Desactivar esta carrera?": "¿Desactivar este puesto?",
+    "Â¿Activar esta carrera?": "¿Activar este puesto?",
+    "Editar Facultad": "Editar Área",
+    "Crear Nueva Facultad": "Crear Nueva Área",
+    "Guardar Facultad": "Guardar Área",
+    "Â¿Desactivar esta facultad?": "¿Desactivar esta área?",
+    "La facultad dejarÃ¡ de estar disponible.": "El área dejará de estar disponible.",
+    "Â¿Activar esta facultad?": "¿Activar esta área?",
+    "La facultad volverÃ¡ a estar disponible.": "El área volverá a estar disponible.",
+    "Editar Carrera": "Editar Puesto",
+    "Guardar Carrera": "Guardar Puesto",
+    "Estudiante": "Trabajador",
+    "Docente": "Supervisor",
+    "Trabajador": "Administrativo",
+    "ESTUDIANTE": "TRABAJADOR",
+    "DOCENTE": "SUPERVISOR",
+    "TRABAJADOR": "ADMINISTRATIVO",
+    "Control BiomÃ©trico": "Control Empresarial",
+    "ConfiguraciÃ³n Cuenta": "Configuración de Cuenta",
+    "Configuracion Cuenta": "Configuración de Cuenta",
+    "ADMINISTRADOR DEL SISTEMA": "ADMINISTRADOR EMPRESARIAL",
+    "La cuenta es obligatoria": "El número de empleado es obligatorio",
+    "La cuenta solo debe contener nÃºmeros": "El número de empleado solo debe contener números",
+    "La cuenta ya estÃ¡ registrada": "El número de empleado ya está registrado",
+    "Sin cuenta": "Sin número de empleado",
+    "Filtrar âŒµ": "Filtrar",
+    "Filtrar ï¸¿": "Filtrar",
+}
+
+EMPRESA_EN = {
+    "SECUREWORK\nControl de Acceso": "SECUREWORK\nAccess Control",
+    "CORREO CORPORATIVO": "CORPORATE EMAIL",
+    "CONTRASEÑA": "PASSWORD",
+    "Escribe tu contraseña": "Enter your password",
+    "BioAccess Empresarial v2.0": "BioAccess Enterprise v2.0",
+    "CONTROL BIOMÉTRICO EMPRESARIAL": "ENTERPRISE BIOMETRIC CONTROL",
+    "CONTROL DE ACCESO": "ACCESS CONTROL",
+    "Panel Ejecutivo": "Executive Dashboard",
+    "Inicio": "Home",
+    "Personal": "Staff",
+    "Nuevo trabajador": "New worker",
+    "Áreas": "Areas",
+    "Puestos": "Positions",
+    "Nueva área": "New area",
+    "Nuevo puesto": "New position",
+    "Ajustes": "Settings",
+    "Perfil administrativo y preferencias del sistema": "Administrator profile and system preferences",
+    "Resumen operativo de accesos, personal y alertas": "Operational summary for access, staff, and alerts",
+    "Personal activo": "Active staff",
+    "Eventos de hoy": "Today events",
+    "Accesos válidos": "Valid access",
+    "Alertas": "Alerts",
+    "Resumen de accesos y actividad laboral": "Access and workforce activity summary",
+    "Trabajadores Registrados": "Registered Workers",
+    "Registro de últimos accesos": "Latest access records",
+    "Configuración": "Settings",
+    "Cerrar Sesión": "Log Out",
+    "FOTOGRAFIA": "PHOTO",
+    "INFORMACION": "INFORMATION",
+    "Personalización": "Customization",
+    "Teléfono": "Phone",
+    "Modifica tu información personal": "Edit your personal information",
+    "Gestión de Trabajadores": "Worker Management",
+    "Agregar Trabajador": "Add Worker",
+    "Buscar trabajador...": "Search worker...",
+    "Personal:": "Staff:",
+    "Número de empleado": "Employee number",
+    "Correo corporativo": "Corporate email",
+    "Tipo de Personal": "Staff Type",
+    "Estado del trabajador": "Worker status",
+    "Trabajador activo": "Active worker",
+    "Identificación Laboral": "Work Identification",
+    "Información Personal": "Personal Information",
+    "Clasificación Laboral": "Work Classification",
+    "Registrar Biometría": "Register Biometrics",
+    "Biometría requerida": "Biometrics required",
+    "No hay trabajadores registrados": "No workers registered",
+    "Gestión de Áreas": "Area Management",
+    "Agregar Área": "Add Area",
+    "Nueva Área": "New Area",
+    "Nombre del Área": "Area Name",
+    "NOMBRE DEL ÁREA": "AREA NAME",
+    "Área de Trabajo": "Work Area",
+    "ÁREA": "AREA",
+    "Seleccionar área": "Select area",
+    "Buscar área por nombre...": "Search area by name...",
+    "Administra las áreas de trabajo": "Manage work areas",
+    "Administra las áreas operativas de la empresa": "Manage the company's operating areas",
+    "No hay áreas registradas": "No areas registered",
+    "Gestión de Puestos": "Position Management",
+    "Agregar Puesto": "Add Position",
+    "Nuevo Puesto": "New Position",
+    "Nombre del Puesto": "Position Name",
+    "Puesto": "Position",
+    "PUESTO": "POSITION",
+    "Buscar puesto por nombre...": "Search position by name...",
+    "No hay puestos registrados": "No positions registered",
+    "El puesto dejará de estar disponible.": "The position will no longer be available.",
+    "El puesto volverá a estar disponible.": "The position will be available again.",
+    "¿Desactivar este puesto?": "Deactivate this position?",
+    "¿Activar este puesto?": "Activate this position?",
+    "Editar Área": "Edit Area",
+    "Crear Nueva Área": "Create New Area",
+    "Guardar Área": "Save Area",
+    "¿Desactivar esta área?": "Deactivate this area?",
+    "El área dejará de estar disponible.": "The area will no longer be available.",
+    "¿Activar esta área?": "Activate this area?",
+    "El área volverá a estar disponible.": "The area will be available again.",
+    "Editar Puesto": "Edit Position",
+    "Guardar Puesto": "Save Position",
+    "Trabajador": "Worker",
+    "Supervisor": "Supervisor",
+    "Administrativo": "Administrative",
+    "TRABAJADOR": "WORKER",
+    "SUPERVISOR": "SUPERVISOR",
+    "ADMINISTRATIVO": "ADMINISTRATIVE",
+    "Control Empresarial": "Enterprise Control",
+    "Configuración de Cuenta": "Account Settings",
+    "ADMINISTRADOR EMPRESARIAL": "ENTERPRISE ADMINISTRATOR",
+    "El número de empleado es obligatorio": "Employee number is required",
+    "El número de empleado solo debe contener números": "Employee number must contain only digits",
+    "El número de empleado ya está registrado": "Employee number is already registered",
+    "Sin número de empleado": "No employee number",
+    "Filtrar": "Filter",
+}
+
 class AppContext:
     idioma_actual = "es"
     traductor = None
 
     @classmethod
     def t(cls, texto: str) -> str:
-<<<<<<< HEAD
         """Devuelve la traduccion del texto segun el idioma actual."""
-=======
-        """Devuelve la traducción del texto según el idioma actual."""
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
+        texto = str(texto)
+        texto = ALIAS_EMPRESA.get(texto, texto)
+        partes_alias = texto.strip().split(maxsplit=1)
+        if len(partes_alias) == 2 and partes_alias[1] in ALIAS_EMPRESA:
+            texto = f"{partes_alias[0]} {ALIAS_EMPRESA[partes_alias[1]]}"
         if cls.idioma_actual == "es":
             return texto
 
-        texto = str(texto)
         clave = texto.strip()
+        if clave in EMPRESA_EN:
+            return EMPRESA_EN[clave]
+
         entrada = TRADUCCIONES.get(clave)
         if entrada:
-<<<<<<< HEAD
             return entrada.get(cls.idioma_actual, clave)
 
         partes = clave.split(maxsplit=1)
@@ -489,11 +690,6 @@ class AppContext:
                 return f"{icono} {entrada.get(cls.idioma_actual, resto)}"
 
         print(f"[i18n] Sin traduccion EN para: {repr(texto)}")
-=======
-            return entrada.get(cls.idioma_actual, texto)
-        # Aviso en consola durante desarrollo � quitar en producci�n
-        print(f"[i18n] Sin traducción EN para: {repr(texto)}")
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
         return texto
 
     @classmethod

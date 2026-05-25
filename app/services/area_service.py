@@ -1,4 +1,4 @@
-from app.database.database import get_connection
+﻿from app.database.database import get_connection
 
 def obtener_todas_facultades():
     
@@ -31,10 +31,10 @@ def obtener_todas_facultades():
 def crear_facultad(nombre, estado=1):
     
     #Inserta una nueva facultad en la base de datos
-    #Parámetros:
+    #ParÃ¡metros:
         #- nombre: str - Nombre de la facultad
         #- estado: int - 1=activa, 0=inactiva (default: 1)
-    #Retorna: True si se creó, False si falló
+    #Retorna: True si se creÃ³, False si fallÃ³
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -57,11 +57,11 @@ def crear_facultad(nombre, estado=1):
 def actualizar_facultad(id_facultad, nombre, estado):
 
     #Actualiza una facultad existente
-    #Parámetros:
+    #ParÃ¡metros:
         #- id_facultad: int - ID de la facultad a editar
         #- nombre: str - Nuevo nombre
         #- estado: int - Nuevo estado (1=activa, 0=inactiva)
-    #Retorna: True si se actualizó, False si falló
+    #Retorna: True si se actualizÃ³, False si fallÃ³
 
     try:
         conn = get_connection()
@@ -85,9 +85,9 @@ def actualizar_facultad(id_facultad, nombre, estado):
 def desactivar_facultad(id_facultad):
 
     #Desactiva una facultad (cambia estado a 0)
-    #Parámetros:
+    #ParÃ¡metros:
         #- id_facultad: int - ID de la facultad a desactivar
-    #Retorna: True si se desactivó, False si falló
+    #Retorna: True si se desactivÃ³, False si fallÃ³
 
     try:
         conn = get_connection()
@@ -111,9 +111,9 @@ def desactivar_facultad(id_facultad):
 def reactivar_facultad(id_facultad):
 
     #Reactiva una facultad (cambia estado a 1)
-    #Parámetros:
+    #ParÃ¡metros:
         #- id_facultad: int - ID de la facultad a reactivar
-    #Retorna: True si se reactivó, False si falló
+    #Retorna: True si se reactivÃ³, False si fallÃ³
 
     try:
         conn = get_connection()
@@ -136,8 +136,8 @@ def reactivar_facultad(id_facultad):
 
 def obtener_facultad_por_id(id_facultad):
     
-    #Obtiene los datos de una facultad específica
-    #Parámetros:
+    #Obtiene los datos de una facultad especÃ­fica
+    #ParÃ¡metros:
         #- id_facultad: int - ID de la facultad
     #Retorna: diccionario con los datos, o None si no existe
     

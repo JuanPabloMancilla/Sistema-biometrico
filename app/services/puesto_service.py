@@ -1,4 +1,4 @@
-from app.database.database import get_connection
+﻿from app.database.database import get_connection
 
 def obtener_todas_carreras():
     
@@ -38,11 +38,11 @@ def obtener_todas_carreras():
 def crear_carrera(nombre, id_facultad, estado=1):
     
     #Inserta una nueva carrera en la base de datos
-    #Parámetros:
+    #ParÃ¡metros:
         #- nombre: str - Nombre de la carrera
         #- id_facultad: int - ID de la facultad a la que pertenece
         #- estado: int - 1=activa, 0=inactiva (default: 1)
-    #Retorna: True si se creó, False si falló
+    #Retorna: True si se creÃ³, False si fallÃ³
     
     try:
         conn = get_connection()
@@ -66,12 +66,12 @@ def crear_carrera(nombre, id_facultad, estado=1):
 def actualizar_carrera(id_carrera, nombre, id_facultad, estado):
     
     #Actualiza una carrera existente
-    #Parámetros:
+    #ParÃ¡metros:
         #- id_carrera: int - ID de la carrera a editar
         #- nombre: str - Nuevo nombre
         #- id_facultad: int - Nueva facultad
         #- estado: int - Nuevo estado (1=activa, 0=inactiva)
-    #Retorna: True si se actualizó, False si falló
+    #Retorna: True si se actualizÃ³, False si fallÃ³
     
     try:
         conn = get_connection()
@@ -92,7 +92,7 @@ def actualizar_carrera(id_carrera, nombre, id_facultad, estado):
         return False
 
 def desactivar_carrera(id_carrera):
-    """Desactiva una carrera sin eliminarla físicamente"""
+    """Desactiva una carrera sin eliminarla fÃ­sicamente"""
     try:
         conn = get_connection()
         cursor = conn.cursor()
@@ -134,8 +134,8 @@ def reactivar_carrera(id_carrera):
 
 def obtener_carrera_por_id(id_carrera):
     
-    #Obtiene los datos de una carrera específica
-    #Parámetros:
+    #Obtiene los datos de una carrera especÃ­fica
+    #ParÃ¡metros:
         #- id_carrera: int - ID de la carrera
     #Retorna: diccionario con los datos, o None si no existe
     

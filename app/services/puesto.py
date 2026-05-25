@@ -1,4 +1,4 @@
-from app.database.database import get_connection
+﻿from app.database.database import get_connection
 
 def insertar_carrera(nombre, id_facultad):
     conn = get_connection()

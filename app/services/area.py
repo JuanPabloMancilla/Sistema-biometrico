@@ -1,4 +1,4 @@
-from app.database.database import get_connection
+﻿from app.database.database import get_connection
 from datetime import datetime
 
 def insertar_facultad(nombre):

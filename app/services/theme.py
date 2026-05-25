@@ -1,12 +1,14 @@
 COLORS = {
-    "bg": ("#F8FAFC", "#0F172A"),
-    "sidebar": ("#FFFFFF", "#020617"),
-    "card": ("#FFFFFF", "#1E293B"),
-    "text": ("#000000", "#FFFFFF"),
-    "subtext": ("#64748B", "#94A3B8"),
-    "border": ("#E2E8F0", "#334155"),
-    "selected": ("#1E293B", "#38BDF8"),
-    "primary": "#1E293B",
-    "hover": ("#F1F5F9", "#374151")
+    "bg": ("#F4F7FA", "#0B0B0B"),
+    "sidebar": ("#FFFFFF", "#101010"),
+    "card": ("#FFFFFF", "#171717"),
+    "text": ("#111827", "#F5F5F5"),
+    "subtext": ("#64748B", "#BDBDBD"),
+    "border": ("#D8E0EA", "#2F2F2F"),
+    "selected": ("#E8F7EF", "#143522"),
+    "primary": "#15803D",
+    "primary_hover": "#166534",
+    "accent": "#2563EB",
+    "hover": ("#EDF2F7", "#242424")
 
 }

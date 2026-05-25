@@ -1,4 +1,4 @@
-import json
+﻿import json
 import os
 import shutil
 import customtkinter as ctk
@@ -14,10 +14,10 @@ _DATA_FILE = os.path.join(_DATA_DIR, "perfil_usuario.json")
 _FOTO_DIR  = os.path.join(_DATA_DIR, "fotos")
 
 _DEFAULTS = {
-    "nombre":   "ADMINISTRADOR DEL SISTEMA",
-    "correo":   "admin@universidad.edu.mx",
+    "nombre":   "ADMINISTRADOR EMPRESARIAL",
+    "correo":   "admin@empresa.com",
     "tel":      "5512345678",
-    "facultad": "ADMINISTRACIÓN CENTRAL",
+    "facultad": "DIRECCIÓN OPERATIVA",
     "foto":     None,
 }
 def _cargar_datos() -> dict:
@@ -92,7 +92,7 @@ class AccountView(ctk.CTkFrame):
                 "content_pad": 8,
                 "header_y": (18, 10),
                 "card_pad": 6,
-                "banner_h": 138,
+            "banner_h": 112,
                 "avatar": 70,
                 "field_h": 62,
                 "btn_h": 44,
@@ -102,7 +102,7 @@ class AccountView(ctk.CTkFrame):
             "content_pad": 30,
             "header_y": (40, 20),
             "card_pad": 30,
-            "banner_h": 160,
+            "banner_h": 126,
             "avatar": 90,
             "field_h": 70,
             "btn_h": 50,
@@ -182,7 +182,7 @@ class AccountView(ctk.CTkFrame):
     def _seleccionar_foto(self):
         ruta_origen = filedialog.askopenfilename(
             title="Seleccionar foto de perfil",
-            filetypes=[("Imágenes", "*.png *.jpg *.jpeg *.webp *.bmp *.gif")]
+            filetypes=[("ImÃ¡genes", "*.png *.jpg *.jpeg *.webp *.bmp *.gif")]
         )
         if not ruta_origen:
             return
@@ -204,57 +204,30 @@ class AccountView(ctk.CTkFrame):
 
         self._pack_header(
             self,
-<<<<<<< HEAD
-            "⚙️ " + AppContext.t("Configuración Cuenta") if self.is_compact else "⚙️   " + AppContext.t("Configuración Cuenta"),
-=======
-            AppContext.t("⚙️ Configuración Cuenta") if self.is_compact else AppContext.t("⚙️   Configuración Cuenta"),
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
-            AppContext.t("Configura tu perfil y preferencias"),
-            "✏️ " + AppContext.t("Editar" if self.is_compact else "Editar Perfil"),
+            AppContext.t("Ajustes"),
+            AppContext.t("Perfil administrativo y preferencias del sistema"),
+            AppContext.t("Editar" if self.is_compact else "Editar Perfil"),
             self.abrir_formulario_edicion,
         )
 
         self.container = ctk.CTkScrollableFrame(self, fg_color="transparent")
         self.container.pack(expand=True, fill="both", padx=l["page_pad"])
 
-        self.create_profile_banner(is_editing=False)
         self.create_customization_card()
 
-        ctk.CTkLabel(
-            self.container,
-<<<<<<< HEAD
-            text="📋 " + AppContext.t("Detalles de la Cuenta"),
-=======
-            text=" " + AppContext.t("Detalles de la Cuenta"),
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
-            font=self.font_sub,
-            text_color=COLORS["text"],
-        ).pack(anchor="w", padx=l["card_pad"], pady=(14, 8))
-
-<<<<<<< HEAD
-        self.create_read_only_field(AppContext.t("Nombres"),  self.datos["nombre"],   "👤")
-        self.create_read_only_field(AppContext.t("Correo"),   self.datos["correo"],   "✉️")
-        self.create_read_only_field(AppContext.t("Teléfono"), self.datos["tel"],      "📞")
-        self.create_read_only_field(AppContext.t("Facultad"), self.datos["facultad"], "🏫")
+        self.create_read_only_field(AppContext.t("Nombres"),  self.datos["nombre"],   "")
+        self.create_read_only_field(AppContext.t("Correo"),   self.datos["correo"],   "")
+        self.create_read_only_field(AppContext.t("TelÃ©fono"), self.datos["tel"],      "")
+        self.create_read_only_field(AppContext.t("Facultad"), self.datos["facultad"], "")
 
         ctk.CTkButton(
             self.container,
-            text="🚪 " + AppContext.t("Cerrar Sesión"),
-=======
-        self.create_read_only_field(AppContext.t("Nombres"),  self.datos["nombre"],   "??")
-        self.create_read_only_field(AppContext.t("Correo"),   self.datos["correo"],   "??")
-        self.create_read_only_field(AppContext.t("Telófono"), self.datos["tel"],      "??")
-        self.create_read_only_field(AppContext.t("Facultad"), self.datos["facultad"], "???")
-
-        ctk.CTkButton(
-            self.container,
-            text="?? " + AppContext.t("Cerrar Sesión"),
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
+            text=AppContext.t("Cerrar SesiÃ³n"),
             fg_color="#FFF1F2",
             text_color="#E11D48",
             hover_color="#FEE2E2",
             height=l["btn_h"],
-            corner_radius=12,
+            corner_radius=8,
             font=self.font_sub,
             command=self.on_logout,
         ).pack(fill="x", pady=(24, 45), padx=l["card_pad"])
@@ -264,9 +237,11 @@ class AccountView(ctk.CTkFrame):
         avatar_size = l["avatar"]
         card = ctk.CTkFrame(
             self.container,
-            fg_color=COLORS["primary"],
-            corner_radius=18,
+            fg_color=COLORS["card"],
+            corner_radius=8,
             height=l["banner_h"],
+            border_width=1,
+            border_color=COLORS["border"],
         )
         card.pack(fill="x", pady=8, padx=l["card_pad"])
         card.pack_propagate(False)
@@ -295,29 +270,21 @@ class AccountView(ctk.CTkFrame):
             avatar_frame = ctk.CTkFrame(card, width=avatar_size, height=avatar_size, corner_radius=avatar_size // 2, fg_color=COLORS["hover"])
             avatar_frame.place(x=avatar_x, rely=0.5, anchor="w")
             avatar_frame.pack_propagate(False)
-<<<<<<< HEAD
-            ctk.CTkLabel(avatar_frame, text="👤", font=("Inter", 32 if self.is_compact else 40)).place(relx=0.5, rely=0.5, anchor="center")
-=======
             ctk.CTkLabel(avatar_frame, text="", font=("Inter", 32 if self.is_compact else 40)).place(relx=0.5, rely=0.5, anchor="center")
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
 
         if is_editing:
             ctk.CTkLabel(
                 card,
                 text=AppContext.t("Editar Registro..."),
                 font=title_font,
-                text_color="#FFFFFF",
+                text_color=COLORS["text"],
                 wraplength=wrap,
                 justify="left",
             ).place(x=text_x, rely=0.35, anchor="w")
 
             ctk.CTkButton(
                 card,
-<<<<<<< HEAD
-                text="📷 " + AppContext.t("Actualizar Foto"),
-=======
-                text=" " + AppContext.t("Actualizar Foto"),
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
+                text=AppContext.t("Actualizar Foto"),
                 font=("Inter", 9 if self.is_compact else 10, "bold"),
                 fg_color="#38BDF8",
                 text_color="#082736",
@@ -338,14 +305,14 @@ class AccountView(ctk.CTkFrame):
                 card,
                 text=AppContext.t("ADMINISTRADOR DEL SISTEMA"),
                 font=role_font,
-                text_color="#38BDF8",
+                text_color=COLORS["primary"],
             ).place(x=text_x, rely=0.62, anchor="w")
     def create_customization_card(self):
         l = self._layout()
         card = ctk.CTkFrame(
             self.container,
             fg_color=COLORS["card"],
-            corner_radius=15,
+            corner_radius=8,
             border_width=1,
             border_color=COLORS["border"],
         )
@@ -353,11 +320,7 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             card,
-<<<<<<< HEAD
-            text="🎨 " + AppContext.t("Personalización"),
-=======
-            text="?? " + AppContext.t("Personalización"),
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
+            text=AppContext.t("PersonalizaciÃ³n"),
             font=self.font_sub,
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=16, pady=(14, 8))
@@ -367,7 +330,7 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             f2,
-            text="🌐 " + AppContext.t("Idioma del Sistema"),
+            text=AppContext.t("Idioma del Sistema"),
             font=self.font_normal,
             text_color=COLORS["text"],
         ).pack(side="left", anchor="w")
@@ -425,7 +388,7 @@ class AccountView(ctk.CTkFrame):
             self.container,
             fg_color=COLORS["card"],
             height=l["field_h"],
-            corner_radius=12,
+            corner_radius=8,
             border_width=1,
             border_color=COLORS["border"],
         )
@@ -453,7 +416,7 @@ class AccountView(ctk.CTkFrame):
         f = ctk.CTkFrame(
             parent,
             fg_color=COLORS["card"],
-            corner_radius=12,
+            corner_radius=8,
             border_width=1,
             border_color=COLORS["border"],
         )
@@ -482,7 +445,7 @@ class AccountView(ctk.CTkFrame):
         f = ctk.CTkFrame(
             parent,
             fg_color=COLORS["card"],
-            corner_radius=12,
+            corner_radius=8,
             border_width=1,
             border_color=COLORS["border"],
         )
@@ -514,12 +477,8 @@ class AccountView(ctk.CTkFrame):
 
         self._pack_header(
             self,
-<<<<<<< HEAD
-            "✏️ " + AppContext.t("Editar Registro") if self.is_compact else "✏️   " + AppContext.t("Editar Registro"),
-=======
-            AppContext.t("?? Editar Registro") if self.is_compact else AppContext.t("??   Editar Registro"),
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
-            AppContext.t("Modifica tu información personal"),
+            AppContext.t("Editar Registro") if self.is_compact else AppContext.t("Editar Registro"),
+            AppContext.t("Modifica tu informaciÃ³n personal"),
         )
 
         form_scroll = ctk.CTkScrollableFrame(self, fg_color="transparent")
@@ -535,39 +494,25 @@ class AccountView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             form_scroll,
-<<<<<<< HEAD
-            text="👤 " + AppContext.t("Información Personal"),
-=======
-            text="?? " + AppContext.t("Información Personal"),
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
+            text=AppContext.t("InformaciÃ³n Personal"),
             font=self.font_sub,
             text_color=COLORS["text"],
         ).pack(anchor="w", padx=l["card_pad"], pady=(14, 8))
 
-        self.create_edit_field(form_scroll, AppContext.t("Nombres"), "👤", "Nombre completo", self.var_nombre)
+        self.create_edit_field(form_scroll, AppContext.t("Nombres"), "", "Nombre completo", self.var_nombre)
 
         if self.is_compact:
-<<<<<<< HEAD
-            self.create_edit_field(form_scroll, AppContext.t("Correo"), "✉️", "correo@dominio.com", self.var_correo)
-            self.create_edit_field(form_scroll, AppContext.t("Teléfono"), "📞", "10 dígitos", self.var_tel)
-=======
-            self.create_edit_field(form_scroll, AppContext.t("Correo"), "??", "correo@dominio.com", self.var_correo)
-            self.create_edit_field(form_scroll, AppContext.t("Telófono"), "??", "10 dígitos", self.var_tel)
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
+            self.create_edit_field(form_scroll, AppContext.t("Correo"), "", "correo@dominio.com", self.var_correo)
+            self.create_edit_field(form_scroll, AppContext.t("TelÃ©fono"), "", "10 dÃ­gitos", self.var_tel)
         else:
             row2 = ctk.CTkFrame(form_scroll, fg_color="transparent")
             row2.pack(fill="x", padx=l["card_pad"], pady=0)
             row2.columnconfigure(0, weight=1)
             row2.columnconfigure(1, weight=1)
-<<<<<<< HEAD
-            self.create_edit_field_grid(row2, AppContext.t("Correo"), "✉️", "correo@dominio.com", self.var_correo, col=0)
-            self.create_edit_field_grid(row2, AppContext.t("Teléfono"), "📞", "10 dígitos", self.var_tel, col=1)
-=======
-            self.create_edit_field_grid(row2, AppContext.t("Correo"), "??", "correo@dominio.com", self.var_correo, col=0)
-            self.create_edit_field_grid(row2, AppContext.t("Telófono"), "??", "10 dígitos", self.var_tel, col=1)
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
+            self.create_edit_field_grid(row2, AppContext.t("Correo"), "", "correo@dominio.com", self.var_correo, col=0)
+            self.create_edit_field_grid(row2, AppContext.t("TelÃ©fono"), "", "10 dÃ­gitos", self.var_tel, col=1)
 
-        self.create_edit_field(form_scroll, AppContext.t("Facultad"), "🏫", "Nombre de la facultad", self.var_facultad)
+        self.create_edit_field(form_scroll, AppContext.t("Facultad"), "", "Nombre del área", self.var_facultad)
 
         btn_row = ctk.CTkFrame(form_scroll, fg_color="transparent")
         btn_row.pack(fill="x", padx=l["card_pad"], pady=(16, 40))
@@ -575,12 +520,12 @@ class AccountView(ctk.CTkFrame):
         if self.is_compact:
             ctk.CTkButton(
                 btn_row,
-                text="💾 " + AppContext.t("Guardar Cambios"),
+                text=AppContext.t("Guardar Cambios"),
                 fg_color=COLORS["primary"],
                 text_color="#FFFFFF",
                 hover_color=COLORS.get("primary_hover", COLORS["primary"]),
                 height=l["btn_h"],
-                corner_radius=12,
+                corner_radius=8,
                 font=self.font_sub,
                 command=self.guardar_cambios,
             ).pack(fill="x", pady=(0, 8))
@@ -594,19 +539,19 @@ class AccountView(ctk.CTkFrame):
                 border_color=COLORS["border"],
                 hover_color=COLORS["hover"],
                 height=l["btn_h"],
-                corner_radius=12,
+                corner_radius=8,
                 font=self.font_sub,
                 command=self.crear_vista_lectura,
             ).pack(fill="x")
         else:
             ctk.CTkButton(
                 btn_row,
-                text="💾 " + AppContext.t("Guardar Cambios"),
+                text=AppContext.t("Guardar Cambios"),
                 fg_color=COLORS["primary"],
                 text_color="#FFFFFF",
                 hover_color=COLORS.get("primary_hover", COLORS["primary"]),
                 height=l["btn_h"],
-                corner_radius=12,
+                corner_radius=8,
                 font=self.font_sub,
                 command=self.guardar_cambios,
             ).pack(side="left", expand=True, fill="x", padx=(0, 8))
@@ -620,7 +565,7 @@ class AccountView(ctk.CTkFrame):
                 border_color=COLORS["border"],
                 hover_color=COLORS["hover"],
                 height=l["btn_h"],
-                corner_radius=12,
+                corner_radius=8,
                 font=self.font_sub,
                 command=self.crear_vista_lectura,
             ).pack(side="left", expand=True, fill="x", padx=(8, 0))

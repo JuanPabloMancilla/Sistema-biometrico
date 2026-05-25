@@ -1,4 +1,4 @@
-import os
+﻿import os
 import customtkinter as ctk
 import numpy as np
 from scipy.interpolate import make_interp_spline
@@ -7,8 +7,8 @@ from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from app.views.user_management_view import UserManagementView
 from app.views.account_view import AccountView, _cargar_datos
-from app.views.facultad_management_view import FacultadManagementView
-from app.views.carrera_management_view import CarreraManagementView
+from app.views.area_management_view import AreaManagementView
+from app.views.puesto_management_view import PuestoManagementView
 from app.services.theme import COLORS
 from app.views.app_context import AppContext
 from datetime import datetime
@@ -23,8 +23,8 @@ class DashboardView(ctk.CTkFrame):
 
         self.btn_panel      = None
         self.btn_users      = None
-        self.btn_facultades = None
-        self.btn_carreras   = None
+        self.btn_areas = None
+        self.btn_puestos   = None
         self.btn_account    = None
         self.bind("<Configure>", self._on_resize)
         self.on_back = on_back
@@ -53,27 +53,15 @@ class DashboardView(ctk.CTkFrame):
         self.mostrar_panel_control()
     
     def construir_menu(self, parent):
-<<<<<<< HEAD
-        self.crear_btn_overlay(parent, "🏠 " + AppContext.t("Panel de Control"),      self.mostrar_panel_control)
-        self.crear_btn_overlay(parent, "👥 " + AppContext.t("Gestión de Usuarios"),   self.mostrar_gestion_usuarios)
-        self.crear_btn_overlay(parent, "🏫 " + AppContext.t("Gestión de Facultades"), self.mostrar_gestion_facultades)
-        self.crear_btn_overlay(parent, "🎓 " + AppContext.t("Gestión de Carreras"),   self.mostrar_gestion_carreras)
-        self.crear_btn_overlay(parent, "⚙️ " + AppContext.t("Configuración"),         self.mostrar_cuenta)
+        self.crear_btn_overlay(parent, AppContext.t("Panel de Control"),      self.mostrar_panel_control)
+        self.crear_btn_overlay(parent, AppContext.t("GestiÃ³n de Usuarios"),   self.mostrar_gestion_usuarios)
+        self.crear_btn_overlay(parent, AppContext.t("GestiÃ³n de Facultades"), self.mostrar_gestion_areas)
+        self.crear_btn_overlay(parent, AppContext.t("GestiÃ³n de Carreras"),   self.mostrar_gestion_puestos)
+        self.crear_btn_overlay(parent, AppContext.t("ConfiguraciÃ³n"),         self.mostrar_cuenta)
 
         ctk.CTkButton(
             parent,
-            text="🚪 " + AppContext.t("Cerrar Sesión"),
-=======
-        self.crear_btn_overlay(parent, "🏠" + AppContext.t("Panel de Control"),      self.mostrar_panel_control)
-        self.crear_btn_overlay(parent, "👥" + AppContext.t("Gestion de Usuarios"),   self.mostrar_gestion_usuarios)
-        self.crear_btn_overlay(parent, "🏫" + AppContext.t("Gestion de Facultades"), self.mostrar_gestion_facultades)
-        self.crear_btn_overlay(parent, "💼" + AppContext.t("Gestion de Carreras"),   self.mostrar_gestion_carreras)
-        self.crear_btn_overlay(parent, "⚙️" + AppContext.t("Configuración"),         self.mostrar_cuenta)
-
-        ctk.CTkButton(
-            parent,
-            text="?? " + AppContext.t("Cerrar Sesión"),
->>>>>>> becb3e8687747707e1d0cb405446f572a2a3f941
+            text=AppContext.t("Cerrar SesiÃ³n"),
             fg_color="transparent",
             text_color="#EF4444",
             command=self.on_back
@@ -98,12 +86,12 @@ class DashboardView(ctk.CTkFrame):
         header.pack_propagate(False)
 
         ctk.CTkLabel(
-            header, text="K O D A",
-            font=("Times New Roman", 32, "bold"), text_color="#3C054F"
+            header, text="SECUREWORK",
+            font=("Inter", 22, "bold"), text_color=COLORS["primary"]
         ).pack(side="left", padx=(5, 0))
 
         ctk.CTkButton(
-            header, text="✕", width=22, height=22,
+            header, text="", width=22, height=22,
             fg_color="transparent", text_color=COLORS["text"],
             hover_color=COLORS["hover"], font=("Inter", 14, "bold"),
             command=self.cerrar_overlay
@@ -152,8 +140,8 @@ class DashboardView(ctk.CTkFrame):
 
         self.btn_panel      = None
         self.btn_users      = None
-        self.btn_facultades = None
-        self.btn_carreras   = None
+        self.btn_areas = None
+        self.btn_puestos   = None
         self.btn_account    = None
 
         if hasattr(self, 'vista_actual_func') and self.vista_actual_func:
@@ -166,25 +154,24 @@ class DashboardView(ctk.CTkFrame):
             ctk.set_appearance_mode("dark")
         else:
             ctk.set_appearance_mode("light")
-        self.actualizar_grafica()
-        self.render_mini_tabla_accesos_data()
+        self.refrescar_idioma_completo()
 
     def limpiar_derecha(self):
         for widget in self.content_container.winfo_children():
             widget.destroy()
 
     def actualizar_navegacion(self, btn_act):
-        btns = [self.btn_panel, self.btn_users, self.btn_facultades, self.btn_carreras, self.btn_account]
+        btns = [self.btn_panel, self.btn_users, self.btn_areas, self.btn_puestos, self.btn_account]
         for b in btns:
             if not b or not b.winfo_exists():
                 continue
             if b == btn_act:
-                b.configure(fg_color=COLORS["selected"], text_color=("white", "black"), hover_color=COLORS["selected"])
+                b.configure(fg_color=COLORS["selected"], text_color=COLORS["primary"], hover_color=COLORS["selected"])
             else:
-                b.configure(fg_color="transparent", text_color=COLORS["text"], hover_color="#F1F5F9")
+                b.configure(fg_color="transparent", text_color=COLORS["text"], hover_color=COLORS["hover"])
 
     # -------------------------------------------------------------
-    # NAVEGACI�N
+    # NAVEGACIï¿½N
     # -------------------------------------------------------------
     def mostrar_panel_control(self):
         self.vista_actual_func = self.mostrar_panel_control
@@ -200,19 +187,19 @@ class DashboardView(ctk.CTkFrame):
             self.actualizar_navegacion(self.btn_users)
         UserManagementView(self.content_container).pack(fill="both", expand=True, padx=40)
 
-    def mostrar_gestion_facultades(self):
-        self.vista_actual_func = self.mostrar_gestion_facultades
+    def mostrar_gestion_areas(self):
+        self.vista_actual_func = self.mostrar_gestion_areas
         self.limpiar_derecha()
         if not self.is_compact:
-            self.actualizar_navegacion(self.btn_facultades)
-        FacultadManagementView(self.content_container).pack(fill="both", expand=True, padx=40)
+            self.actualizar_navegacion(self.btn_areas)
+        AreaManagementView(self.content_container).pack(fill="both", expand=True, padx=40)
 
-    def mostrar_gestion_carreras(self):
-        self.vista_actual_func = self.mostrar_gestion_carreras
+    def mostrar_gestion_puestos(self):
+        self.vista_actual_func = self.mostrar_gestion_puestos
         self.limpiar_derecha()
         if not self.is_compact:
-            self.actualizar_navegacion(self.btn_carreras)
-        CarreraManagementView(self.content_container).pack(fill="both", expand=True, padx=40)
+            self.actualizar_navegacion(self.btn_puestos)
+        PuestoManagementView(self.content_container).pack(fill="both", expand=True, padx=40)
 
     def mostrar_cuenta(self):
         self.vista_actual_func = self.mostrar_cuenta
@@ -234,12 +221,12 @@ class DashboardView(ctk.CTkFrame):
             if hasattr(self, 'sidebar_frame') and self.sidebar_frame.winfo_exists():
                 self.sidebar_frame.destroy()
             self.create_sidebar()
-            # Restaurar resaltado del bot�n de cuenta
+            # Restaurar resaltado del botï¿½n de cuenta
             if self.btn_account and self.btn_account.winfo_exists():
                 self.actualizar_navegacion(self.btn_account)
 
     # -------------------------------------------------------------
-    # ESTAD�STICAS
+    # ESTADï¿½STICAS
     # -------------------------------------------------------------
     def obtener_estadisticas_dashboard(self):
         conn = get_connection()
@@ -271,12 +258,12 @@ class DashboardView(ctk.CTkFrame):
         header.pack(fill="x", padx=padx_main, pady=(10, 20))
         ctk.CTkLabel(
             header,
-            text="🏠  " + AppContext.t("Panel de Control"),
-            font=("Inter", 28, "bold"), text_color=COLORS["text"]
+            text=AppContext.t("Inicio"),
+            font=("Inter", 30, "bold"), text_color=COLORS["text"]
         ).pack(anchor="w")
         ctk.CTkLabel(
             header,
-            text=AppContext.t("Resumen general y actividad reciente"),
+            text=AppContext.t("Resumen operativo de accesos, personal y alertas"),
             font=("Inter", 16), text_color=COLORS["subtext"]
         ).pack(anchor="w")
 
@@ -288,21 +275,21 @@ class DashboardView(ctk.CTkFrame):
 
         total_registros, accesos_hoy, autorizados, denegados = self.obtener_estadisticas_dashboard()
 
-        self.create_stat_card(stats_frame, "📋 " + AppContext.t("Total Registros"), str(total_registros), "#3B82F6", 0)
-        self.create_stat_card(stats_frame, "📅 " + AppContext.t("Accesos Hoy"),     str(accesos_hoy),     "#6366F1", 1)
-        self.create_stat_card(stats_frame, "✅ " + AppContext.t("Autorizados"),      str(autorizados),     "#10B981", 2)
-        self.create_stat_card(stats_frame, "⛔ " + AppContext.t("Denegados"),        str(denegados),       "#EF4444", 3)
+        self.create_stat_card(stats_frame, AppContext.t("Personal activo"), str(total_registros), "#15803D", 0)
+        self.create_stat_card(stats_frame, AppContext.t("Eventos de hoy"),  str(accesos_hoy),     "#2563EB", 1)
+        self.create_stat_card(stats_frame, AppContext.t("Accesos validos"), str(autorizados),     "#0F766E", 2)
+        self.create_stat_card(stats_frame, AppContext.t("Alertas"),         str(denegados),       "#DC2626", 3)
 
         graph_box = ctk.CTkFrame(
             main_scroll, fg_color=COLORS["card"],
-            corner_radius=20, border_width=1, border_color=COLORS["border"], height=280
+            corner_radius=8, border_width=1, border_color=COLORS["border"], height=280
         )
         graph_box.pack(fill="x", padx=40, pady=20)
         graph_box.pack_propagate(False)
     
         ctk.CTkLabel(
             graph_box,
-            text="📈 " + AppContext.t("Tendencia de Accesos por Hora"),
+            text=AppContext.t("Tendencia de Accesos por Hora"),
             font=("Inter", 18, "bold"), text_color=COLORS["text"]
         ).pack(anchor="w", padx=30, pady=20)
 
@@ -331,13 +318,13 @@ class DashboardView(ctk.CTkFrame):
         header_tabla.pack(fill="x", padx=75, pady=(20, 10))
         ctk.CTkLabel(
             header_tabla,
-            text=AppContext.t("Registro de últimos accesos"),
+            text=AppContext.t("Registro de Ãºltimos accesos"),
             font=("Inter", 18, "bold"), text_color=COLORS["text"]
         ).pack(anchor="w")
 
         self.contenedor_tabla = ctk.CTkFrame(
             main_scroll, fg_color="white",
-            corner_radius=15, border_width=1, border_color="#E2E8F0"
+            corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
         self.contenedor_tabla.pack(fill="x", padx=40, pady=(0, 40))
         self.render_mini_tabla_accesos_data()
@@ -492,7 +479,7 @@ class DashboardView(ctk.CTkFrame):
             top = ctk.CTkFrame(card, fg_color="transparent")
             top.pack(fill="x", padx=14, pady=(12, 4))
 
-            ctk.CTkLabel(top, text="✅" if ok else "❌", font=("Inter", 22)).pack(side="left", padx=(0, 10))
+            ctk.CTkLabel(top, text="" if ok else "âŒ", font=("Inter", 22)).pack(side="left", padx=(0, 10))
 
             info = ctk.CTkFrame(top, fg_color="transparent")
             info.pack(side="left", fill="x", expand=True)
@@ -502,7 +489,7 @@ class DashboardView(ctk.CTkFrame):
                 font=("Inter", 13, "bold"), text_color=text_color, anchor="w"
             ).pack(anchor="w", fill="x")
             ctk.CTkLabel(
-                info, text=f"ID: {cuenta_txt}  •  {correo_txt}",
+                info, text=f"ID: {cuenta_txt}  |  {correo_txt}",
                 font=("Inter", 11), text_color=subtext_color, anchor="w"
             ).pack(anchor="w", fill="x")
 
@@ -518,12 +505,12 @@ class DashboardView(ctk.CTkFrame):
             bottom = ctk.CTkFrame(card, fg_color="transparent")
             bottom.pack(fill="x", padx=14, pady=(0, 12))
             ctk.CTkLabel(
-                bottom, text=f"🕒 {fecha_hora}   •   {motivo_txt}",
+                bottom, text=f"{fecha_hora}   |   {motivo_txt}",
                 font=("Inter", 10), text_color=subtext_color, anchor="w"
             ).pack(anchor="w")
     def create_sidebar(self):
         self.sidebar_frame = ctk.CTkFrame(
-            self, width=280, corner_radius=0,
+            self, width=250, corner_radius=0,
             fg_color=COLORS["sidebar"],
             border_width=1, border_color=COLORS["border"]
         )
@@ -533,8 +520,8 @@ class DashboardView(ctk.CTkFrame):
         header = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
         header.pack(fill="x", pady=(15, 0), padx=15)
         ctk.CTkLabel(
-            header, text="K O D A",
-            font=("Times New Roman", 38, "bold"), text_color="#3C054F"
+            header, text="SECUREWORK",
+            font=("Inter", 24, "bold"), text_color=COLORS["primary"]
         ).pack(side="left", padx=15)
 
         if not self.is_compact:
@@ -542,7 +529,7 @@ class DashboardView(ctk.CTkFrame):
             datos_perfil = _cargar_datos()
 
             profile = ctk.CTkFrame(self.sidebar_frame, fg_color="transparent")
-            profile.pack(pady=(40, 15), padx=20, fill="x")
+            profile.pack(pady=(28, 20), padx=20, fill="x")
 
             # Intentar cargar foto circular del perfil
             ruta_foto = datos_perfil.get("foto")
@@ -581,7 +568,7 @@ class DashboardView(ctk.CTkFrame):
                 ).place(relx=0.5, rely=0.5, anchor="center")
             else:
                 # Sin foto: mostrar emoji de persona
-                ctk.CTkLabel(profile, text="👤", font=("Arial", 35)).pack(side="left")
+                ctk.CTkLabel(profile, text="", font=("Arial", 35)).pack(side="left")
 
             txt_info = ctk.CTkFrame(profile, fg_color="transparent")
             txt_info.pack(side="left", padx=10)
@@ -597,27 +584,27 @@ class DashboardView(ctk.CTkFrame):
             ).pack(anchor="w")
 
             ctk.CTkLabel(
-                txt_info, text=AppContext.t("Control Biométrico"),
+                txt_info, text=AppContext.t("Control BiomÃ©trico"),
                 font=("Inter", 11), text_color=COLORS["subtext"]
             ).pack(anchor="w")
 
-        self.btn_panel      = self.crear_btn_sidebar(self.sidebar_frame, "🏠   " + AppContext.t("Panel de Control"),      self.mostrar_panel_control)
-        self.btn_users      = self.crear_btn_sidebar(self.sidebar_frame, "👥   " + AppContext.t("Gestión de Usuarios"),    self.mostrar_gestion_usuarios)
-        self.btn_facultades = self.crear_btn_sidebar(self.sidebar_frame, "🏫   " + AppContext.t("Gestión de Facultades"),  self.mostrar_gestion_facultades)
-        self.btn_carreras   = self.crear_btn_sidebar(self.sidebar_frame, "🎓   " + AppContext.t("Gestión de Carreras"),    self.mostrar_gestion_carreras)
-        self.btn_account    = self.crear_btn_sidebar(self.sidebar_frame, "⚙️   " + AppContext.t("Configuración Cuenta"),   self.mostrar_cuenta)
+        self.btn_panel      = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Inicio"),   self.mostrar_panel_control)
+        self.btn_users      = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Personal"), self.mostrar_gestion_usuarios)
+        self.btn_areas      = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Áreas"),    self.mostrar_gestion_areas)
+        self.btn_puestos    = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Puestos"),  self.mostrar_gestion_puestos)
+        self.btn_account    = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Ajustes"),  self.mostrar_cuenta)
 
         ctk.CTkButton(
             self.sidebar_frame,
-            text="🚪 " + AppContext.t("Cerrar Sesión"),
+            text=AppContext.t("Cerrar SesiÃ³n"),
             fg_color="transparent", text_color="#EF4444",
             font=("Inter", 14, "bold"), command=self.on_back
         ).pack(side="bottom", pady=30, padx=20, fill="x")
 
     def create_stat_card(self, master, title, value, color, index):
         card = ctk.CTkFrame(
-            master, height=100, fg_color=COLORS["card"],
-            corner_radius=15, border_width=1, border_color=COLORS["border"]
+            master, height=104, fg_color=COLORS["card"],
+            corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
         if self.is_compact:
             card.configure(height=80)
@@ -632,9 +619,9 @@ class DashboardView(ctk.CTkFrame):
 
     def crear_btn_sidebar(self, master, texto, comando):
         btn = ctk.CTkButton(
-            master, text=texto, height=45, anchor="w",
+            master, text=texto, height=44, anchor="w",
             fg_color="transparent", text_color=COLORS["text"],
-            hover_color=COLORS["hover"], font=("Inter", 16),
+            hover_color=COLORS["hover"], font=("Inter", 15, "bold"),
             command=comando
         )
         btn.pack(pady=6, padx=20, fill="x")
@@ -646,7 +633,7 @@ class DashboardView(ctk.CTkFrame):
 
         if self.is_compact:
             ctk.CTkButton(
-                container, text="☰", width=40, height=40,
+                container, text="", width=40, height=40,
                 fg_color="transparent", text_color=COLORS["text"],
                 command=self.toggle_sidebar_overlay
             ).pack(side="left", padx=20)
@@ -655,13 +642,13 @@ class DashboardView(ctk.CTkFrame):
         wrapper.pack(side="right", padx=40, pady=20)
 
         # Switch de Tema
-        t_f = ctk.CTkFrame(wrapper, fg_color="#E2E8F0", corner_radius=20, width=100, height=38)
+        t_f = ctk.CTkFrame(wrapper, fg_color="#E8EEF5", corner_radius=8, width=100, height=38)
         t_f.pack(side="left", padx=10)
         t_f.pack_propagate(False)
-        ctk.CTkLabel(t_f, text="☀️", font=("Inter", 16)).place(x=20, y=19, anchor="center")
+        ctk.CTkLabel(t_f, text="", font=("Inter", 16)).place(x=20, y=19, anchor="center")
         self.theme_switch = ctk.CTkSwitch(
             t_f, text="", width=40,
-            progress_color="#1D1D1F", command=self.toggle_theme
+            progress_color=COLORS["primary"], command=self.toggle_theme
         )
         if ctk.get_appearance_mode() == "Dark":
             self.theme_switch.select()
@@ -670,22 +657,22 @@ class DashboardView(ctk.CTkFrame):
         self.theme_switch.place(x=65, y=19, anchor="center")
 
         # Selector de Idioma
-        l_c = ctk.CTkFrame(wrapper, fg_color="#E2E8F0", corner_radius=20, height=38)
+        l_c = ctk.CTkFrame(wrapper, fg_color="#E8EEF5", corner_radius=8, height=38)
         l_c.pack(side="left", padx=10)
-        ctk.CTkLabel(l_c, text="🌐", font=("Inter", 16)).pack(side="left", padx=(12, 5))
+        ctk.CTkLabel(l_c, text="", font=("Inter", 16)).pack(side="left", padx=(12, 5))
 
-        color_es = "#1D1D1F" if AppContext.idioma_actual == "es" else "transparent"
+        color_es = COLORS["primary"] if AppContext.idioma_actual == "es" else "transparent"
         txt_es   = "white"   if AppContext.idioma_actual == "es" else COLORS["text"]
-        color_en = "#1D1D1F" if AppContext.idioma_actual == "en" else "transparent"
+        color_en = COLORS["primary"] if AppContext.idioma_actual == "en" else "transparent"
         txt_en   = "white"   if AppContext.idioma_actual == "en" else COLORS["text"]
 
         ctk.CTkButton(
-            l_c, text="ES", width=38, height=28, corner_radius=14,
+            l_c, text="ES", width=38, height=28, corner_radius=6,
             fg_color=color_es, text_color=txt_es,
             command=lambda: self.cambiar_idioma_dashboard("es")
         ).pack(side="left", padx=2, pady=5)
         ctk.CTkButton(
-            l_c, text="EN", width=38, height=28, corner_radius=14,
+            l_c, text="EN", width=38, height=28, corner_radius=6,
             fg_color=color_en, text_color=txt_en,
             command=lambda: self.cambiar_idioma_dashboard("en")
         ).pack(side="left", padx=(2, 10), pady=5)
@@ -708,8 +695,8 @@ class DashboardView(ctk.CTkFrame):
         if self.is_compact:
             self.btn_panel      = None
             self.btn_users      = None
-            self.btn_facultades = None
-            self.btn_carreras   = None
+            self.btn_areas = None
+            self.btn_puestos   = None
             self.btn_account    = None
 
         if hasattr(self, 'vista_actual_func'):

@@ -1,229 +1,309 @@
-# 🗄️ Guía de Configuración - Sistema Biométrico Facial
+# Guia de configuracion - SecureWork
 
-## 📋 Cómo acceder a la base de datos con SQLite Browser
+Esta guia resume como preparar, ejecutar y diagnosticar el sistema biometrico facial SecureWork en Windows y Raspberry Pi.
 
-### 1. 📥 Descargar SQLite Browser
-Ve a: https://sqlitebrowser.org/ y descarga la versión para Windows.
+## 1. Requisitos
 
-### 2. 🔓 Abrir la base de datos
-- Abre SQLite Browser
-- Ve a **File → Open Database**
-- Navega a: `c:\xampp\htdocs\sistema-biometrico\app\database\sistema_biometrico.db`
-- ¡Listo! Verás todas las tablas del sistema
+### Windows
 
-### 3. 📊 Explorar las tablas
-En la pestaña **"Browse Data"** encontrarás:
-- `usuario_rol` - Roles (admin, docente, estudiante)
-- `facultad` - Facultades académicas
-- `carrera` - Carreras disponibles
-- `usuario` - Datos de usuarios
-- `biometria` - Datos biométricos
-- `registro_acceso` - Historial de accesos
+- Python 3.10 recomendado.
+- Camara web disponible.
+- PowerShell.
+- SQLite Browser opcional para inspeccionar la base de datos.
+- Visual Studio Build Tools con C++ si necesitas compilar `dlib`.
 
-## 📦 Dependencias necesarias y comandos de instalación
+### Raspberry Pi
 
-### ⚠️ Importante: Activar entorno virtual primero
+- Raspberry Pi OS con entorno grafico.
+- Camara compatible.
+- Python 3.
+- Fuente externa para cerradura electrica.
+- Rele, buzzer y PIR si se usara hardware fisico.
+
+## 2. Preparar entorno virtual en Windows
+
+Desde la carpeta del proyecto:
+
 ```powershell
-# Activar el entorno virtual
-& c:\xampp\htdocs\sistema-biometrico\.venv\Scripts\Activate.ps1
-```
-
-### 📚 Dependencias principales:
-
-#### 1. **NumPy** - Computación numérica
-```powershell
-pip install numpy==1.24.3
-```
-
-#### 2. **OpenCV (cv2)** - Procesamiento de imágenes
-```powershell
-pip install opencv-python==4.8.1.78
-```
-
-#### 3. **face-recognition** - Reconocimiento facial
-```powershell
-# Esta es la más compleja de instalar
-pip install face-recognition==1.3.0
-
-# Si hay errores, instala dlib primero:
-pip install dlib==19.24.2
-```
-
-#### 4. **CustomTkinter** - Interfaz gráfica moderna
-```powershell
-pip install customtkinter==5.2.2
-```
-
-#### 5. **Pillow** - Manipulación de imágenes
-```powershell
-pip install Pillow==10.0.1
-```
-
-### 🚀 Instalación automática (recomendado):
-```powershell
-# Instalar todas las dependencias de una vez
+cd C:\Users\vinel\Documents\sistema-biometrico
+py -3.10 -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip setuptools wheel
 pip install -r requirements.txt
 ```
 
-## 🛠️ Comandos para usar el proyecto
+Si el entorno ya existe:
 
-### 1. 🗄️ Crear/Inicializar base de datos
+```powershell
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+## 3. Dependencias probadas
+
+El proyecto debe quedar con estas versiones:
+
+```text
+customtkinter==5.2.2
+opencv-contrib-python==4.10.0.84
+numpy==1.26.4
+face-recognition==1.3.0
+Pillow==10.0.1
+dlib==20.0.1
+mediapipe==0.10.14
+```
+
+Verifica dependencias:
+
+```powershell
+python -m pip check
+python -c "import numpy, cv2, mediapipe, face_recognition; print(numpy.__version__, cv2.__version__, mediapipe.__version__)"
+```
+
+Importante: evita `numpy 2.x` en este proyecto. Con `face_recognition/dlib` puede provocar que el encoding facial falle.
+
+## 4. Base de datos
+
+La app verifica/crea la base al iniciar. Para hacerlo manualmente:
+
 ```powershell
 python init_db.py
 ```
 
-### 2. ▶️ Ejecutar la aplicación
+Archivos relevantes:
+
+- Base local: `app/database/sistema_biometrico.db`
+- Esquema y datos: `app/database/schema_and_data.sql`
+- Proyecto SQLite Browser: `app/database/sistema_biometrico.sqbpro`
+
+### Abrir con SQLite Browser
+
+1. Instala SQLite Browser desde `https://sqlitebrowser.org/`.
+2. Abre SQLite Browser.
+3. Usa `File -> Open Database`.
+4. Selecciona `app/database/sistema_biometrico.db`.
+5. Revisa tablas desde `Browse Data`.
+
+Tablas principales:
+
+- `usuario_rol`: roles de usuario.
+- `facultad`: areas/facultades.
+- `carrera`: puestos/carreras.
+- `usuario`: datos de usuarios.
+- `biometria`: datos biometricos asociados.
+- `registro_acceso`: historial de accesos.
+
+## 5. Ejecutar la aplicacion
+
 ```powershell
+.\venv\Scripts\Activate.ps1
 python main.py
 ```
 
-### 3. 🔍 Verificar datos en BD (opcional)
+La aplicacion inicia en la terminal biometrica. Para entrar al panel administrativo:
+
+1. Presiona `Salir` en la terminal.
+2. Inicia sesion en el login.
+3. Credenciales de prueba:
+
+```text
+usuario: 1
+contrasena: 1
+```
+
+## 6. Configuracion de camara
+
+La camara se maneja desde `app/camara/camara.py`.
+
+En PC Windows se usa:
+
+- OpenCV con backend `CAP_DSHOW`.
+- Resolucion 640x480.
+- FPS objetivo 30.
+- Buffer minimo para evitar retraso.
+- Lectura en segundo plano para tomar siempre el frame mas reciente.
+
+En Raspberry Pi se intenta usar `picamera2`.
+
+### Deteccion y reconocimiento
+
+El pipeline esta en `app/detection/detector_rostro.py`:
+
+- MediaPipe detecta rostros rapidamente.
+- `face_recognition/dlib` genera embeddings para comparar identidad.
+- Se reutiliza el ultimo resultado algunos frames para mantener fluidez.
+- Los frames se convierten a `RGB uint8` contiguo para evitar errores de dlib.
+
+## 7. Problemas comunes
+
+### La camara se queda en "Iniciando camara..."
+
+1. Cierra Zoom, Teams, navegador u otra app que use camara.
+2. Revisa que la app no tenga una excepcion en consola.
+3. Ejecuta:
+
 ```powershell
-python -c "from app.database.database import get_connection; conn = get_connection(); cursor = conn.cursor(); cursor.execute('SELECT COUNT(*) FROM usuario'); print(f'Usuarios: {cursor.fetchone()[0]}'); conn.close()"
+python -m pip check
+python -c "import numpy, cv2, face_recognition; print(numpy.__version__, cv2.__version__)"
 ```
 
-## 👤 Crear usuarios de prueba
+Debe mostrar `numpy 1.26.4` y OpenCV `4.10.0`.
 
-### Administrador (tu usuario):
-```sql
-INSERT INTO usuario (nombre, a_paterno, a_materno, fecha_registro, id_rol, id_facultad, id_carrera)
-VALUES ('Juan Pablo', 'Mancilla', 'Rodriguez', datetime('now'), 1, 4, 35);
-```
+### Error: Unsupported image type, must be 8bit gray or RGB image
 
-## 🔧 Solución de problemas comunes
+Este error suele venir de una version incompatible de NumPy con dlib. Repara el entorno:
 
-### ❌ Error: "ModuleNotFoundError: No module named 'cv2'"
 ```powershell
-pip install opencv-python==4.8.1.78
+pip install numpy==1.26.4 opencv-contrib-python==4.10.0.84
+pip install -r requirements.txt
 ```
 
-### ❌ Error: "face_recognition no se instala"
+### MediaPipe imprime advertencias
+
+Mensajes como estos son normales:
+
+```text
+INFO: Created TensorFlow Lite XNNPACK delegate for CPU.
+Feedback manager requires a model with a single signature inference.
+```
+
+No indican fallo de camara.
+
+### No se instala dlib o face-recognition
+
+Recomendado:
+
 ```powershell
-# Windows: Instalar CMake primero
-pip install cmake
-pip install dlib==19.24.2
-pip install face-recognition==1.3.0
+python -m pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
 ```
 
-### ❌ Error: "No se puede acceder a la cámara"
-- Verifica que la cámara esté conectada
-- Prueba cambiando el índice de cámara en el código (0, 1, 2...)
+Si falla en Windows, instala Visual Studio Build Tools con C++ y vuelve a ejecutar el comando.
 
-### ❌ Error: "Foreign Key constraint failed"
-- Asegúrate de ejecutar las inserciones en el orden correcto
-- Verifica que existan las facultades antes de insertar carreras
+### SQLite dice "database is locked"
 
-## 📊 Referencias de IDs
+- Cierra SQLite Browser si esta editando la base.
+- Cierra otra instancia de la app.
+- Espera unos segundos; la conexion usa timeout para evitar fallos rapidos.
 
-### Roles:
-- 1 = admin
+## 8. Datos sensibles y archivos locales
 
-### Facultades:
-- 1 = Facultad de Ciencias Marinas (FACIMAR)
-- 2 = Facultad de Contabilidad y Administración (FCAM)
-- 3 = Escuela de Enfermería
-- 4 = Facultad de Ingeniería Electromecánica (FIE)
+No subas al repositorio:
 
-### Carreras (ejemplos):
-- 1 = Ingeniería Oceánica (IO)
-- 2 = Licenciatura en Sustentabilidad Marina
-- 3 = Contador Público
-- 4 = Licenciatura en Administración
-- 35 = Ingeniería de Software (IS)
+- `encodings.json`
+- `logs_accesos.json`
+- `app/data/perfil_usuario.json`
+- `app/data/fotos/`
+- `app/database/sistema_biometrico.db`
 
-## 👤 Sistema de Roles
+Estos archivos pueden contener datos biometricos, accesos, usuarios o informacion personal.
 
-### ⚠️ **Importante**: Actualmente solo existe el rol "admin"
+## 9. Variables de entorno de hardware
 
-El sistema está diseñado para múltiples roles (admin, docente, estudiante, etc.), pero **inicialmente solo existe el rol de administrador**.
+El archivo `app/config.py` permite ajustar hardware sin tocar codigo:
 
-### 📋 Roles disponibles actualmente:
-- **1 = admin** - Administrador del sistema (único rol disponible)
-
-### 🔄 Para agregar más roles:
-El sistema tiene la infraestructura para múltiples roles a través de la tabla `usuario_rol`, pero actualmente solo está configurado el rol de admin. Si necesitas agregar roles adicionales (docente, estudiante, etc.), puedes insertarlos manualmente en SQLite Browser:
-
-```sql
--- Agregar rol docente
-INSERT INTO usuario_rol (nombre, descripcion) VALUES ('docente', 'Docente');
-
--- Agregar rol estudiante
-INSERT INTO usuario_rol (nombre, descripcion) VALUES ('estudiante', 'Estudiante');
+```text
+PIN_RELEVADOR=22
+PIN_BUZZER=18
+PIN_PIR=17
+SIMULATE_HARDWARE=0
+UNLOCK_TIMEOUT=2.0
 ```
 
-### 💡 Nota sobre asignación de roles:
-La aplicación probablemente tenga una interfaz para gestionar roles, pero actualmente solo el rol "admin" está disponible en el sistema.
+Ejemplo en PowerShell:
 
-## 🗄️ Configuración de base de datos con datos incluidos
+```powershell
+$env:SIMULATE_HARDWARE="1"
+$env:UNLOCK_TIMEOUT="2"
+python main.py
+```
 
-Si quieres una base de datos con datos de prueba ya incluidos (facultades, carreras, usuarios, etc.), importa el archivo `schema_and_data.sql`:
+Usa `UNLOCK_TIMEOUT=none` solo si quieres mantener la cerradura abierta sin cierre automatico.
 
-### 1. 📥 Abrir SQLite Browser
-- Abre SQLite Browser
-- Ve a **File → Import → Database from SQL file**
-- Selecciona: `c:\xampp\htdocs\sistema-biometrico\app\database\schema_and_data.sql`
-- Elige un nombre para la nueva BD (ej: `sistema_biometrico_con_datos.db`)
+## 10. Conexion de hardware en Raspberry Pi
 
-### 2. 🔄 Reemplazar la base de datos
-- Copia el archivo generado al directorio `app/database/`
-- Renómbralo a `sistema_biometrico.db` (reemplaza el existente)
+### Rele y cerradura
 
-¡Listo! Tendrás la BD con esquema y datos de prueba.
+- No alimentes la cerradura desde la Raspberry Pi.
+- Usa una fuente externa adecuada para la cerradura.
+- Conecta la cerradura en serie con COM/NO del rele.
+- Conecta `IN` del rele al GPIO configurado, por defecto `PIN_RELEVADOR=22`.
+- Comparte GND entre Raspberry Pi y fuente externa.
 
----
+### Buzzer
 
-**¡Con esta guía tienes todo lo necesario para configurar y usar el sistema biométrico!** 🎉
+- Pin por defecto: `PIN_BUZZER=18`.
+- Si el buzzer consume mucha corriente, usa transistor o modulo dedicado.
 
-## 🔌 Conexión de hardware (Raspberry Pi)
+### PIR
 
-Estas indicaciones asumen que usarás una fuente externa de 12V para la cerradura y la Raspberry Pi alimentada por su propia fuente. Nunca alimentes la cerradura desde la Pi.
+- Pin por defecto: `PIN_PIR=17`.
+- Conecta VCC, GND y salida al GPIO configurado.
 
-- **Relé y cerradura (12V)**:
-	- Conecta la cerradura a la fuente de 12V (VCC y GND de la fuente externa).
-	- Conecta el contacto COM/NO del relé en serie con la alimentación de la cerradura según el diagrama del relé.
-	- Conecta la entrada del relé (IN) a un pin GPIO de la Raspberry Pi (por defecto `PIN_RELEVADOR = 22`).
-	- Conecta el GND de la Raspberry Pi al GND de la fuente de 12V para tener referencia común.
+### Seguridad electrica
 
-- **Buzzer**:
-	- Conecta el pin de control del buzzer a `PIN_BUZZER = 18` (o al pin que configures en `app/config.py`).
-	- Si el buzzer requiere más corriente, usa un transistor o un módulo con alimentación separada (3.3V/5V) y activa la señal desde la Pi.
+- Usa fusible para la cerradura.
+- Si la cerradura es inductiva, usa diodo flyback o rele con proteccion.
+- Verifica voltajes antes de energizar el circuito.
 
-- **PIR (sensor de movimiento)**:
-	- Conecta VCC a 3.3V (si el sensor lo requiere), GND común y la salida al pin `PIN_PIR = 17`.
-	- Implementa debounce en software (el proyecto incluye una prueba simple en `app/hardware/test_hardware.py`).
+## 11. Despliegue en Raspberry Pi con systemd
 
-- **Advertencias eléctricas**:
-	- Usa un fusible en la línea de la cerradura y añade diodos de protección / flyback según el tipo de carga.
-	- Si la cerradura es inductiva (solenoide), coloca diodos o usa un relé con protección y alimentación separada.
+Existe una plantilla:
 
-## 🖥️ Despliegue en Raspberry Pi (systemd)
+```text
+deploy/sistema-biometrico.service
+```
 
-Ya existe una plantilla de servicio `deploy/sistema-biometrico.service` y un script `scripts/install_service.sh` para instalarlo en la Pi. El servicio está pensado para Raspberry Pi OS con escritorio, porque la aplicación abre una interfaz gráfica con CustomTkinter.
+Y un instalador:
 
-Pasos rápidos:
+```text
+scripts/install_service.sh
+```
+
+Pasos:
+
 ```bash
-# En la Raspberry Pi, desde la carpeta del proyecto
+cd /ruta/al/sistema-biometrico
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
-pip install gpiozero pigpio
-
-# Instalar y arrancar el servicio (ejecutar como root)
+pip install gpiozero pigpio picamera2
 sudo bash scripts/install_service.sh
 sudo systemctl status sistema-biometrico.service
 ```
 
-El servicio se ejecutará usando el intérprete dentro de `venv`, intentará usar la sesión gráfica `DISPLAY=:0` del usuario `pi` y reiniciará automáticamente si hay fallos. Si tu usuario o ruta del proyecto son distintos, ajusta `User`, `WorkingDirectory`, `XAUTHORITY` y `ExecStart` en `deploy/sistema-biometrico.service`.
+Si tu usuario o ruta no coinciden, ajusta en el servicio:
 
-## 🧪 Pruebas de hardware
+- `User`
+- `WorkingDirectory`
+- `ExecStart`
+- `DISPLAY`
+- `XAUTHORITY`
 
-Usa `app/hardware/test_hardware.py` para probar el relé, buzzer y PIR (funciona en modo simulación si `gpiozero` no está instalado).
+## 12. Pruebas utiles
+
+### Verificar imports criticos
+
+```powershell
+python -c "import cv2, mediapipe, face_recognition, customtkinter; print('OK')"
+```
+
+### Verificar pipeline de encoding
+
+```powershell
+python -c "import numpy as np, face_recognition; img=np.zeros((100,100,3), dtype=np.uint8); face_recognition.face_encodings(img, [(10,90,90,10)]); print('encoding ok')"
+```
+
+### Probar hardware
 
 ```bash
 python app/hardware/test_hardware.py
 ```
 
-## 📝 Notas finales
-- Configura `app/config.py` (o mediante variables de entorno) para ajustar pines y el modo de simulación `SIMULATE_HARDWARE`.
-- Puedes ajustar el tiempo de apertura con `UNLOCK_TIMEOUT` en segundos. Usa `UNLOCK_TIMEOUT=none` solo si quieres abrir la cerradura sin cierre automático.
-- Asegúrate de compartir GND entre la Pi y la fuente de la cerradura.
+## 13. Notas operativas
+
+- Buena iluminacion mejora mucho la deteccion.
+- Debe haber una sola cara frente a la camara.
+- Evita mover demasiado la cabeza durante el escaneo.
+- El tiempo de escaneo visual se configura en `SCAN_DURATION` dentro de `app/views/terminal_view.py`.
+- La deteccion rapida con MediaPipe se activa si `mediapipe` esta instalado correctamente.

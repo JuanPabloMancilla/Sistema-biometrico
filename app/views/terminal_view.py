@@ -16,26 +16,27 @@ from app.hardware.cerradura import Cerradura
 
 
 # -- Paleta --------------------------------------------------------------------
-BG_DEEP        = "#F4F7FA"
-BG_PANEL       = "#FFFFFF"
-BG_BANNER      = "#FFFFFF"
-BORDER_IDLE    = "#D8E0EA"
-ACCENT_PURPLE  = "#15803D"
-ACCENT_GREEN   = "#15803D"
+BG_DEEP        = "#080B12"
+BG_PANEL       = "#0F172A"
+BG_BANNER      = "#111827"
+BORDER_IDLE    = "#273449"
+ACCENT_PURPLE  = "#F59E0B"
+ACCENT_GREEN   = "#0F766E"
 ACCENT_RED     = "#DC2626"
-ACCENT_AMBER   = "#D97706"
+ACCENT_AMBER   = "#F59E0B"
 ACCENT_CYAN    = "#2563EB"
-TEXT_PRIMARY   = "#111827"
-TEXT_SECONDARY = "#64748B"
+TEXT_PRIMARY   = "#F8FAFC"
+TEXT_SECONDARY = "#CBD5E1"
 TEXT_MUTED     = "#94A3B8"
 
-BANNER_H = 100
+BANNER_H = 76
+SCAN_DURATION = 1.2
 
 TEMAS = {
     "escaneando": {
         "border":   ACCENT_AMBER,
         "bar":      ACCENT_AMBER,
-        "banner":   "#FFF7ED",
+        "banner":   "#29210F",
         "dot":      ACCENT_AMBER,
         "status":   "ESCANEANDO",
         "st_color": ACCENT_AMBER,
@@ -45,7 +46,7 @@ TEMAS = {
     "autorizado": {
         "border":   ACCENT_GREEN,
         "bar":      ACCENT_GREEN,
-        "banner":   "#ECFDF5",
+        "banner":   "#0F2E2B",
         "dot":      ACCENT_GREEN,
         "status":   "ACCESO AUTORIZADO",
         "st_color": ACCENT_GREEN,
@@ -55,7 +56,7 @@ TEMAS = {
     "negado": {
         "border":   ACCENT_RED,
         "bar":      ACCENT_RED,
-        "banner":   "#FEF2F2",
+        "banner":   "#33131B",
         "dot":      ACCENT_RED,
         "status":   "ACCESO DENEGADO",
         "st_color": ACCENT_RED,
@@ -65,7 +66,7 @@ TEMAS = {
     "inactivo": {
         "border":   ACCENT_RED,
         "bar":      ACCENT_RED,
-        "banner":   "#FEF2F2",
+        "banner":   "#33131B",
         "dot":      ACCENT_RED,
         "status":   "USUARIO INACTIVO",
         "st_color": ACCENT_RED,
@@ -75,7 +76,7 @@ TEMAS = {
     "multiples": {
         "border":   ACCENT_CYAN,
         "bar":      ACCENT_CYAN,
-        "banner":   "#EFF6FF",
+        "banner":   "#10213F",
         "dot":      ACCENT_CYAN,
         "status":   "MULTIPLES ROSTROS DETECTADOS",
         "st_color": ACCENT_CYAN,
@@ -85,7 +86,7 @@ TEMAS = {
     "sin_camara": {
         "border":   ACCENT_RED,
         "bar":      ACCENT_RED,
-        "banner":   "#FEF2F2",
+        "banner":   "#33131B",
         "dot":      ACCENT_RED,
         "status":   "SIN CAMARA",
         "st_color": ACCENT_RED,
@@ -95,7 +96,7 @@ TEMAS = {
     "acercarse": {
         "border":   ACCENT_AMBER,
         "bar":      ACCENT_AMBER,
-        "banner":   "#FFF7ED",
+        "banner":   "#29210F",
         "dot":      ACCENT_AMBER,
         "status":   "ACERQUESE A LA CAMARA",
         "st_color": ACCENT_AMBER,
@@ -105,7 +106,7 @@ TEMAS = {
     "iluminacion": {
         "border":   ACCENT_AMBER,
         "bar":      ACCENT_AMBER,
-        "banner":   "#FFF7ED",
+        "banner":   "#29210F",
         "dot":      ACCENT_AMBER,
         "status":   "MEJORE LA ILUMINACION",
         "st_color": ACCENT_AMBER,
@@ -115,7 +116,7 @@ TEMAS = {
     "centrar": {
         "border":   ACCENT_AMBER,
         "bar":      ACCENT_AMBER,
-        "banner":   "#FFF7ED",
+        "banner":   "#29210F",
         "dot":      ACCENT_AMBER,
         "status":   "CENTRE SU ROSTRO",
         "st_color": ACCENT_AMBER,
@@ -125,7 +126,7 @@ TEMAS = {
     "frente": {
         "border":   ACCENT_AMBER,
         "bar":      ACCENT_AMBER,
-        "banner":   "#FFF7ED",
+        "banner":   "#29210F",
         "dot":      ACCENT_AMBER,
         "status":   "MIRE AL FRENTE",
         "st_color": ACCENT_AMBER,
@@ -135,7 +136,7 @@ TEMAS = {
     "enderezar": {
         "border":   ACCENT_AMBER,
         "bar":      ACCENT_AMBER,
-        "banner":   "#FFF7ED",
+        "banner":   "#29210F",
         "dot":      ACCENT_AMBER,
         "status":   "ENDERECE SU ROSTRO",
         "st_color": ACCENT_AMBER,
@@ -145,7 +146,7 @@ TEMAS = {
     "alejarse": {
         "border":   ACCENT_AMBER,
         "bar":      ACCENT_AMBER,
-        "banner":   "#FFF7ED",
+        "banner":   "#29210F",
         "dot":      ACCENT_AMBER,
         "status":   "ALEJESE UN POCO",
         "st_color": ACCENT_AMBER,
@@ -187,6 +188,8 @@ class TerminalView(ctk.CTkFrame):
         self.usuario_detectado = ""
         self.ultimo_rostro_visto = 0.0
         self.face_box = None
+        self._haar_frame_count = 0
+        self._last_faces = []
         self.esperando_reset = False
         self.inicio_espera_reset = 0.0
         self.encodings_conocidos, self.ids_conocidos = cargar_encodings()
@@ -203,68 +206,19 @@ class TerminalView(ctk.CTkFrame):
     def _build_ui(self):
         ctk.CTkFrame(self, fg_color=ACCENT_GREEN, height=3).pack(fill="x", side="top")
 
-        hdr = ctk.CTkFrame(self, fg_color="transparent")
-        hdr.pack(pady=(20, 4))
-
-        if self.modo != "registro":
-            self.btn_salir = ctk.CTkButton(
-                self, text="Salir", width=72, height=36,
-                corner_radius=8,
-                fg_color=BG_PANEL, hover_color="#E8F7EF",
-                text_color=ACCENT_GREEN,
-                font=("Inter", 12, "bold"),
-                border_width=1, border_color=BORDER_IDLE,
-                command=self.cerrar_y_volver,
-            )
-            self.btn_salir.place(relx=0.974, rely=0.046, anchor="ne")
-
-        if self.modo == "registro":
-            self.btn_cerrar = ctk.CTkButton(
-                self,
-                text="X",
-                width=40,
-                height=40,
-                corner_radius=8,
-                fg_color=BG_PANEL,
-                hover_color="#FEF2F2",
-                text_color=ACCENT_RED,
-                font=("Segoe UI", 16, "bold"),
-                border_width=1,
-                border_color=BORDER_IDLE,
-                command=self.cerrar_y_volver
-            )
-            self.btn_cerrar.place(relx=0.974, rely=0.046, anchor="ne")
-
-        ctk.CTkLabel(
-            hdr, text="SECUREWORK",
-            font=("Inter", 34, "bold"),
-            text_color=ACCENT_GREEN,
-        ).pack()
-
-        ctk.CTkLabel(
-            hdr,
-            text=AppContext.t("CONTROL DE ACCESO"),
-            font=("Inter", 16, "bold"),
-            text_color=TEXT_SECONDARY,
-        ).pack(pady=(4, 0))
-
         main = ctk.CTkFrame(self, fg_color="transparent")
-        main.pack(expand=True, fill="both", padx=44, pady=(8, 28))
+        main.pack(expand=True, fill="both", padx=14, pady=(14, 12))
 
-        self.video_container = ctk.CTkFrame(
-            main, fg_color=BG_PANEL, corner_radius=8,
-            border_width=1, border_color=BORDER_IDLE,
-        )
-        self.video_container.pack(expand=True, fill="both")
-
-        # -- Banner ------------------------------------------------------------
+        # -- Panel lateral -----------------------------------------------------
         self.data_banner = ctk.CTkFrame(
-            self.video_container,
+            main,
             fg_color=BG_BANNER,
-            corner_radius=0,
-            height=BANNER_H,
+            corner_radius=8,
+            width=292,
+            border_width=1,
+            border_color=BORDER_IDLE,
         )
-        self.data_banner.pack(side="top", fill="x")
+        self.data_banner.pack(side="left", fill="y", padx=(0, 12))
         self.data_banner.pack_propagate(False)
 
         self.accent_bar = ctk.CTkFrame(
@@ -272,37 +226,101 @@ class TerminalView(ctk.CTkFrame):
         )
         self.accent_bar.pack(side="left", fill="y")
 
-        center = ctk.CTkFrame(self.data_banner, fg_color="transparent")
-        center.pack(side="left", fill="both", expand=True)
+        side = ctk.CTkFrame(self.data_banner, fg_color="transparent")
+        side.pack(side="left", fill="both", expand=True, padx=20, pady=20)
 
-        row = ctk.CTkFrame(center, fg_color="transparent")
-        row.pack(fill="x", padx=20, pady=(18, 0))
+        ctk.CTkLabel(
+            side,
+            text="SECUREWORK",
+            font=("Inter", 24, "bold"),
+            text_color="#FFFFFF",
+        ).pack(anchor="w")
+
+        ctk.CTkLabel(
+            side,
+            text=AppContext.t("CONTROL DE ACCESO"),
+            font=("Inter", 11, "bold"),
+            text_color=TEXT_SECONDARY,
+        ).pack(anchor="w", pady=(2, 22))
+
+        ctk.CTkLabel(
+            side,
+            text=AppContext.t("ESTADO ACTUAL"),
+            font=("Inter", 10, "bold"),
+            text_color=TEXT_MUTED,
+        ).pack(anchor="w")
+
+        row = ctk.CTkFrame(side, fg_color="transparent")
+        row.pack(fill="x", pady=(8, 4))
 
         self.dot_indicator = ctk.CTkLabel(
-            row, text="●", font=("Segoe UI Symbol", 13), text_color=ACCENT_PURPLE
+            row, text="●", font=("Segoe UI Symbol", 15), text_color=ACCENT_PURPLE
         )
-        self.dot_indicator.pack(side="left", padx=(0, 10))
+        self.dot_indicator.pack(side="left", padx=(0, 8))
 
         self.status_label = ctk.CTkLabel(
             row,
             text=AppContext.t("SISTEMA ACTIVO"),
-            font=("Inter", 24, "bold"),
+            font=("Inter", 18, "bold"),
             text_color=TEXT_PRIMARY,
+            wraplength=220,
+            justify="left",
         )
         self.status_label.pack(side="left")
 
-        ctk.CTkFrame(center, fg_color=BORDER_IDLE, height=1).pack(
-            fill="x", padx=20, pady=(8, 0)
-        )
+        ctk.CTkFrame(side, fg_color=BORDER_IDLE, height=1).pack(fill="x", pady=(14, 16))
 
         self.lbl_nombre = ctk.CTkLabel(
-            center,
+            side,
             text=AppContext.t("ESPERANDO DETECCION..."),
-            font=("Inter", 16),
+            font=("Inter", 13),
             text_color=TEXT_SECONDARY,
             anchor="w",
+            wraplength=230,
+            justify="left",
         )
-        self.lbl_nombre.pack(fill="x", padx=24, pady=(5, 0))
+        self.lbl_nombre.pack(fill="x", anchor="w")
+
+        ctk.CTkFrame(side, fg_color=BORDER_IDLE, height=1).pack(fill="x", pady=(22, 16))
+
+        ctk.CTkLabel(
+            side,
+            text=AppContext.t("GUIA RAPIDA"),
+            font=("Inter", 10, "bold"),
+            text_color=TEXT_MUTED,
+        ).pack(anchor="w")
+
+        for texto in [
+            AppContext.t("Mantenga una sola cara visible"),
+            AppContext.t("Mire de frente a la camara"),
+            AppContext.t("Evite sombras sobre el rostro"),
+        ]:
+            ctk.CTkLabel(
+                side,
+                text=texto,
+                font=("Inter", 11),
+                text_color=TEXT_SECONDARY,
+                wraplength=230,
+                justify="left",
+            ).pack(anchor="w", pady=(8, 0))
+
+        ctk.CTkFrame(side, fg_color="transparent").pack(fill="both", expand=True)
+
+        btn_text = AppContext.t("Entrar al panel") if self.modo != "registro" else AppContext.t("Cerrar")
+        btn_color = ACCENT_GREEN if self.modo != "registro" else ACCENT_RED
+        btn_hover = "#0B5F59" if self.modo != "registro" else "#7F1D1D"
+        self.btn_salir = ctk.CTkButton(
+            side,
+            text=btn_text,
+            height=44,
+            corner_radius=8,
+            fg_color=btn_color,
+            hover_color=btn_hover,
+            text_color="#FFFFFF",
+            font=("Inter", 13, "bold"),
+            command=self.cerrar_y_volver,
+        )
+        self.btn_salir.pack(fill="x", side="bottom", pady=(16, 0))
 
         self.accent_line = ctk.CTkFrame(
             self.data_banner, fg_color=ACCENT_PURPLE, height=2, corner_radius=0
@@ -310,13 +328,20 @@ class TerminalView(ctk.CTkFrame):
         self.accent_line.pack(side="bottom", fill="x")
 
         # -- Area de video -----------------------------------------------------
+        self.video_container = ctk.CTkFrame(
+            main, fg_color=BG_PANEL, corner_radius=8,
+            border_width=1, border_color=BORDER_IDLE,
+        )
+        self.video_container.pack(side="left", expand=True, fill="both")
+
+        # -- Area de video -----------------------------------------------------
         self.video_display = ctk.CTkLabel(
             self.video_container,
             text=AppContext.t("Iniciando camara..."),
             text_color=TEXT_MUTED,
-            font=("Inter", 13),
+            font=("Inter", 12),
         )
-        self.video_display.pack(side="bottom", fill="both", expand=True)
+        self.video_display.pack(fill="both", expand=True)
 
         # Footer
         ctk.CTkLabel(
@@ -326,9 +351,9 @@ class TerminalView(ctk.CTkFrame):
                 AppContext.t("Acceso Seguro") + "  //  " +
                 AppContext.t("Cifrado AES-256")
             ),
-            font=("Inter", 10),
+            font=("Inter", 9),
             text_color=TEXT_MUTED,
-        ).pack(side="bottom", pady=(0, 10))
+        ).pack(side="bottom", pady=(0, 4))
         ctk.CTkFrame(self, fg_color=BORDER_IDLE, height=1).pack(fill="x", side="bottom")
 
     def aplicar_estilo_visual(self, estado: str, usuario: str = ""):
@@ -370,9 +395,18 @@ class TerminalView(ctk.CTkFrame):
             )
 
     def detectar_rostros(self, frame):
-        gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-        faces = self.face_cascade.detectMultiScale(gray, 1.3, 5)
-        return list(faces) if len(faces) > 0 else []
+        self._haar_frame_count += 1
+        if self._haar_frame_count % 3 != 0:
+            return self._last_faces
+
+        small = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)
+        gray = cv2.cvtColor(small, cv2.COLOR_BGR2GRAY)
+        faces = self.face_cascade.detectMultiScale(gray, 1.25, 4)
+        self._last_faces = [
+            (int(x * 2), int(y * 2), int(w * 2), int(h * 2))
+            for (x, y, w, h) in faces
+        ]
+        return self._last_faces
 
     def _rostro_principal(self, faces):
         x, y, w, h = max(faces, key=lambda r: r[2] * r[3])
@@ -551,7 +585,7 @@ class TerminalView(ctk.CTkFrame):
                 if msg_actual and not any(g in msg_actual for g in MENSAJES_GENERICOS):
                     self.usuario_detectado = msg_actual
 
-                if ahora - self.inicio_escaneo > 3.0:
+                if ahora - self.inicio_escaneo > SCAN_DURATION:
                     self.escaneando = False
                     self.pos_linea = 0
                     self.esperando_reset = True

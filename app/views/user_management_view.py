@@ -35,7 +35,7 @@ class UserManagementView(ctk.CTkFrame):
         self.controller = controller
         self.usuario_editando_id = None
 
-        self.font_header = ("Inter", 30, "bold")
+        self.font_header = ("Inter", 28, "bold")
         self.font_sub    = ("Inter", 16, "bold")
         self.font_normal = ("Inter", 13)
         self.font_small  = ("Inter", 11, "bold")
@@ -117,7 +117,7 @@ class UserManagementView(ctk.CTkFrame):
         return bool(re.match(r"^[A-Za-zÃÃ‰ÃÃ“ÃšÃ¡Ã©Ã­Ã³ÃºÃ‘Ã±\s]+$", texto))
 
     def _on_resize(self, event):
-        nuevo_compact = event.width < 700
+        nuevo_compact = event.width < 1040
         if nuevo_compact != self.is_compact:
             self.is_compact = nuevo_compact
             if hasattr(self, "vista_tabla") and self.vista_tabla.winfo_exists():
@@ -135,7 +135,7 @@ class UserManagementView(ctk.CTkFrame):
                 )
                 self.main_card.pack(
                     expand=True, fill="both",
-                    padx=10 if self.is_compact else 30,
+                    padx=8 if self.is_compact else 30,
                     pady=(5, 15)
                 )
                 self.render_table_content(self.all_users)
@@ -153,7 +153,7 @@ class UserManagementView(ctk.CTkFrame):
             scrollbar_button_color="#CBD5E1",
             scrollbar_button_hover_color="#94A3B8",
         )
-        scroll.pack(expand=True, fill="both", padx=10 if self.is_compact else 20, pady=10)
+        scroll.pack(expand=True, fill="both", padx=8 if self.is_compact else 20, pady=10)
 
         if not user_list:
             ctk.CTkLabel(
@@ -183,11 +183,13 @@ class UserManagementView(ctk.CTkFrame):
                 info = ctk.CTkFrame(top, fg_color="transparent")
                 info.pack(side="left", fill="x", expand=True)
 
+                wrap = max(180, min(520, max(self.winfo_width(), 520) - 150))
+
                 ctk.CTkLabel(
                     info,
                     text=f"{u['nombre_solo']} {u['ap']} {u['am']}".upper(),
                     font=("Inter", 12, "bold"), text_color=COLORS["text"],
-                    anchor="w", wraplength=300, justify="left"
+                    anchor="w", wraplength=wrap, justify="left"
                 ).pack(anchor="w", fill="x")
 
                 ctk.CTkLabel(
@@ -199,8 +201,23 @@ class UserManagementView(ctk.CTkFrame):
                     ctk.CTkLabel(
                         info, text=u["correo"],
                         font=("Inter", 10), text_color=COLORS["subtext"],
-                        anchor="w", wraplength=300, justify="left"
+                        anchor="w", wraplength=wrap, justify="left"
                     ).pack(anchor="w", fill="x")
+
+                area = u.get("facultad") or AppContext.t("Sin área")
+                puesto = u.get("carrera") or AppContext.t("Sin puesto")
+                ctk.CTkLabel(
+                    info,
+                    text=f"{AppContext.t('Área')}: {area}",
+                    font=("Inter", 10), text_color=COLORS["subtext"],
+                    anchor="w", wraplength=wrap, justify="left"
+                ).pack(anchor="w", fill="x", pady=(2, 0))
+                ctk.CTkLabel(
+                    info,
+                    text=f"{AppContext.t('Puesto')}: {puesto}",
+                    font=("Inter", 10), text_color=COLORS["subtext"],
+                    anchor="w", wraplength=wrap, justify="left"
+                ).pack(anchor="w", fill="x")
 
                 badges = ctk.CTkFrame(card, fg_color="transparent")
                 badges.pack(fill="x", padx=12, pady=(4, 8))
@@ -385,7 +402,9 @@ class UserManagementView(ctk.CTkFrame):
 
         modal = ctk.CTkFrame(
             self.overlay, fg_color=COLORS["card"], corner_radius=8,
-            width=420, height=250, border_width=2, border_color="#CBD5E1"
+            width=340 if self.is_compact else 420,
+            height=220 if self.is_compact else 250,
+            border_width=2, border_color="#CBD5E1"
         )
         modal.place(relx=0.5, rely=0.5, anchor="center")
         modal.pack_propagate(False)
@@ -405,8 +424,8 @@ class UserManagementView(ctk.CTkFrame):
             btn_color = "#10B981"
             btn_hover = "#059669"
 
-        ctk.CTkLabel(modal, text=icono, font=("Inter", 45)).pack(pady=(20, 5))
-        ctk.CTkLabel(modal, text=titulo, font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text=icono, font=("Inter", 32 if self.is_compact else 45)).pack(pady=(12 if self.is_compact else 20, 5))
+        ctk.CTkLabel(modal, text=titulo, font=("Inter", 14 if self.is_compact else 16, "bold"), text_color=COLORS["text"]).pack()
         ctk.CTkLabel(modal, text=nombre.upper(), font=("Inter", 12, "bold"), text_color=COLORS["subtext"]).pack()
         ctk.CTkLabel(modal, text=sub, font=("Inter", 11), text_color=COLORS["subtext"]).pack(pady=(2, 0))
 
@@ -469,15 +488,15 @@ class UserManagementView(ctk.CTkFrame):
         self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
 
-        padx_form = 12 if self.is_compact else 60
+        padx_form = 8 if self.is_compact else 60
         self.form_container = ctk.CTkScrollableFrame(self.form_base, fg_color="transparent")
         self.form_container.pack(fill="both", expand=True, padx=padx_form, pady=10)
 
         ctk.CTkLabel(
             self.form_container,
             text=(AppContext.t("Editar Registro")) if usuario else (AppContext.t("Nuevo Registro")),
-            font=self.font_header, text_color=COLORS["text"]
-        ).pack(anchor="w", padx=padx_form, pady=(30, 10))
+            font=("Inter", 22, "bold") if self.is_compact else self.font_header, text_color=COLORS["text"]
+        ).pack(anchor="w", padx=padx_form, pady=(12 if self.is_compact else 30, 8))
 
         c_clasi = ctk.CTkFrame(
             self.form_container, fg_color=COLORS["card"],
@@ -654,7 +673,7 @@ class UserManagementView(ctk.CTkFrame):
             self.btn_guardar.pack(side="left", expand=True, fill="x", padx=(10, 0))
 
     def create_section_card(self, master, title, fields):
-        padx_form = 12 if self.is_compact else 60
+        padx_form = 8 if self.is_compact else 60
         card = ctk.CTkFrame(
             master, fg_color=COLORS["card"],
             corner_radius=8, border_width=1, border_color=COLORS["border"]
@@ -914,7 +933,7 @@ class UserManagementView(ctk.CTkFrame):
         self.render_table_content(self.all_users)
 
     def create_header(self, master):
-        padx_header = 12 if self.is_compact else 30
+        padx_header = 8 if self.is_compact else 30
         h = ctk.CTkFrame(master, fg_color="transparent")
         h.pack(fill="x", padx=padx_header, pady=(20, 10))
 
@@ -922,7 +941,7 @@ class UserManagementView(ctk.CTkFrame):
             ctk.CTkLabel(
                 h,
                 text=AppContext.t("Personal"),
-                font=("Inter", 30, "bold"),
+                font=("Inter", 24, "bold"),
                 text_color=COLORS["text"]
             ).pack(anchor="center", pady=(0, 12))
             ctk.CTkButton(
@@ -931,7 +950,7 @@ class UserManagementView(ctk.CTkFrame):
                 font=self.font_sub, fg_color=COLORS["primary"],
                 height=45, corner_radius=10,
                 command=self.abrir_formulario
-            ).pack(fill="x", padx=20)
+            ).pack(fill="x", padx=8)
         else:
             ctk.CTkLabel(
                 h,
@@ -949,7 +968,7 @@ class UserManagementView(ctk.CTkFrame):
 
     def create_search_bar(self, master):
         bar = ctk.CTkFrame(master, fg_color="transparent")
-        bar.pack(fill="x", padx=30, pady=10)
+        bar.pack(fill="x", padx=8 if self.is_compact else 30, pady=10)
         self.entry_busqueda = ctk.CTkEntry(
             bar,
             placeholder_text=AppContext.t("Buscar usuario..."),
@@ -958,7 +977,7 @@ class UserManagementView(ctk.CTkFrame):
             border_color=COLORS["border"],
             text_color=COLORS["text"]
         )
-        self.entry_busqueda.pack(side="left", fill="x", expand=True, padx=(0, 15))
+        self.entry_busqueda.pack(side="left", fill="x", expand=True, padx=(0, 0 if self.is_compact else 15))
         self.entry_busqueda.bind("<KeyRelease>", self.buscar_usuarios)
         self.btn_filter = ctk.CTkButton(
             bar,
@@ -968,7 +987,10 @@ class UserManagementView(ctk.CTkFrame):
             border_color=COLORS["border"],
             command=self.toggle_filter
         )
-        self.btn_filter.pack(side="left")
+        if self.is_compact:
+            self.btn_filter.pack(side="left", padx=(8, 0))
+        else:
+            self.btn_filter.pack(side="left")
 
     def buscar_usuarios(self, event=None):
         texto = self.entry_busqueda.get().strip().lower()
@@ -1001,7 +1023,7 @@ class UserManagementView(ctk.CTkFrame):
     def toggle_filter(self):
         if not self.filter_visible:
             self.draw_tags()
-            self.filter_container.pack(fill="x", padx=30, pady=(0, 15), before=self.main_card)
+            self.filter_container.pack(fill="x", padx=8 if self.is_compact else 30, pady=(0, 15), before=self.main_card)
             self.btn_filter.configure(text=AppContext.t("Filtrar ï¸¿"))
             self.filter_visible = True
         else:
@@ -1013,11 +1035,11 @@ class UserManagementView(ctk.CTkFrame):
         for w in self.filter_container.winfo_children():
             w.destroy()
         r1 = ctk.CTkFrame(self.filter_container, fg_color="transparent")
-        r1.pack(fill="x", padx=20)
+        r1.pack(fill="x", padx=8 if self.is_compact else 20)
         ctk.CTkLabel(
             r1,
             text=AppContext.t("Rol:"),
-            font=self.font_small, text_color=COLORS["text"], width=80
+            font=self.font_small, text_color=COLORS["text"], width=52 if self.is_compact else 80
         ).pack(side="left")
         # -- CorrecciÃ³n: todos los roles pasan por AppContext.t() --
         for t in ["Todos", "TRABAJADOR", "SUPERVISOR", "ADMINISTRATIVO"]:

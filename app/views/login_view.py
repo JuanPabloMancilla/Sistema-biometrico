@@ -11,25 +11,26 @@ class LoginView(ctk.CTkFrame):
         self.master = master
         self.on_login_success = on_login_success
         self.password_visible = False
+        self.is_compact = True
 
         # --- BARRA SUPERIOR ---
-        self.top_bar = ctk.CTkFrame(self, fg_color="transparent", height=80)
+        self.top_bar = ctk.CTkFrame(self, fg_color="transparent", height=58)
         self.top_bar.place(relx=0, rely=0, relwidth=1)
 
         # Marca empresarial - Esquina superior izquierda
         self.koda_label_top = ctk.CTkLabel(
             self.top_bar, text="SECUREWORK",
-            font=("Inter", 26, "bold"), text_color=COLORS["primary"]
+            font=("Inter", 18, "bold"), text_color=COLORS["primary"]
         )
-        self.koda_label_top.pack(side="left", padx=15, pady=15)
+        self.koda_label_top.pack(side="left", padx=10, pady=10)
 
         # Contenedor de Controles - Esquina superior derecha
         self.controls_wrapper = ctk.CTkFrame(self.top_bar, fg_color="transparent")
-        self.controls_wrapper.pack(side="right", padx=15, pady=15)
+        self.controls_wrapper.pack(side="right", padx=8, pady=8)
 
         # 1. Control de Tema
-        self.theme_control = ctk.CTkFrame(self.controls_wrapper, fg_color="#E8EEF5", corner_radius=8, width=110, height=38)
-        self.theme_control.pack(side="left", padx=8)
+        self.theme_control = ctk.CTkFrame(self.controls_wrapper, fg_color=COLORS["card"], corner_radius=8, width=82, height=34, border_width=1, border_color=COLORS["border"])
+        self.theme_control.pack(side="left", padx=4)
         self.theme_control.pack_propagate(False)
         self.theme_icon = ctk.CTkLabel(self.theme_control, text="", font=("Inter", 16), text_color="black")
         self.theme_icon.place(x=22, y=19, anchor="center")
@@ -38,11 +39,11 @@ class LoginView(ctk.CTkFrame):
             progress_color="#1D1D1F", button_color="#1D1D1F",
             command=self.actualizar_icono_tema
         )
-        self.theme_switch.place(x=72, y=19, anchor="center")
+        self.theme_switch.place(x=55, y=17, anchor="center")
 
         # 2. Selector de Idioma
-        self.lang_control = ctk.CTkFrame(self.controls_wrapper, fg_color="#E8EEF5", corner_radius=8, height=38)
-        self.lang_control.pack(side="left", padx=8)
+        self.lang_control = ctk.CTkFrame(self.controls_wrapper, fg_color=COLORS["card"], corner_radius=8, height=34, border_width=1, border_color=COLORS["border"])
+        self.lang_control.pack(side="left", padx=4)
         ctk.CTkLabel(self.lang_control, text="", font=("Inter", 16), text_color="black").pack(side="left", padx=(12, 5))
 
         # Ambos botones se crean neutros; _sincronizar_botones_idioma pinta el correcto
@@ -65,17 +66,17 @@ class LoginView(ctk.CTkFrame):
 
         # 3. Botï¿½n de Cï¿½mara
         self.btn_regresar_terminal = ctk.CTkButton(
-            self.controls_wrapper, text="Cam", width=54, height=38, corner_radius=8,
-            fg_color="#FFFFFF", text_color=COLORS["primary"], hover_color="#E8F7EF",
+            self.controls_wrapper, text="Cam", width=48, height=34, corner_radius=8,
+            fg_color=COLORS["card"], text_color=COLORS["primary"], hover_color=COLORS["hover"],
             border_width=1, border_color=COLORS["border"], font=("Inter", 12, "bold"),
             command=self.regresar_a_terminal
         )
-        self.btn_regresar_terminal.pack(side="left", padx=8)
+        self.btn_regresar_terminal.pack(side="left", padx=4)
 
         # --- TARJETA DE LOGIN CENTRAL ---
         self.card = ctk.CTkFrame(
-            self, fg_color=COLORS["card"], width=440, height=600,
-            corner_radius=10, border_width=1, border_color=COLORS["border"]
+            self, fg_color=COLORS["card"], width=390, height=440,
+            corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
         self.card.place(relx=0.5, rely=0.55, anchor="center")
         self.card.pack_propagate(False)
@@ -104,7 +105,7 @@ class LoginView(ctk.CTkFrame):
         if os.path.exists(assets_path):
             try:
                 pil_image_original = Image.open(assets_path)
-                tamanio_logo = (120, 120)
+                tamanio_logo = (60, 60)
                 pil_image_circular = self.hacer_imagen_circular(pil_image_original, tamanio_logo)
                 self.logo_image = ctk.CTkImage(
                     light_image=pil_image_circular,
@@ -112,7 +113,7 @@ class LoginView(ctk.CTkFrame):
                     size=tamanio_logo
                 )
                 self.logo_label = ctk.CTkLabel(self.card, text="", image=self.logo_image)
-                self.logo_label.pack(pady=(30, 0))
+                self.logo_label.pack(pady=(12, 0))
                 print("DEBUG: Imagen cargada con exito!")
             except Exception as e:
                 print(f"ERROR: {e}")
@@ -121,15 +122,15 @@ class LoginView(ctk.CTkFrame):
 
         ctk.CTkLabel(
             self.card,
-            text=AppContext.t("Sistema de Reconocimiento\nFacial"),
-            font=("Inter", 26, "bold"), text_color=COLORS["text"], justify="center"
-        ).pack(pady=(15, 10))
+            text=AppContext.t("Acceso administrativo"),
+            font=("Inter", 22, "bold"), text_color=COLORS["text"], justify="center"
+        ).pack(pady=(6, 4))
 
         ctk.CTkLabel(
             self.card,
-            text=AppContext.t("Ingresa tus credenciales para continuar"),
-            font=("Inter", 14), text_color="#8E8E93"
-        ).pack(pady=(0, 25))
+            text=AppContext.t("Verifica tu identidad para continuar"),
+            font=("Inter", 11), text_color="#8E8E93"
+        ).pack(pady=(0, 14))
 
         self.create_input_group(AppContext.t("CORREO CORPORATIVO"), AppContext.t("Escribe tu correo"))
         self.user_entry = self.last_entry
@@ -141,20 +142,20 @@ class LoginView(ctk.CTkFrame):
 
         self.login_btn = ctk.CTkButton(
             self.card,
-            text=AppContext.t("INICIAR SESIÃ“N"),
+            text=AppContext.t("INICIAR SESION"),
             fg_color=COLORS["primary"], hover_color=COLORS["primary_hover"],
-            width=350, height=52, corner_radius=8,
-            font=("Inter", 15, "bold"), command=self.validar_login
+            width=292, height=42, corner_radius=8,
+            font=("Inter", 13, "bold"), command=self.validar_login
         )
-        self.login_btn.pack(pady=(25, 20))
+        self.login_btn.pack(pady=(8, 10))
 
     def _sincronizar_botones_idioma(self):
         """Pinta el botÃ³n activo segÃºn AppContext.idioma_actual."""
         if AppContext.idioma_actual == "es":
-            self.es_btn.configure(fg_color="#1D1D1F", text_color="white", hover_color="#3E3E3F")
+            self.es_btn.configure(fg_color=COLORS["primary"], text_color="white", hover_color=COLORS["primary_hover"])
             self.en_btn.configure(fg_color="transparent", text_color="#4A4A4A", hover_color="#CBD5E1")
         else:
-            self.en_btn.configure(fg_color="#1D1D1F", text_color="white", hover_color="#3E3E3F")
+            self.en_btn.configure(fg_color=COLORS["primary"], text_color="white", hover_color=COLORS["primary_hover"])
             self.es_btn.configure(fg_color="transparent", text_color="#4A4A4A", hover_color="#CBD5E1")
 
     def actualizar_idioma(self, lang):
@@ -183,16 +184,16 @@ class LoginView(ctk.CTkFrame):
 
     def create_input_group(self, label_text, placeholder, is_password=False):
         group_frame = ctk.CTkFrame(self.card, fg_color="transparent")
-        group_frame.pack(fill="x", padx=45, pady=10)
-        lbl = ctk.CTkLabel(group_frame, text=label_text, font=("Inter", 12, "bold"), text_color=COLORS["text"])
+        group_frame.pack(fill="x", padx=34, pady=4)
+        lbl = ctk.CTkLabel(group_frame, text=label_text, font=("Inter", 10, "bold"), text_color=COLORS["text"])
         lbl.pack(side="top", anchor="w")
-        input_container = ctk.CTkFrame(group_frame, fg_color=COLORS["hover"], height=50, corner_radius=10)
-        input_container.pack(fill="x", pady=(5, 0))
+        input_container = ctk.CTkFrame(group_frame, fg_color=COLORS["card_alt"], height=40, corner_radius=8, border_width=1, border_color=COLORS["border"])
+        input_container.pack(fill="x", pady=(4, 0))
         input_container.pack_propagate(False)
         entry = ctk.CTkEntry(
             input_container, placeholder_text=placeholder,
             fg_color="transparent", border_width=0,
-            font=("Inter", 14), text_color=("black", "white")
+            font=("Inter", 12), text_color=("black", "white")
         )
         if is_password:
             entry.configure(show="*")

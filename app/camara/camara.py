@@ -1,6 +1,7 @@
 import cv2
 import time
 import platform
+import threading
 
 ES_RASPBERRY = platform.system() == "Linux"
 
@@ -8,6 +9,57 @@ if ES_RASPBERRY:
     from picamera2 import Picamera2
 
 picam2 = None
+
+
+class CamaraThreaded:
+    def __init__(self, index=0, width=640, height=480, fps=30):
+        backend = cv2.CAP_DSHOW if platform.system() == "Windows" else 0
+        self.cap = cv2.VideoCapture(index, backend)
+        self.running = False
+        self.frame = None
+        self.lock = threading.Lock()
+        self.thread = None
+
+        if self.cap.isOpened():
+            self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+            self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
+            self.cap.set(cv2.CAP_PROP_FPS, fps)
+            self.cap.set(cv2.CAP_PROP_BUFFERSIZE, 1)
+            self.cap.set(cv2.CAP_PROP_FOURCC, cv2.VideoWriter_fourcc(*"MJPG"))
+
+    def isOpened(self):
+        return self.cap is not None and self.cap.isOpened()
+
+    def start(self):
+        if not self.isOpened():
+            return self
+        self.running = True
+        self.thread = threading.Thread(target=self._reader, daemon=True)
+        self.thread.start()
+        return self
+
+    def _reader(self):
+        while self.running:
+            ret, frame = self.cap.read()
+            if not ret:
+                time.sleep(0.01)
+                continue
+            with self.lock:
+                self.frame = frame
+
+    def read(self):
+        with self.lock:
+            if self.frame is None:
+                return False, None
+            return True, self.frame.copy()
+
+    def release(self):
+        self.running = False
+        if self.thread and self.thread.is_alive():
+            self.thread.join(timeout=0.5)
+        if self.cap is not None:
+            self.cap.release()
+            self.cap = None
 
 
 def iniciar_camara():
@@ -56,7 +108,7 @@ def iniciar_camara():
             return None
 
     else:
-        cap = cv2.VideoCapture(0)
+        cap = CamaraThreaded(0).start()
 
         if not cap.isOpened():
             print("No se pudo abrir la cámara")

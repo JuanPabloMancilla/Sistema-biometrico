@@ -18,7 +18,7 @@ class AreaManagementView(ctk.CTkFrame):
         self.modo_edicion       = False
         self.facultad_actual_id = None
 
-        self.font_header = ("Inter", 30, "bold")
+        self.font_header = ("Inter", 28, "bold")
         self.font_sub    = ("Inter", 16, "bold")
         self.font_normal = ("Inter", 13)
         self.font_small  = ("Inter", 11, "bold")
@@ -32,7 +32,7 @@ class AreaManagementView(ctk.CTkFrame):
     # RESIZE
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _on_resize(self, event):
-        nuevo_compact = event.width < 700
+        nuevo_compact = event.width < 1040
         if nuevo_compact != self.is_compact:
             self.is_compact = nuevo_compact
             if hasattr(self, "vista_tabla") and self.vista_tabla.winfo_exists():
@@ -46,8 +46,8 @@ class AreaManagementView(ctk.CTkFrame):
         self.vista_tabla = ctk.CTkFrame(self, fg_color="transparent")
         self.vista_tabla.pack(fill="both", expand=True)
 
-        padx_main = 20 if self.is_compact else 40
-        pady_top  = 10 if self.is_compact else 40
+        padx_main = 8 if self.is_compact else 40
+        pady_top  = 6 if self.is_compact else 40
 
         # â”€â”€ Header â”€â”€
         header = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
@@ -74,9 +74,9 @@ class AreaManagementView(ctk.CTkFrame):
                 text=AppContext.t("Nueva área"),
                 fg_color=COLORS["primary"],
                 font=self.font_sub,
-                height=45, corner_radius=8,
+                height=40, corner_radius=8,
                 command=self.abrir_formulario
-            ).pack(fill="x", padx=10)
+            ).pack(fill="x", padx=4)
         else:
             title_cont.pack(side="left")
             ctk.CTkLabel(
@@ -140,7 +140,7 @@ class AreaManagementView(ctk.CTkFrame):
         )
 
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
-        scroll.pack(expand=True, fill="both", padx=16, pady=12)
+        scroll.pack(expand=True, fill="both", padx=8 if self.is_compact else 16, pady=8 if self.is_compact else 12)
 
         if not facultades:
             msg = f"No se encontraron facultades para '{query}'" if query else "No hay facultades registradas"
@@ -313,7 +313,9 @@ class AreaManagementView(ctk.CTkFrame):
 
         modal = ctk.CTkFrame(
             self.overlay, fg_color=COLORS["card"], corner_radius=8,
-            width=420, height=250, border_width=2, border_color="#CBD5E1"
+            width=340 if self.is_compact else 420,
+            height=220 if self.is_compact else 250,
+            border_width=2, border_color="#CBD5E1"
         )
         modal.place(relx=0.5, rely=0.5, anchor="center")
         modal.pack_propagate(False)
@@ -333,8 +335,8 @@ class AreaManagementView(ctk.CTkFrame):
             btn_color = "#10B981"
             btn_hover = "#059669"
 
-        ctk.CTkLabel(modal, text=icono, font=("Inter", 45)).pack(pady=(20, 5))
-        ctk.CTkLabel(modal, text=titulo, font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text=icono, font=("Inter", 32 if self.is_compact else 45)).pack(pady=(12 if self.is_compact else 20, 5))
+        ctk.CTkLabel(modal, text=titulo, font=("Inter", 14 if self.is_compact else 16, "bold"), text_color=COLORS["text"]).pack()
         ctk.CTkLabel(modal, text=nombre.upper(), font=("Inter", 12, "bold"), text_color=COLORS["subtext"]).pack()
         ctk.CTkLabel(modal, text=sub, font=("Inter", 11), text_color=COLORS["subtext"]).pack(pady=(2, 0))
 

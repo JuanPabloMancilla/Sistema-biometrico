@@ -1,236 +1,203 @@
-# Sistema Biométrico Facial - Control de Acceso
+# SecureWork - Sistema Biometrico Facial
 
-Proyecto universitario desarrollado en Python para la detección y reconocimiento facial utilizando visión por computadora.
+SecureWork es una aplicacion de escritorio en Python para control de acceso mediante reconocimiento facial. El sistema inicia en una terminal biometrica, valida rostros con camara en tiempo real y permite administrar personal, areas, puestos, perfil administrativo y registros de acceso desde un dashboard grafico.
 
-## 📋 Descripción
+## Funcionalidades principales
 
-Este sistema permite capturar rostros mediante una cámara, procesarlos y almacenarlos en una base de datos para su posterior reconocimiento facial en tiempo real. Incluye una interfaz gráfica completa para administración de usuarios, facultades y carreras.
+- Terminal de acceso con camara en vivo.
+- Deteccion facial acelerada con MediaPipe y OpenCV.
+- Reconocimiento facial con `face-recognition` y `dlib`.
+- Captura y actualizacion de biometria para usuarios.
+- Dashboard con metricas, grafica por hora y ultimos accesos.
+- Gestion de personal, areas y puestos.
+- Perfil administrativo con foto e idioma.
+- Soporte para tema claro/oscuro e idioma ES/EN.
+- Base de datos SQLite con esquema y datos iniciales.
+- Integracion opcional con hardware en Raspberry Pi: rele, cerradura, buzzer y PIR.
 
-## ✨ Características
+## Tecnologias
 
-- 🔐 **Control de acceso biométrico** con reconocimiento facial
-- 👥 **Gestión completa de usuarios** (estudiantes, docentes, administradores)
-- 🏫 **Organización académica** (facultades y carreras)
-- 📊 **Base de datos SQLite** para almacenamiento persistente
-- 🎨 **Interfaz gráfica moderna** con CustomTkinter
-- 📈 **Registro de accesos** con historial completo
+- Python 3.10 recomendado.
+- CustomTkinter para la interfaz grafica.
+- OpenCV contrib para camara y procesamiento de imagen.
+- MediaPipe para deteccion rapida de rostro.
+- face-recognition y dlib para embeddings y comparacion facial.
+- NumPy, Pillow, SciPy, Matplotlib y tkcalendar.
+- SQLite para persistencia local.
 
-## 🛠️ Tecnologías utilizadas
+## Estructura del proyecto
 
-- **Python 3.8+**
-- **OpenCV** - Procesamiento de imágenes y visión por computadora
-- **face-recognition** - Biblioteca de reconocimiento facial
-- **SQLite** - Base de datos ligera y embebida
-- **CustomTkinter** - Interfaz gráfica moderna
-- **NumPy** - Computación numérica
-- **Pillow** - Procesamiento de imágenes
-
-## 📁 Estructura del proyecto
-
-```
+```text
 sistema-biometrico/
-├── app/
-│   ├── camara/
-│   │   └── camara.py              # Control de cámara
-│   ├── database/
-│   │   └── database.py            # Conexión y configuración BD
-│   ├── detection/
-│   │   └── detector_rostro.py     # Detección de rostros
-│   ├── recognition/
-│   │   ├── embedding_generator.py # Generación de embeddings
-│   │   ├── face_detector.py       # Detector facial
-│   │   ├── matcher.py             # Comparación de rostros
-│   │   ├── recognition_service.py # Servicio de reconocimiento
-│   │   └── registro_usuario.py    # Registro de usuarios
-│   ├── services/
-│   │   ├── biometria.py           # Gestión datos biométricos
-│   │   ├── carrera.py             # Gestión carreras
-│   │   ├── facial_service.py      # Servicios faciales
-│   │   ├── facultad.py            # Gestión facultades
-│   │   ├── registro_acceso.py     # Registro de accesos
-│   │   ├── usuario.py             # Gestión usuarios
-│   │   └── usuario_rol.py         # Gestión roles
-│   └── views/
-│       ├── account_view.py        # Vista cuenta
-│       ├── app_context.py         # Contexto aplicación
-│       ├── dashboard_view.py      # Panel principal
-│       ├── home_view.py           # Vista inicio
-│       ├── landing_view.py        # Vista landing
-│       ├── login_view.py          # Vista login
-│       ├── terminal_view.py       # Vista terminal
-│       └── user_management_view.py # Gestión usuarios
-├── init_db.py                     # Inicialización base de datos
-├── main.py                        # Archivo principal
-├── requirements.txt               # Dependencias Python
-└── README.md                      # Este archivo
+|-- app/
+|   |-- camara/                 # Lectura de camara y captura en segundo plano
+|   |-- database/               # Conexion SQLite y schema_and_data.sql
+|   |-- detection/              # Pipeline de deteccion/reconocimiento en vivo
+|   |-- hardware/               # Rele, buzzer, GPIO y pruebas de hardware
+|   |-- recognition/            # Registro, embeddings y comparacion facial
+|   |-- services/               # Servicios de usuarios, areas, puestos y tema
+|   |-- views/                  # Pantallas CustomTkinter
+|-- deploy/                     # Servicio systemd para Raspberry Pi
+|-- scripts/                    # Scripts de instalacion/despliegue
+|-- main.py                     # Punto de entrada de la aplicacion
+|-- init_db.py                  # Inicializacion de base de datos
+|-- requirements.txt            # Dependencias Python
+|-- GUIA_CONFIGURACION.md       # Guia operativa de instalacion y soporte
 ```
 
-## Seguridad de datos sensibles
-
-Este proyecto trabaja con informacion biometrica y registros de acceso, por lo que algunos archivos se generan solo de forma local y no deben subirse al repositorio:
-
-- `encodings.json`: contiene representaciones numericas de rostros registrados. Aunque no sea una fotografia, sigue siendo informacion biometrica sensible.
-- `logs_accesos.json`: contiene historial de accesos, fechas, horas e intentos de ingreso, informacion que puede revelar patrones de uso o actividad de personas.
-
-Por seguridad, estos archivos estan incluidos en `.gitignore`. En su lugar se incluyen archivos de ejemplo vacios:
-
-- `encodings.example.json`
-- `logs_accesos.example.json`
-
-Esto permite documentar la estructura esperada sin exponer datos reales de usuarios, credenciales, registros internos o informacion perteneciente a una institucion/equipo.
-
-## 🚀 Instalación y Configuración
-
-### 1. 📥 Clonar el repositorio
-
-```bash
-git clone <url-del-repositorio>
-cd sistema-biometrico
-```
-
-### 2. 🐍 Crear entorno virtual
+## Instalacion rapida
 
 ```powershell
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. 📦 Instalar dependencias
-
-```powershell
+cd C:\Users\vinel\Documents\sistema-biometrico
+py -3.10 -m venv venv
+.\venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-#### ⚠️ Dependencias principales:
-
-- **customtkinter** - Interfaz gráfica moderna
-- **opencv-python** - Procesamiento de imágenes
-- **numpy** - Computación numérica
-- **face-recognition** - Reconocimiento facial
-- **Pillow** - Manipulación de imágenes
-- **dlib** - Biblioteca base para face-recognition
-
-#### 🔧 Instalación manual (si es necesario):
+Si ya tienes el entorno creado:
 
 ```powershell
-# Instalar OpenCV
-pip install opencv-python==4.8.1.78
-
-# Instalar NumPy
-pip install numpy==1.24.3
-
-# Instalar face-recognition (incluye dlib)
-pip install face-recognition==1.3.0
-
-# Instalar CustomTkinter
-pip install customtkinter==5.2.2
-
-# Instalar Pillow
-pip install Pillow==10.0.1
+.\venv\Scripts\Activate.ps1
+pip install -r requirements.txt
 ```
 
-### 4. 🗄️ Configurar base de datos
+## Dependencias clave
 
-#### Crear la base de datos:
+El proyecto usa esta combinacion probada:
+
+```text
+customtkinter==5.2.2
+opencv-contrib-python==4.10.0.84
+numpy==1.26.4
+face-recognition==1.3.0
+Pillow==10.0.1
+dlib==20.0.1
+mediapipe==0.10.14
+```
+
+Importante: no subir `numpy` a 2.x en este proyecto, porque puede romper `face_recognition/dlib` con el error `Unsupported image type, must be 8bit gray or RGB image`.
+
+## Base de datos
+
+La base se crea y verifica automaticamente al iniciar la app. Tambien puedes inicializarla manualmente:
+
 ```powershell
 python init_db.py
 ```
 
-#### Acceder a la base de datos con SQLite Browser:
+Ruta de la base:
 
-1. **Descargar SQLite Browser**: https://sqlitebrowser.org/
-2. **Abrir la aplicación**
-3. **File → Open Database**
-4. **Seleccionar archivo**: `app/database/sistema_biometrico.db`
-5. **¡Listo!** Puedes ver todas las tablas y datos
+```text
+app/database/sistema_biometrico.db
+```
 
-#### Tablas principales:
-- `usuario_rol` - Roles de usuario
-- `facultad` - Facultades académicas
-- `carrera` - Carreras disponibles
-- `usuario` - Datos de usuarios
-- `biometria` - Datos biométricos
-- `registro_acceso` - Historial de accesos
+El esquema y datos base viven en:
 
-### 5. ▶️ Ejecutar la aplicación
+```text
+app/database/schema_and_data.sql
+```
+
+Tablas principales:
+
+- `usuario_rol`
+- `facultad`
+- `carrera`
+- `usuario`
+- `biometria`
+- `registro_acceso`
+
+## Ejecucion
 
 ```powershell
+.\venv\Scripts\Activate.ps1
 python main.py
 ```
 
-## 👤 Usuarios de prueba
+La aplicacion inicia en la terminal biometrica. Desde ahi puedes ir al login con el boton `Salir` y entrar al dashboard. Las credenciales de prueba actuales son:
 
-Para probar el sistema, puedes crear usuarios desde SQLite Browser:
-
-### Administrador de ejemplo:
-```sql
-INSERT INTO usuario (nombre, a_paterno, a_materno, fecha_registro, id_rol, id_facultad, id_carrera)
-VALUES ('Juan Pablo', 'Mancilla', 'Rodriguez', datetime('now'), 1, 4, 35);
+```text
+usuario: 1
+contrasena: 1
 ```
 
-## 🎯 Uso del sistema
+## Flujo de uso
 
-1. **Login**: Inicia sesión con credenciales de usuario
-2. **Dashboard**: Panel principal con opciones disponibles
-3. **Gestión de usuarios**: Crear, editar y eliminar usuarios
-4. **Reconocimiento facial**: Capturar y registrar rostros
-5. **Control de acceso**: Verificar identidad en tiempo real
+1. Iniciar la aplicacion con `python main.py`.
+2. Usar la terminal biometrica para validar accesos.
+3. Presionar `Salir` para entrar al login administrativo.
+4. Iniciar sesion con las credenciales de prueba.
+5. Administrar personal, areas, puestos y ajustes desde el dashboard.
+6. Registrar biometria desde el formulario de personal.
+7. Revisar metricas y ultimos accesos en el panel principal.
 
-## 🔧 Solución de problemas
+## Rendimiento de camara
 
-### Error al instalar face-recognition:
+La camara usa lectura en segundo plano para evitar frames viejos. La deteccion de rostro usa MediaPipe cuando esta instalado; si no esta disponible, el sistema cae al detector HOG de `face_recognition`.
+
+Recomendaciones:
+
+- Cerrar otras aplicaciones que usen la camara.
+- Usar buena iluminacion frontal.
+- Mantener una sola cara visible.
+- Evitar actualizar `numpy` y OpenCV fuera de las versiones del `requirements.txt`.
+
+## Datos sensibles
+
+Estos archivos contienen informacion local sensible y no deben subirse al repositorio:
+
+- `encodings.json`: embeddings/representaciones numericas de rostros.
+- `logs_accesos.json`: historial de accesos e intentos.
+- `app/data/perfil_usuario.json`: datos de perfil administrativo.
+- `app/data/fotos/`: fotos de perfil.
+- `app/database/sistema_biometrico.db`: base local con usuarios y registros.
+
+Se incluyen archivos `.example.json` para documentar la estructura sin exponer datos reales.
+
+## Solucion de problemas
+
+### La camara no muestra video
+
+- Verifica que otra aplicacion no este usando la camara.
+- Reinstala dependencias con `pip install -r requirements.txt`.
+- Ejecuta `python -m pip check`.
+- Si aparece `Unsupported image type`, confirma:
+
 ```powershell
-# Instalar CMake primero (Windows)
-pip install cmake
-
-# Instalar dlib por separado
-pip install dlib==19.24.2
-
-# Luego face-recognition
-pip install face-recognition
+python -c "import numpy, cv2; print(numpy.__version__, cv2.__version__)"
 ```
 
-### Error de cámara:
-- Asegúrate de que la cámara esté conectada
-- Verifica permisos de acceso a cámara
-- Prueba con diferentes índices de cámara (0, 1, 2...)
+Debe mostrar `numpy 1.26.4` y OpenCV `4.10.0`.
 
-### Base de datos corrupta:
+### MediaPipe muestra advertencias
+
+Mensajes como `TensorFlow Lite XNNPACK delegate` o `Feedback manager...` son advertencias normales de MediaPipe. No bloquean la camara.
+
+### Error instalando dlib o face-recognition
+
+En Windows, usa Python 3.10 y actualiza pip:
+
 ```powershell
-# Recrear base de datos
-python init_db.py
+python -m pip install --upgrade pip setuptools wheel
+pip install -r requirements.txt
 ```
 
-## 📊 Estado del proyecto
+Si sigue fallando, instala Visual Studio Build Tools con soporte para C++.
 
-- ✅ **Base de datos**: Configurada y poblada
-- ✅ **Interfaz gráfica**: Completa y funcional
-- ✅ **Reconocimiento facial**: Implementado
-- ✅ **Gestión de usuarios**: Funcional
-- 🔄 **Registro biométrico**: En desarrollo
-- 🔄 **Control de acceso**: En desarrollo
+## Raspberry Pi y hardware
 
-## 🤝 Contribución
+El proyecto incluye soporte opcional para cerradura, rele, buzzer y PIR. Consulta [GUIA_CONFIGURACION.md](GUIA_CONFIGURACION.md) para cableado, variables de entorno y despliegue con systemd.
 
-1. Fork el proyecto
-2. Crea una rama para tu feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit tus cambios (`git commit -am 'Agrega nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abre un Pull Request
+## Estado actual
 
-## 📝 Licencia
+- Base de datos: funcional.
+- Interfaz grafica: funcional.
+- Dashboard: funcional.
+- Gestion de personal, areas y puestos: funcional.
+- Terminal biometrica: funcional con MediaPipe/OpenCV.
+- Registro de accesos: funcional.
+- Hardware Raspberry Pi: preparado con modo simulacion y servicio systemd.
 
-Este proyecto es de uso educativo y universitario.
+## Licencia
 
-
----
-
-**¡El sistema biométrico está listo para usar!** 🎉
-
-
-
+Proyecto de uso educativo/universitario.

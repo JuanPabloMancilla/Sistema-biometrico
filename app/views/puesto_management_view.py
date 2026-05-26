@@ -18,7 +18,7 @@ class PuestoManagementView(ctk.CTkFrame):
         self.controller = controller
         self.usuario_editando_id = None
 
-        self.font_header = ("Inter", 30, "bold")
+        self.font_header = ("Inter", 28, "bold")
         self.font_sub    = ("Inter", 16, "bold")
         self.font_normal = ("Inter", 13)
         self.font_small  = ("Inter", 11, "bold")
@@ -46,7 +46,7 @@ class PuestoManagementView(ctk.CTkFrame):
     # RESIZE
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def _on_resize(self, event):
-        nuevo_compact = event.width < 700
+        nuevo_compact = event.width < 1040
         if nuevo_compact != self.is_compact:
             self.is_compact = nuevo_compact
 
@@ -65,8 +65,8 @@ class PuestoManagementView(ctk.CTkFrame):
             )
             self.main_card.pack(
                 fill="both", expand=True,
-                padx=10 if self.is_compact else 40,
-                pady=(0, 20 if self.is_compact else 40)
+                padx=8 if self.is_compact else 40,
+                pady=(0, 12 if self.is_compact else 40)
             )
 
             self.render_table_content()
@@ -90,7 +90,7 @@ class PuestoManagementView(ctk.CTkFrame):
         )
 
         scroll = ctk.CTkScrollableFrame(self.main_card, fg_color="transparent")
-        scroll.pack(expand=True, fill="both", padx=16, pady=12)
+        scroll.pack(expand=True, fill="both", padx=8 if self.is_compact else 16, pady=8 if self.is_compact else 12)
 
         if not carreras:
             msg = f"No se encontraron carreras para \"{query}\"" if query else "No hay carreras registradas"
@@ -273,7 +273,9 @@ class PuestoManagementView(ctk.CTkFrame):
 
         modal = ctk.CTkFrame(
             self.overlay, fg_color=COLORS["card"], corner_radius=8,
-            width=420, height=250, border_width=2, border_color="#CBD5E1"
+            width=340 if self.is_compact else 420,
+            height=220 if self.is_compact else 250,
+            border_width=2, border_color="#CBD5E1"
         )
         modal.place(relx=0.5, rely=0.5, anchor="center")
         modal.pack_propagate(False)
@@ -293,8 +295,8 @@ class PuestoManagementView(ctk.CTkFrame):
             btn_color = "#10B981"
             btn_hover = "#059669"
 
-        ctk.CTkLabel(modal, text=icono, font=("Inter", 45)).pack(pady=(20, 5))
-        ctk.CTkLabel(modal, text=titulo, font=("Inter", 16, "bold"), text_color=COLORS["text"]).pack()
+        ctk.CTkLabel(modal, text=icono, font=("Inter", 32 if self.is_compact else 45)).pack(pady=(12 if self.is_compact else 20, 5))
+        ctk.CTkLabel(modal, text=titulo, font=("Inter", 14 if self.is_compact else 16, "bold"), text_color=COLORS["text"]).pack()
         ctk.CTkLabel(modal, text=nombre.upper(), font=("Inter", 12, "bold"), text_color=COLORS["subtext"]).pack()
         ctk.CTkLabel(modal, text=sub, font=("Inter", 11), text_color=COLORS["subtext"]).pack(pady=(2, 0))
 
@@ -462,21 +464,21 @@ class PuestoManagementView(ctk.CTkFrame):
     # HEADER & SEARCH
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     def create_header(self, master):
-        padx_header = 12 if self.is_compact else 30
+        padx_header = 8 if self.is_compact else 30
         h = ctk.CTkFrame(master, fg_color="transparent")
-        h.pack(fill="x", padx=padx_header, pady=(15, 10))
+        h.pack(fill="x", padx=padx_header, pady=(8 if self.is_compact else 15, 8))
 
         if self.is_compact:
             ctk.CTkLabel(
                 h, text=AppContext.t("Puestos"),
-                font=("Inter", 26, "bold"), text_color=COLORS["text"]
-            ).pack(anchor="center", pady=(0, 10))
+                font=("Inter", 22, "bold"), text_color=COLORS["text"]
+            ).pack(anchor="center", pady=(0, 8))
             ctk.CTkButton(
                 h, text=AppContext.t("Nuevo puesto"),
                 font=self.font_sub, fg_color=COLORS["primary"],
-                height=45, corner_radius=8,
+                height=40, corner_radius=8,
                 command=self.abrir_formulario
-            ).pack(fill="x", padx=10)
+            ).pack(fill="x", padx=4)
         else:
             ctk.CTkLabel(
                 h, text=AppContext.t("Puestos"),
@@ -490,7 +492,7 @@ class PuestoManagementView(ctk.CTkFrame):
             ).pack(side="right")
 
     def create_search_bar(self, master):
-        padx_bar = 12 if self.is_compact else 30
+        padx_bar = 8 if self.is_compact else 30
         bar = ctk.CTkFrame(master, fg_color="transparent")
         bar.pack(fill="x", padx=padx_bar, pady=10)
         self.entry_busqueda = ctk.CTkEntry(

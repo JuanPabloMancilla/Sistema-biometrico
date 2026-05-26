@@ -1,3 +1,9 @@
+import os
+
+os.environ.setdefault("TF_CPP_MIN_LOG_LEVEL", "3")
+os.environ.setdefault("GLOG_minloglevel", "3")
+os.environ.setdefault("ABSL_LOGGING_MIN_LOG_LEVEL", "3")
+
 import customtkinter as ctk
 from app.views.login_view import LoginView
 from app.views.dashboard_view import DashboardView

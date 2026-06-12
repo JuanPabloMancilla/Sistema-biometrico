@@ -98,7 +98,7 @@ class LoginView(ctk.CTkFrame):
 
     def create_form(self):
         base_path = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        assets_path = os.path.join(base_path, "app", "views", "assets", "imgg.png")
+        assets_path = os.path.join(base_path, "app", "views", "assets", "img.png")
 
         print(f"DEBUG: Buscando logo circular en: {assets_path}")
 

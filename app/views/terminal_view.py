@@ -206,6 +206,21 @@ class TerminalView(ctk.CTkFrame):
     def _build_ui(self):
         ctk.CTkFrame(self, fg_color=ACCENT_GREEN, height=3).pack(fill="x", side="top")
 
+        if self.modo != "registro":
+            self.btn_panel_compacto = ctk.CTkButton(
+                self,
+                text=AppContext.t("Panel"),
+                width=92,
+                height=34,
+                corner_radius=8,
+                fg_color=ACCENT_GREEN,
+                hover_color="#0B5F59",
+                text_color="#FFFFFF",
+                font=("Inter", 12, "bold"),
+                command=self.cerrar_y_volver,
+            )
+            self.btn_panel_compacto.place(relx=1.0, y=12, x=-16, anchor="ne")
+
         main = ctk.CTkFrame(self, fg_color="transparent")
         main.pack(expand=True, fill="both", padx=14, pady=(14, 12))
 

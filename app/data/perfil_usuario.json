@@ -1,7 +1,7 @@
 {
-  "nombre": "ADMINISTRADOR EMPRESARIAL",
+  "nombre": "ADMINISTRADOR",
   "correo": "admin@empresa.com",
-  "tel": "5512345678",
+  "tel": "3141509894",
   "facultad": "DIRECCION OPERATIVA",
-  "foto": null
+  "foto": "C:\\Users\\vinel\\Documents\\sistema-biometrico\\app\\views\\..\\data\\fotos\\avatar.jpeg"
 }

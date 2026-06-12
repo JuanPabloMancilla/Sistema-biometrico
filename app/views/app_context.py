@@ -668,6 +668,8 @@ EMPRESA_EN = {
     "Sin puesto": "No position",
     "Areas": "Areas",
     "Consola biometrica": "Biometric Console",
+    "Panel": "Panel",
+    "Entrar al panel": "Open panel",
     "Salir": "Exit",
     "Tablero operativo": "Operations Board",
     "Turno activo": "Active Shift",

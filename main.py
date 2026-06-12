@@ -18,6 +18,7 @@ class AppPrincipal(ctk.CTk):
 
         self.title("SECUREWORK")
         self.geometry("1100x800")
+        self.minsize(760, 620)
         self.configure(fg_color="white")
 
         # Inicializar base de datos al arrancar

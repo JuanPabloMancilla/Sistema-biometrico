@@ -5,7 +5,7 @@ from PIL import Image
 import time
 from app.hardware import buzzer
 from app.recognition.encoding_manager import cargar_encodings
-from app.detection.detector_rostro import find_best_match
+from app.detection.detector_rostro import find_best_match, UMBRAL_ACCESO
 from app.views.app_context import AppContext
 from app.camara.camara import iniciar_camara, liberar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
@@ -186,6 +186,7 @@ class TerminalView(ctk.CTkFrame):
         self.pos_linea = 0
         self.subiendo = False
         self.usuario_detectado = ""
+        self.ids_detectados_escaneo = []
         self.ultimo_rostro_visto = 0.0
         self.face_box = None
         self._haar_frame_count = 0
@@ -606,6 +607,7 @@ class TerminalView(ctk.CTkFrame):
                     self.escaneando = True
                     self.inicio_escaneo = ahora
                     self.usuario_detectado = ""
+                    self.ids_detectados_escaneo = []
                     self.aplicar_estilo_visual("escaneando")
 
             if self.escaneando and self.face_box is not None:
@@ -620,6 +622,8 @@ class TerminalView(ctk.CTkFrame):
                 )
                 if msg_actual and not any(g in msg_actual for g in MENSAJES_GENERICOS):
                     self.usuario_detectado = msg_actual
+                if face_encoding is not None:
+                    self.ids_detectados_escaneo.append(usuario_id)
 
                 if ahora - self.inicio_escaneo > SCAN_DURATION:
                     self.escaneando = False
@@ -637,7 +641,7 @@ class TerminalView(ctk.CTkFrame):
                                 self.ids_conocidos
                             )
 
-                            if match_id is not None and distancia < 0.45:
+                            if match_id is not None and distancia < UMBRAL_ACCESO:
 
                                 self.status_label.configure(
                                     text=AppContext.t("USUARIO YA REGISTRADO"),
@@ -663,6 +667,16 @@ class TerminalView(ctk.CTkFrame):
                             return
 
                     else:
+                        ids_validos = [
+                            detectado for detectado in self.ids_detectados_escaneo
+                            if detectado is not None
+                        ]
+                        identidad_consistente = (
+                            usuario_id is not None
+                            and len(ids_validos) >= 3
+                            and len(ids_validos) == len(self.ids_detectados_escaneo)
+                            and all(detectado == usuario_id for detectado in ids_validos)
+                        )
 
                         if not self.usuario_detectado:
                             self.usuario_detectado = msg_actual
@@ -688,10 +702,10 @@ class TerminalView(ctk.CTkFrame):
                                     self.cerradura.bloquear()
                                 self._activar_buzzer("denegado")
 
-                            elif usuario_id is None:
+                            elif not identidad_consistente:
 
                                 self.aplicar_estilo_visual("negado")
-                                self.registrar_acceso_bd(None, 0, None, "Usuario no identificado")
+                                self.registrar_acceso_bd(None, 0, None, "Identidad no confirmada")
                                 if self.cerradura:
                                     self.cerradura.bloquear()
                                 self._activar_buzzer("denegado")

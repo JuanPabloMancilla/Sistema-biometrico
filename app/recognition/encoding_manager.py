@@ -51,7 +51,7 @@ def find_best_match(
     encoding_actual,
     encoding_db,
     usuarios_db,
-    threshold=0.6
+    threshold=0.42
 ):
 
     mejor_distancia = float("inf")

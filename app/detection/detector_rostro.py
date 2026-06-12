@@ -62,6 +62,8 @@ ultimo_encoding = None
 ultimo_usuario_id = None
 frame_count = 0
 PROCESAR_CADA_N_FRAMES = 6
+UMBRAL_ACCESO = 0.42
+MARGEN_MINIMO_COINCIDENCIA = 0.04
 mp_face_detector = None
 
 if mp is not None:
@@ -291,15 +293,9 @@ def procesar_frame(frame):
     nombre_detectado = "DESCONOCIDO"
     usuario_id = None
     if verificar_dimension(face_encoding) and len(encodings_db) > 0:
-        distancias = face_recognition.face_distance(encodings_db, face_encoding)
-        mejor_distancia = min(distancias)
-
-        if mejor_distancia < 0.6:
-            idx = np.argmin(distancias)
-
-            usuario_id = usuarios_db[idx]  # ðŸ”¥ este es el ID
-            nombre_detectado = obtener_nombre_usuario_por_id(usuario_id)  # ðŸ”¥ aquÃ­ lo conviertes a nombre
-
+        usuario_id, _ = find_best_match(face_encoding, encodings_db, usuarios_db)
+        if usuario_id is not None:
+            nombre_detectado = obtener_nombre_usuario_por_id(usuario_id)
             registrar_acceso()
 
     # Guardar resultado para frames intermedios
@@ -313,7 +309,13 @@ def procesar_frame(frame):
 
     return frame, face_encoding, nombre_detectado, usuario_id
     
-def find_best_match(face_encoding, known_encodings, known_ids, threshold=0.45):
+def find_best_match(
+    face_encoding,
+    known_encodings,
+    known_ids,
+    threshold=UMBRAL_ACCESO,
+    min_margin=MARGEN_MINIMO_COINCIDENCIA
+):
     import numpy as np
 
     if face_encoding is None:
@@ -341,9 +343,20 @@ def find_best_match(face_encoding, known_encodings, known_ids, threshold=0.45):
 
     mejor_indice = int(np.argmin(distancias))
     mejor_distancia = float(distancias[mejor_indice])
+    mejor_id = known_ids[mejor_indice]
+    distancias_otros_usuarios = [
+        distancia
+        for indice, distancia in enumerate(distancias)
+        if known_ids[indice] != mejor_id
+    ]
+    margen = (
+        min(distancias_otros_usuarios) - mejor_distancia
+        if distancias_otros_usuarios
+        else float("inf")
+    )
 
-    if mejor_distancia < threshold:
-        return known_ids[mejor_indice], mejor_distancia
+    if mejor_distancia < threshold and margen >= min_margin:
+        return mejor_id, mejor_distancia
 
     return None, mejor_distancia
    

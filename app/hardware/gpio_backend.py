@@ -2,14 +2,18 @@ import logging
 from app.config import SIMULATE_HARDWARE
 
 SIMULATE = SIMULATE_HARDWARE
+BACKEND_ERROR = None
 
 try:
     if not SIMULATE:
-        from gpiozero import OutputDevice, Buzzer as GpioBuzzer  # type: ignore
+        from gpiozero import Device, OutputDevice, Buzzer as GpioBuzzer  # type: ignore
+
+        Device.ensure_pin_factory()
         GPIO_OK = True
     else:
         raise Exception("SIMULATE_HARDWARE enabled")
 except Exception as e:
+    BACKEND_ERROR = str(e)
     logging.debug("gpiozero not available or simulation enabled: %s", e)
     GPIO_OK = False
 
@@ -66,4 +70,4 @@ else:
 
 
 def get_backend_info():
-    return {"gpio_ok": GPIO_OK, "simulate": SIMULATE}
+    return {"gpio_ok": GPIO_OK, "simulate": SIMULATE, "error": BACKEND_ERROR}

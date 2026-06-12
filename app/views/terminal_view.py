@@ -195,6 +195,9 @@ class TerminalView(ctk.CTkFrame):
         self.encodings_conocidos, self.ids_conocidos = cargar_encodings()
 
         self._pending_style = None
+        self.compact_ui = (
+            self.winfo_screenwidth() < 1100 or self.winfo_screenheight() < 700
+        )
 
         self.face_cascade = cv2.CascadeClassifier(
             cv2.data.haarcascades + "haarcascade_frontalface_default.xml"
@@ -207,18 +210,19 @@ class TerminalView(ctk.CTkFrame):
         ctk.CTkFrame(self, fg_color=ACCENT_GREEN, height=3).pack(fill="x", side="top")
 
         main = ctk.CTkFrame(self, fg_color="transparent")
-        main.pack(expand=True, fill="both", padx=14, pady=(14, 12))
+        page_pad = 7 if self.compact_ui else 14
+        main.pack(expand=True, fill="both", padx=page_pad, pady=(page_pad, page_pad))
 
         # -- Panel lateral -----------------------------------------------------
         self.data_banner = ctk.CTkFrame(
             main,
             fg_color=BG_BANNER,
             corner_radius=8,
-            width=292,
+            width=220 if self.compact_ui else 292,
             border_width=1,
             border_color=BORDER_IDLE,
         )
-        self.data_banner.pack(side="left", fill="y", padx=(0, 12))
+        self.data_banner.pack(side="left", fill="y", padx=(0, 7 if self.compact_ui else 12))
         self.data_banner.pack_propagate(False)
 
         self.accent_bar = ctk.CTkFrame(
@@ -227,12 +231,16 @@ class TerminalView(ctk.CTkFrame):
         self.accent_bar.pack(side="left", fill="y")
 
         side = ctk.CTkFrame(self.data_banner, fg_color="transparent")
-        side.pack(side="left", fill="both", expand=True, padx=20, pady=20)
+        side.pack(
+            side="left", fill="both", expand=True,
+            padx=12 if self.compact_ui else 20,
+            pady=10 if self.compact_ui else 20,
+        )
 
         ctk.CTkLabel(
             side,
             text="SECUREWORK",
-            font=("Inter", 24, "bold"),
+            font=("Inter", 18 if self.compact_ui else 24, "bold"),
             text_color="#FFFFFF",
         ).pack(anchor="w")
 
@@ -241,7 +249,21 @@ class TerminalView(ctk.CTkFrame):
             text=AppContext.t("CONTROL DE ACCESO"),
             font=("Inter", 11, "bold"),
             text_color=TEXT_SECONDARY,
-        ).pack(anchor="w", pady=(2, 22))
+        ).pack(anchor="w", pady=(2, 10))
+
+        if self.modo != "registro":
+            self.btn_panel = ctk.CTkButton(
+                side,
+                text=AppContext.t("Entrar al panel de control"),
+                height=38,
+                corner_radius=8,
+                fg_color=ACCENT_GREEN,
+                hover_color="#0B5F59",
+                text_color="#FFFFFF",
+                font=("Inter", 12, "bold"),
+                command=self.cerrar_y_volver,
+            )
+            self.btn_panel.pack(fill="x", pady=(0, 12 if self.compact_ui else 18))
 
         ctk.CTkLabel(
             side,
@@ -261,9 +283,9 @@ class TerminalView(ctk.CTkFrame):
         self.status_label = ctk.CTkLabel(
             row,
             text=AppContext.t("SISTEMA ACTIVO"),
-            font=("Inter", 18, "bold"),
+            font=("Inter", 14 if self.compact_ui else 18, "bold"),
             text_color=TEXT_PRIMARY,
-            wraplength=220,
+            wraplength=170 if self.compact_ui else 220,
             justify="left",
         )
         self.status_label.pack(side="left")
@@ -276,51 +298,49 @@ class TerminalView(ctk.CTkFrame):
             font=("Inter", 13),
             text_color=TEXT_SECONDARY,
             anchor="w",
-            wraplength=230,
+            wraplength=175 if self.compact_ui else 230,
             justify="left",
         )
         self.lbl_nombre.pack(fill="x", anchor="w")
 
-        ctk.CTkFrame(side, fg_color=BORDER_IDLE, height=1).pack(fill="x", pady=(22, 16))
-
-        ctk.CTkLabel(
-            side,
-            text=AppContext.t("GUIA RAPIDA"),
-            font=("Inter", 10, "bold"),
-            text_color=TEXT_MUTED,
-        ).pack(anchor="w")
-
-        for texto in [
-            AppContext.t("Mantenga una sola cara visible"),
-            AppContext.t("Mire de frente a la camara"),
-            AppContext.t("Evite sombras sobre el rostro"),
-        ]:
+        if not self.compact_ui:
+            ctk.CTkFrame(side, fg_color=BORDER_IDLE, height=1).pack(fill="x", pady=(22, 16))
             ctk.CTkLabel(
                 side,
-                text=texto,
-                font=("Inter", 11),
-                text_color=TEXT_SECONDARY,
-                wraplength=230,
-                justify="left",
-            ).pack(anchor="w", pady=(8, 0))
+                text=AppContext.t("GUIA RAPIDA"),
+                font=("Inter", 10, "bold"),
+                text_color=TEXT_MUTED,
+            ).pack(anchor="w")
+
+            for texto in [
+                AppContext.t("Mantenga una sola cara visible"),
+                AppContext.t("Mire de frente a la camara"),
+                AppContext.t("Evite sombras sobre el rostro"),
+            ]:
+                ctk.CTkLabel(
+                    side,
+                    text=texto,
+                    font=("Inter", 11),
+                    text_color=TEXT_SECONDARY,
+                    wraplength=230,
+                    justify="left",
+                ).pack(anchor="w", pady=(8, 0))
 
         ctk.CTkFrame(side, fg_color="transparent").pack(fill="both", expand=True)
 
-        btn_text = AppContext.t("Entrar al panel") if self.modo != "registro" else AppContext.t("Cerrar")
-        btn_color = ACCENT_GREEN if self.modo != "registro" else ACCENT_RED
-        btn_hover = "#0B5F59" if self.modo != "registro" else "#7F1D1D"
-        self.btn_salir = ctk.CTkButton(
-            side,
-            text=btn_text,
-            height=44,
-            corner_radius=8,
-            fg_color=btn_color,
-            hover_color=btn_hover,
-            text_color="#FFFFFF",
-            font=("Inter", 13, "bold"),
-            command=self.cerrar_y_volver,
-        )
-        self.btn_salir.pack(fill="x", side="bottom", pady=(16, 0))
+        if self.modo == "registro":
+            self.btn_salir = ctk.CTkButton(
+                side,
+                text=AppContext.t("Cerrar"),
+                height=38 if self.compact_ui else 44,
+                corner_radius=8,
+                fg_color=ACCENT_RED,
+                hover_color="#7F1D1D",
+                text_color="#FFFFFF",
+                font=("Inter", 13, "bold"),
+                command=self.cerrar_y_volver,
+            )
+            self.btn_salir.pack(fill="x", side="bottom", pady=(16, 0))
 
         self.accent_line = ctk.CTkFrame(
             self.data_banner, fg_color=ACCENT_PURPLE, height=2, corner_radius=0
@@ -344,17 +364,18 @@ class TerminalView(ctk.CTkFrame):
         self.video_display.pack(fill="both", expand=True)
 
         # Footer
-        ctk.CTkLabel(
-            self,
-            text=(
-                AppContext.t("Sistema Biometrico v2.0") + "  //  " +
-                AppContext.t("Acceso Seguro") + "  //  " +
-                AppContext.t("Cifrado AES-256")
-            ),
-            font=("Inter", 9),
-            text_color=TEXT_MUTED,
-        ).pack(side="bottom", pady=(0, 4))
-        ctk.CTkFrame(self, fg_color=BORDER_IDLE, height=1).pack(fill="x", side="bottom")
+        if not self.compact_ui:
+            ctk.CTkLabel(
+                self,
+                text=(
+                    AppContext.t("Sistema Biometrico v2.0") + "  //  " +
+                    AppContext.t("Acceso Seguro") + "  //  " +
+                    AppContext.t("Cifrado AES-256")
+                ),
+                font=("Inter", 9),
+                text_color=TEXT_MUTED,
+            ).pack(side="bottom", pady=(0, 4))
+            ctk.CTkFrame(self, fg_color=BORDER_IDLE, height=1).pack(fill="x", side="bottom")
 
     def aplicar_estilo_visual(self, estado: str, usuario: str = ""):
         self._pending_style = (estado, usuario)
@@ -663,9 +684,13 @@ class TerminalView(ctk.CTkFrame):
                             elif usuario_activo(usuario_id):
 
                                 self.aplicar_estilo_visual("autorizado", usuario=self.usuario_detectado)
-                                self.registrar_acceso_bd(usuario_id, 1, None, "Acceso autorizado")
                                 if self.cerradura:
-                                    self.cerradura.desbloquear_temporal()
+                                    apertura_enviada = self.cerradura.desbloquear_temporal()
+                                    print(
+                                        "ACCESO AUTORIZADO: "
+                                        f"usuario={usuario_id}, apertura_enviada={apertura_enviada}"
+                                    )
+                                self.registrar_acceso_bd(usuario_id, 1, None, "Acceso autorizado")
                                 self._activar_buzzer("autorizado")
 
                             else:

@@ -36,9 +36,9 @@ class UserManagementView(ctk.CTkFrame):
         self.usuario_editando_id = None
 
         self.font_header = ("Inter", 28, "bold")
-        self.font_sub    = ("Inter", 16, "bold")
-        self.font_normal = ("Inter", 13)
-        self.font_small  = ("Inter", 11, "bold")
+        self.font_sub    = ("Inter", 14, "bold")
+        self.font_normal = ("Inter", 12)
+        self.font_small  = ("Inter", 12, "bold")
 
         self.rol_var             = ctk.StringVar(value="TRABAJADOR")
         self.carrera_var         = ctk.StringVar()
@@ -73,7 +73,7 @@ class UserManagementView(ctk.CTkFrame):
             border_width=1,
             border_color=COLORS["border"]
         )
-        self.main_card.pack(expand=True, fill="both", padx=30, pady=(5, 15))
+        self.main_card.pack(expand=True, fill="both", padx=20, pady=(5, 10))
 
         self.render_table_content(self.all_users)
 
@@ -173,10 +173,10 @@ class UserManagementView(ctk.CTkFrame):
                     scroll, fg_color=COLORS["card"],
                     corner_radius=8, border_width=1, border_color=COLORS["border"]
                 )
-                card.pack(fill="x", padx=2, pady=8)
+                card.pack(fill="x", padx=2, pady=5)
 
                 top = ctk.CTkFrame(card, fg_color="transparent")
-                top.pack(fill="x", padx=12, pady=(12, 4))
+                top.pack(fill="x", padx=10, pady=(8, 3))
 
                 ctk.CTkLabel(top, text="", font=("Inter", 28)).pack(side="left", padx=(0, 8))
 
@@ -246,12 +246,12 @@ class UserManagementView(ctk.CTkFrame):
                 ).pack(padx=8, pady=3)
 
                 actions = ctk.CTkFrame(card, fg_color="transparent")
-                actions.pack(fill="x", padx=12, pady=(0, 12))
+                actions.pack(fill="x", padx=10, pady=(0, 8))
 
                 ctk.CTkButton(
                     actions,
                     text="✎",
-                    width=46, height=34,
+                    width=42, height=30,
                     fg_color=COLORS["hover"], text_color=COLORS["text"],
                     font=("Segoe UI Symbol", 14, "bold"),
                     command=lambda d=u: self.abrir_formulario(d)
@@ -261,7 +261,7 @@ class UserManagementView(ctk.CTkFrame):
                     ctk.CTkButton(
                         actions,
                         text="⊘",
-                        width=46, height=34,
+                        width=42, height=30,
                         fg_color="#FFF1F2", text_color="#E11D48",
                         font=("Segoe UI Symbol", 14, "bold"),
                         command=lambda i=u["id"], n=f"{u['nombre_solo']} {u['ap']}": self.confirmar_cambio_estado(i, n, desactivar=True)
@@ -270,7 +270,7 @@ class UserManagementView(ctk.CTkFrame):
                     ctk.CTkButton(
                         actions,
                         text="✓",
-                        width=46, height=34,
+                        width=42, height=30,
                         fg_color="#10B981", text_color="white",
                         font=("Segoe UI Symbol", 14, "bold"),
                         command=lambda i=u["id"], n=f"{u['nombre_solo']} {u['ap']}": self.confirmar_cambio_estado(i, n, desactivar=False)
@@ -488,36 +488,50 @@ class UserManagementView(ctk.CTkFrame):
         self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
 
-        padx_form = 8 if self.is_compact else 60
+        padx_form = 8 if self.is_compact else 36
+        self.form_actions = ctk.CTkFrame(
+            self.form_base,
+            fg_color=COLORS["card"],
+            corner_radius=8,
+            border_width=1,
+            border_color=COLORS["border"],
+        )
+        self.form_actions.pack(
+            side="bottom",
+            fill="x",
+            padx=padx_form,
+            pady=(4, 8),
+        )
+
         self.form_container = ctk.CTkScrollableFrame(self.form_base, fg_color="transparent")
         self.form_container.pack(fill="both", expand=True, padx=padx_form, pady=10)
 
         ctk.CTkLabel(
             self.form_container,
             text=(AppContext.t("Editar Registro")) if usuario else (AppContext.t("Nuevo Registro")),
-            font=("Inter", 22, "bold") if self.is_compact else self.font_header, text_color=COLORS["text"]
-        ).pack(anchor="w", padx=padx_form, pady=(12 if self.is_compact else 30, 8))
+            font=("Inter", 20, "bold") if self.is_compact else self.font_header, text_color=COLORS["text"]
+        ).pack(anchor="w", padx=0, pady=(6 if self.is_compact else 24, 5))
 
         c_clasi = ctk.CTkFrame(
             self.form_container, fg_color=COLORS["card"],
             corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
-        c_clasi.pack(fill="x", padx=padx_form, pady=10)
+        c_clasi.pack(fill="x", padx=0, pady=6)
 
         ctk.CTkLabel(
             c_clasi,
             text=AppContext.t("ClasificaciÃ³n"),
             font=self.font_sub,
             text_color=COLORS["text"]
-        ).pack(anchor="w", padx=20, pady=(15, 5))
+        ).pack(anchor="w", padx=14, pady=(10, 3))
 
         grid = ctk.CTkFrame(c_clasi, fg_color="transparent")
-        grid.pack(fill="x", padx=20, pady=(0, 20))
+        grid.pack(fill="x", padx=14, pady=(0, 10))
 
         def crear_campo_menu(titulo):
             campo = ctk.CTkFrame(grid, fg_color="transparent")
             if self.is_compact:
-                campo.pack(fill="x", pady=6)
+                campo.pack(fill="x", pady=3)
             else:
                 campo.pack(side="left", expand=True, fill="x", padx=5)
             ctk.CTkLabel(
@@ -533,7 +547,7 @@ class UserManagementView(ctk.CTkFrame):
             campo_rol,
             values=["TRABAJADOR", "SUPERVISOR", "ADMINISTRATIVO"],
             variable=self.rol_var,
-            height=40,
+            height=34 if self.is_compact else 38,
             text_color=COLORS["text"],
             fg_color=COLORS["hover"],
             button_color=COLORS["border"]
@@ -545,7 +559,7 @@ class UserManagementView(ctk.CTkFrame):
             campo_facultad,
             values=nombres_f,
             command=self.update_carreras_dinamicas,
-            height=40,
+            height=34 if self.is_compact else 38,
             text_color=COLORS["text"],
             fg_color=COLORS["hover"],
             button_color=COLORS["border"]
@@ -557,7 +571,7 @@ class UserManagementView(ctk.CTkFrame):
             campo_carrera,
             variable=self.carrera_var,
             values=[],
-            height=40,
+            height=34 if self.is_compact else 38,
             text_color=COLORS["text"],
             fg_color=COLORS["hover"],
             button_color=COLORS["border"]
@@ -598,7 +612,7 @@ class UserManagementView(ctk.CTkFrame):
                 self.form_container, fg_color=COLORS["card"],
                 corner_radius=8, border_width=1, border_color=COLORS["border"]
             )
-            estado_card.pack(fill="x", padx=padx_form, pady=10)
+            estado_card.pack(fill="x", padx=0, pady=10)
             ctk.CTkLabel(
                 estado_card,
                 text=AppContext.t("Estado del usuario"),
@@ -619,21 +633,22 @@ class UserManagementView(ctk.CTkFrame):
             entrada.configure(validate="key", validatecommand=vcmd)
 
         self.btn_biometria = ctk.CTkButton(
-            self.form_container,
+            self.form_actions,
             text=AppContext.t("Registrar BiometrÃ­a"),
-            height=50, fg_color="#0EA5E9", text_color="white",
+            height=36 if self.is_compact else 42,
+            fg_color="#0EA5E9", text_color="white",
             font=self.font_sub, command=self.abrir_terminal_biometrica
         )
-        self.btn_biometria.pack(fill="x", padx=padx_form, pady=(20, 10))
+        self.btn_biometria.pack(fill="x", padx=8, pady=(7, 3))
 
         self.label_estado = ctk.CTkLabel(
-            self.form_container, text="",
+            self.form_actions, text="",
             font=self.font_small, text_color="#EF4444"
         )
-        self.label_estado.pack(fill="x", padx=padx_form, pady=(0, 10))
+        self.label_estado.pack(fill="x", padx=10, pady=0)
 
-        btns = ctk.CTkFrame(self.form_container, fg_color="transparent")
-        btns.pack(fill="x", padx=padx_form, pady=(20, 50))
+        btns = ctk.CTkFrame(self.form_actions, fg_color="transparent")
+        btns.pack(fill="x", padx=8, pady=(3, 7))
 
         self.btn_guardar = ctk.CTkButton(
             btns,
@@ -643,7 +658,7 @@ class UserManagementView(ctk.CTkFrame):
             text_color="#065F46",
             hover_color="#BBF7D0",
             corner_radius=8,
-            height=55,
+            height=36 if self.is_compact else 42,
             command=self.validar_y_guardar
         )
         btn_cancelar = ctk.CTkButton(
@@ -654,7 +669,7 @@ class UserManagementView(ctk.CTkFrame):
             text_color="#991B1B",
             hover_color="#FECACA",
             corner_radius=8,
-            height=55,
+            height=36 if self.is_compact else 42,
             command=self.cerrar_formulario
         )
 
@@ -673,19 +688,18 @@ class UserManagementView(ctk.CTkFrame):
             self.btn_guardar.pack(side="left", expand=True, fill="x", padx=(10, 0))
 
     def create_section_card(self, master, title, fields):
-        padx_form = 8 if self.is_compact else 60
         card = ctk.CTkFrame(
             master, fg_color=COLORS["card"],
             corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
-        card.pack(fill="x", padx=padx_form, pady=10)
-        ctk.CTkLabel(card, text=title, font=self.font_sub, text_color=COLORS["text"]).pack(anchor="w", padx=20, pady=(15, 5))
+        card.pack(fill="x", padx=0, pady=6)
+        ctk.CTkLabel(card, text=title, font=self.font_sub, text_color=COLORS["text"]).pack(anchor="w", padx=14, pady=(10, 3))
         grid = ctk.CTkFrame(card, fg_color="transparent")
-        grid.pack(fill="x", padx=20, pady=(0, 20))
+        grid.pack(fill="x", padx=14, pady=(0, 10))
         for label, val in fields:
             f = ctk.CTkFrame(grid, fg_color="transparent")
             if self.is_compact:
-                f.pack(fill="x", pady=6)
+                f.pack(fill="x", pady=3)
             else:
                 f.pack(side="left", expand=True, fill="x", padx=5)
             ctk.CTkLabel(
@@ -694,7 +708,7 @@ class UserManagementView(ctk.CTkFrame):
                 font=self.font_small, text_color=COLORS["subtext"]
             ).pack(anchor="w")
             entry = ctk.CTkEntry(
-                f, height=40, font=self.font_normal,
+                f, height=34 if self.is_compact else 38, font=self.font_normal,
                 fg_color=COLORS["hover"], border_width=0, text_color=COLORS["text"]
             )
             entry.insert(0, val)
@@ -935,20 +949,20 @@ class UserManagementView(ctk.CTkFrame):
     def create_header(self, master):
         padx_header = 8 if self.is_compact else 30
         h = ctk.CTkFrame(master, fg_color="transparent")
-        h.pack(fill="x", padx=padx_header, pady=(20, 10))
+        h.pack(fill="x", padx=padx_header, pady=(8, 6))
 
         if self.is_compact:
             ctk.CTkLabel(
                 h,
                 text=AppContext.t("Personal"),
-                font=("Inter", 24, "bold"),
+                font=("Inter", 20, "bold"),
                 text_color=COLORS["text"]
-            ).pack(anchor="center", pady=(0, 12))
+            ).pack(anchor="center", pady=(0, 6))
             ctk.CTkButton(
                 h,
                 text=AppContext.t("Nuevo trabajador"),
                 font=self.font_sub, fg_color=COLORS["primary"],
-                height=45, corner_radius=10,
+                height=36, corner_radius=8,
                 command=self.abrir_formulario
             ).pack(fill="x", padx=8)
         else:
@@ -962,17 +976,17 @@ class UserManagementView(ctk.CTkFrame):
                 h,
                 text=AppContext.t("Nuevo trabajador"),
                 font=self.font_sub, fg_color=COLORS["primary"],
-                height=45, corner_radius=10,
+                height=40, corner_radius=8,
                 command=self.abrir_formulario
             ).pack(side="right")
 
     def create_search_bar(self, master):
         bar = ctk.CTkFrame(master, fg_color="transparent")
-        bar.pack(fill="x", padx=8 if self.is_compact else 30, pady=10)
+        bar.pack(fill="x", padx=8 if self.is_compact else 30, pady=6)
         self.entry_busqueda = ctk.CTkEntry(
             bar,
             placeholder_text=AppContext.t("Buscar usuario..."),
-            height=42, corner_radius=10,
+            height=36 if self.is_compact else 40, corner_radius=8,
             fg_color=COLORS["hover"],
             border_color=COLORS["border"],
             text_color=COLORS["text"]
@@ -982,7 +996,8 @@ class UserManagementView(ctk.CTkFrame):
         self.btn_filter = ctk.CTkButton(
             bar,
             text=AppContext.t("Filtrar âŒµ"),
-            width=110, height=42, corner_radius=10,
+            width=90 if self.is_compact else 110,
+            height=36 if self.is_compact else 40, corner_radius=8,
             fg_color=COLORS["card"], text_color=COLORS["text"],
             border_color=COLORS["border"],
             command=self.toggle_filter

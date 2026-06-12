@@ -68,7 +68,7 @@ class DashboardView(ctk.CTkFrame):
             self.right_panel.grid(row=0, column=0, columnspan=2, sticky="nsew")
 
     def _topbar_height(self):
-        return 138 if self.is_compact else 96
+        return 108 if self.is_compact else 78
 
     def _cancel_pending_jobs(self):
         for attr in ("_resize_job", "_view_job"):
@@ -108,7 +108,7 @@ class DashboardView(ctk.CTkFrame):
     
     def crear_btn_overlay(self, master, texto, comando):
         ctk.CTkButton(
-            master, text=texto, height=45, anchor="w",
+            master, text=texto, height=36, anchor="w",
             fg_color="transparent", text_color=COLORS["text"],
             hover_color=COLORS["hover"],
             command=lambda: [self.cerrar_overlay(), comando()]
@@ -204,19 +204,19 @@ class DashboardView(ctk.CTkFrame):
         self.vista_actual_func = self.mostrar_gestion_usuarios
         self.limpiar_derecha()
         self.actualizar_navegacion(self.btn_users)
-        UserManagementView(self.content_container).pack(fill="both", expand=True, padx=8 if self.is_compact else 40)
+        UserManagementView(self.content_container).pack(fill="both", expand=True, padx=4 if self.is_compact else 20)
 
     def mostrar_gestion_areas(self):
         self.vista_actual_func = self.mostrar_gestion_areas
         self.limpiar_derecha()
         self.actualizar_navegacion(self.btn_areas)
-        AreaManagementView(self.content_container).pack(fill="both", expand=True, padx=8 if self.is_compact else 40)
+        AreaManagementView(self.content_container).pack(fill="both", expand=True, padx=4 if self.is_compact else 20)
 
     def mostrar_gestion_puestos(self):
         self.vista_actual_func = self.mostrar_gestion_puestos
         self.limpiar_derecha()
         self.actualizar_navegacion(self.btn_puestos)
-        PuestoManagementView(self.content_container).pack(fill="both", expand=True, padx=8 if self.is_compact else 40)
+        PuestoManagementView(self.content_container).pack(fill="both", expand=True, padx=4 if self.is_compact else 20)
 
     def mostrar_cuenta(self):
         self.vista_actual_func = self.mostrar_cuenta
@@ -226,7 +226,7 @@ class DashboardView(ctk.CTkFrame):
             self.content_container,
             on_logout=self.on_back,
             on_profile_updated=self._refrescar_perfil_sidebar,  # ? NUEVO
-        ).pack(fill="both", expand=True, padx=8 if self.is_compact else 40)
+        ).pack(fill="both", expand=True, padx=4 if self.is_compact else 20)
 
     # -------------------------------------------------------------
     # ACTUALIZAR SIDEBAR CON PERFIL  ? NUEVO
@@ -261,7 +261,7 @@ class DashboardView(ctk.CTkFrame):
         return total_registros, accesos_hoy, autorizados, denegados
     
     def render_dashboard_principal(self):
-        padx_main = 10 if self.is_compact else 28
+        padx_main = 6 if self.is_compact else 18
 
         main_scroll = ctk.CTkScrollableFrame(self.content_container, fg_color="transparent")
         main_scroll.pack(fill="both", expand=True)
@@ -270,11 +270,11 @@ class DashboardView(ctk.CTkFrame):
         tasa = 0 if accesos_hoy == 0 else int((autorizados / max(accesos_hoy, 1)) * 100)
 
         header = ctk.CTkFrame(main_scroll, fg_color="transparent")
-        header.pack(fill="x", padx=padx_main, pady=(18 if self.is_compact else 22, 8))
+        header.pack(fill="x", padx=padx_main, pady=(8 if self.is_compact else 14, 5))
         ctk.CTkLabel(
             header,
             text=AppContext.t("Tablero operativo"),
-            font=("Inter", 24 if self.is_compact else 34, "bold"),
+            font=("Inter", 20 if self.is_compact else 28, "bold"),
             text_color=COLORS["text"],
         ).pack(side="left", anchor="w")
         if not self.is_compact:
@@ -286,7 +286,7 @@ class DashboardView(ctk.CTkFrame):
             ).pack(side="right", anchor="e", pady=(10, 0))
 
         layout = ctk.CTkFrame(main_scroll, fg_color="transparent")
-        layout.pack(fill="both", expand=True, padx=padx_main, pady=(8, 18))
+        layout.pack(fill="both", expand=True, padx=padx_main, pady=(4, 10))
         if not self.is_compact:
             layout.grid_columnconfigure(0, weight=0)
             layout.grid_columnconfigure(1, weight=1)
@@ -296,8 +296,8 @@ class DashboardView(ctk.CTkFrame):
             layout,
             fg_color=COLORS["sidebar"],
             corner_radius=8,
-            width=310,
-            height=350 if self.is_compact else 520,
+            width=270,
+            height=280 if self.is_compact else 430,
             border_width=1,
             border_color="#22304A",
         )
@@ -308,7 +308,7 @@ class DashboardView(ctk.CTkFrame):
         left_panel.pack_propagate(False)
 
         left_body = ctk.CTkFrame(left_panel, fg_color="transparent")
-        left_body.pack(fill="both", expand=True, padx=18, pady=18)
+        left_body.pack(fill="both", expand=True, padx=12, pady=12)
 
         ctk.CTkLabel(
             left_body,
@@ -319,7 +319,7 @@ class DashboardView(ctk.CTkFrame):
         ctk.CTkLabel(
             left_body,
             text=f"{tasa}%",
-            font=("Inter", 48 if not self.is_compact else 36, "bold"),
+            font=("Inter", 38 if not self.is_compact else 30, "bold"),
             text_color="#FFFFFF",
         ).pack(anchor="w", pady=(6, 0))
         ctk.CTkLabel(
@@ -329,7 +329,7 @@ class DashboardView(ctk.CTkFrame):
             text_color=COLORS["sidebar_muted"],
             wraplength=250,
             justify="left",
-        ).pack(anchor="w", pady=(0, 18))
+        ).pack(anchor="w", pady=(0, 10))
 
         metricas = [
             (AppContext.t("Personal"), total_registros, COLORS["primary"]),
@@ -339,20 +339,20 @@ class DashboardView(ctk.CTkFrame):
         ]
         for titulo, valor, color in metricas:
             row = ctk.CTkFrame(left_body, fg_color="#111C31", corner_radius=8)
-            row.pack(fill="x", pady=5)
+            row.pack(fill="x", pady=3)
             ctk.CTkFrame(row, fg_color=color, width=4, corner_radius=0).pack(side="left", fill="y")
             ctk.CTkLabel(
                 row,
                 text=titulo,
                 font=("Inter", 12, "bold"),
                 text_color=COLORS["sidebar_muted"],
-            ).pack(side="left", padx=12, pady=12)
+            ).pack(side="left", padx=10, pady=7)
             ctk.CTkLabel(
                 row,
                 text=str(valor),
-                font=("Inter", 20, "bold"),
+                font=("Inter", 17, "bold"),
                 text_color="#FFFFFF",
-            ).pack(side="right", padx=12, pady=8)
+            ).pack(side="right", padx=10, pady=5)
 
         right_panel = ctk.CTkFrame(layout, fg_color="transparent")
         if self.is_compact:
@@ -366,17 +366,17 @@ class DashboardView(ctk.CTkFrame):
             corner_radius=8,
             border_width=1,
             border_color=COLORS["border"],
-            height=310 if not self.is_compact else 240,
+            height=260 if not self.is_compact else 205,
         )
-        graph_box.pack(fill="x", pady=(0, 16))
+        graph_box.pack(fill="x", pady=(0, 10))
         graph_box.pack_propagate(False)
     
         graph_header = ctk.CTkFrame(graph_box, fg_color="transparent")
-        graph_header.pack(fill="x", padx=18 if self.is_compact else 24, pady=(16, 6))
+        graph_header.pack(fill="x", padx=12 if self.is_compact else 18, pady=(10, 4))
         ctk.CTkLabel(
             graph_header,
             text=AppContext.t("Radar horario"),
-            font=("Inter", 16 if self.is_compact else 22, "bold"),
+            font=("Inter", 14 if self.is_compact else 18, "bold"),
             text_color=COLORS["text"],
         ).pack(side="left", anchor="w")
 
@@ -402,7 +402,7 @@ class DashboardView(ctk.CTkFrame):
         self.calendario.configure(font=("Inter", 10), justify="center")
 
         self.graph_container = ctk.CTkFrame(graph_box, fg_color="transparent")
-        self.graph_container.pack(fill="both", expand=True, padx=12 if self.is_compact else 20, pady=(4, 14))
+        self.graph_container.pack(fill="both", expand=True, padx=8 if self.is_compact else 14, pady=(2, 8))
 
         self.filtrar_por_fecha()
 
@@ -411,7 +411,7 @@ class DashboardView(ctk.CTkFrame):
         ctk.CTkLabel(
             header_tabla,
             text=AppContext.t("Actividad reciente"),
-            font=("Inter", 16 if self.is_compact else 22, "bold"),
+            font=("Inter", 14 if self.is_compact else 18, "bold"),
             text_color=COLORS["text"],
         ).pack(side="left", anchor="w")
 
@@ -749,7 +749,7 @@ class DashboardView(ctk.CTkFrame):
             ctk.CTkLabel(
                 brand,
                 text="SECUREWORK",
-                font=("Inter", 19 if compact else 24, "bold"),
+                font=("Inter", 17 if compact else 20, "bold"),
                 text_color="#FFFFFF",
             ).pack(anchor="w")
             ctk.CTkLabel(
@@ -784,7 +784,7 @@ class DashboardView(ctk.CTkFrame):
                 fg_color="#111C31",
                 corner_radius=8,
                 width=62 if compact else 82,
-                height=36,
+                height=32,
                 border_width=1,
                 border_color="#22304A",
             )
@@ -805,7 +805,7 @@ class DashboardView(ctk.CTkFrame):
                 fg_color="#111C31",
                 corner_radius=8,
                 width=96 if compact else 112,
-                height=36,
+                height=32,
                 border_width=1,
                 border_color="#22304A",
             )
@@ -819,12 +819,12 @@ class DashboardView(ctk.CTkFrame):
             btn_w = 41 if compact else 48
 
             ctk.CTkButton(
-                l_c, text="ES", width=btn_w, height=28, corner_radius=6,
+                l_c, text="ES", width=btn_w, height=24, corner_radius=6,
                 fg_color=color_es, text_color=txt_es,
                 command=lambda: self.cambiar_idioma_dashboard("es")
             ).pack(side="left", padx=(4, 2), pady=4)
             ctk.CTkButton(
-                l_c, text="EN", width=btn_w, height=28, corner_radius=6,
+                l_c, text="EN", width=btn_w, height=24, corner_radius=6,
                 fg_color=color_en, text_color=txt_en,
                 command=lambda: self.cambiar_idioma_dashboard("en")
             ).pack(side="left", padx=(2, 4), pady=4)
@@ -833,7 +833,7 @@ class DashboardView(ctk.CTkFrame):
                 wrapper,
                 text=AppContext.t("Salir"),
                 width=56 if compact else 70,
-                height=36,
+                height=32,
                 corner_radius=8,
                 fg_color="#33131B",
                 hover_color="#4C1624",
@@ -844,24 +844,24 @@ class DashboardView(ctk.CTkFrame):
 
         if self.is_compact:
             top_row = ctk.CTkFrame(shell, fg_color="transparent")
-            top_row.pack(fill="x", padx=16, pady=(12, 6))
+            top_row.pack(fill="x", padx=10, pady=(7, 4))
             add_brand(top_row, compact=True)
             add_controls(top_row, compact=True)
 
             nav_row = ctk.CTkFrame(shell, fg_color="transparent")
-            nav_row.pack(fill="x", padx=10, pady=(0, 10))
+            nav_row.pack(fill="x", padx=6, pady=(0, 6))
             nav = ctk.CTkFrame(nav_row, fg_color="#0B1220", corner_radius=8)
             nav.pack(anchor="center")
         else:
             brand_host = ctk.CTkFrame(shell, fg_color="transparent")
-            brand_host.pack(side="left", padx=28, pady=16, fill="y")
+            brand_host.pack(side="left", padx=18, pady=10, fill="y")
             add_brand(brand_host, compact=False)
 
             nav = ctk.CTkFrame(shell, fg_color="#0B1220", corner_radius=8)
-            nav.pack(side="left", padx=16, pady=18)
+            nav.pack(side="left", padx=10, pady=12)
 
             controls_host = ctk.CTkFrame(shell, fg_color="transparent")
-            controls_host.pack(side="right", padx=14, pady=16)
+            controls_host.pack(side="right", padx=10, pady=10)
             add_controls(controls_host, compact=False)
 
         self.btn_panel = self._crear_btn_topnav(nav, AppContext.t("Inicio"), self.mostrar_panel_control)
@@ -885,8 +885,8 @@ class DashboardView(ctk.CTkFrame):
         btn = ctk.CTkButton(
             master,
             text=texto,
-            width=62 if self.is_compact else 84,
-            height=34,
+            width=58 if self.is_compact else 76,
+            height=30,
             corner_radius=7,
             fg_color="#162033",
             hover_color="#22304A",

@@ -18,10 +18,10 @@ class AreaManagementView(ctk.CTkFrame):
         self.modo_edicion       = False
         self.facultad_actual_id = None
 
-        self.font_header = ("Inter", 28, "bold")
-        self.font_sub    = ("Inter", 16, "bold")
-        self.font_normal = ("Inter", 13)
-        self.font_small  = ("Inter", 11, "bold")
+        self.font_header = ("Inter", 24, "bold")
+        self.font_sub    = ("Inter", 14, "bold")
+        self.font_normal = ("Inter", 12)
+        self.font_small  = ("Inter", 12, "bold")
 
         self.is_compact = False
         self.bind("<Configure>", self._on_resize)
@@ -51,7 +51,7 @@ class AreaManagementView(ctk.CTkFrame):
 
         # â”€â”€ Header â”€â”€
         header = ctk.CTkFrame(self.vista_tabla, fg_color="transparent")
-        header.pack(fill="x", padx=padx_main, pady=(pady_top, 20))
+        header.pack(fill="x", padx=padx_main, pady=(pady_top, 10))
 
         title_cont = ctk.CTkFrame(header, fg_color="transparent")
 
@@ -60,7 +60,7 @@ class AreaManagementView(ctk.CTkFrame):
             ctk.CTkLabel(
                 title_cont,
                 text=AppContext.t("Áreas"),
-                font=("Inter", 22, "bold"),
+                font=("Inter", 20, "bold"),
                 text_color=COLORS["text"]
             ).pack(anchor="center", pady=(0, 6))
             ctk.CTkLabel(
@@ -74,7 +74,7 @@ class AreaManagementView(ctk.CTkFrame):
                 text=AppContext.t("Nueva área"),
                 fg_color=COLORS["primary"],
                 font=self.font_sub,
-                height=40, corner_radius=8,
+                height=36, corner_radius=8,
                 command=self.abrir_formulario
             ).pack(fill="x", padx=4)
         else:
@@ -94,7 +94,7 @@ class AreaManagementView(ctk.CTkFrame):
                 text=AppContext.t("Nueva área"),
                 fg_color=COLORS["text"], hover_color=COLORS["hover"],
                 text_color=COLORS["bg"], font=self.font_sub,
-                height=50, corner_radius=8,
+                height=40, corner_radius=8,
                 command=self.abrir_formulario
             ).pack(side="right", anchor="n")
 
@@ -104,7 +104,7 @@ class AreaManagementView(ctk.CTkFrame):
         self.entry_busqueda = ctk.CTkEntry(
             bar,
             placeholder_text=AppContext.t("Buscar facultad por nombre..."),
-            height=42, corner_radius=10,
+            height=36 if self.is_compact else 40, corner_radius=8,
             fg_color=COLORS["hover"], border_width=1,
             border_color=COLORS["border"], text_color=COLORS["text"]
         )
@@ -159,10 +159,10 @@ class AreaManagementView(ctk.CTkFrame):
                     scroll, fg_color=COLORS["card"],
                     corner_radius=8, border_width=1, border_color=COLORS["border"]
                 )
-                card.pack(fill="x", padx=2, pady=8)
+                card.pack(fill="x", padx=2, pady=5)
 
                 top = ctk.CTkFrame(card, fg_color="transparent")
-                top.pack(fill="x", padx=14, pady=(14, 8))
+                top.pack(fill="x", padx=10, pady=(8, 5))
 
                 ctk.CTkLabel(top, text="", font=("Inter", 26)).pack(side="left", padx=(0, 10))
 
@@ -195,10 +195,10 @@ class AreaManagementView(ctk.CTkFrame):
                 ).pack(padx=10, pady=4)
 
                 actions = ctk.CTkFrame(card, fg_color="transparent")
-                actions.pack(fill="x", padx=14, pady=(0, 14))
+                actions.pack(fill="x", padx=10, pady=(0, 8))
 
                 ctk.CTkButton(
-                    actions, text="✎", height=36,
+                    actions, text="✎", height=30,
                     fg_color=COLORS["hover"], text_color=COLORS["text"],
                     font=("Segoe UI Symbol", 14, "bold"),
                     command=lambda id_f=f["id"]: self.abrir_formulario(id_f)
@@ -206,14 +206,14 @@ class AreaManagementView(ctk.CTkFrame):
 
                 if es_activa:
                     ctk.CTkButton(
-                        actions, text="⊘", height=36,
+                        actions, text="⊘", height=30,
                         fg_color="#FFF1F2", text_color="#E11D48",
                         font=("Segoe UI Symbol", 14, "bold"),
                         command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_cambio_estado(id_f, n, desactivar=True)
                     ).pack(side="left", expand=True, fill="x", padx=(6, 0))
                 else:
                     ctk.CTkButton(
-                        actions, text="✓", height=36,
+                        actions, text="✓", height=30,
                         fg_color="#10B981", text_color="white",
                         font=("Segoe UI Symbol", 14, "bold"),
                         command=lambda id_f=f["id"], n=f["nombre"]: self.confirmar_cambio_estado(id_f, n, desactivar=False)
@@ -391,55 +391,57 @@ class AreaManagementView(ctk.CTkFrame):
         self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
         padx_form = 12 if self.is_compact else 60
+        form_scroll = ctk.CTkScrollableFrame(self.form_base, fg_color="transparent")
+        form_scroll.pack(fill="both", expand=True)
 
         ctk.CTkLabel(
-            self.form_base, text=titulo,
+            form_scroll, text=titulo,
             font=self.font_header, text_color=COLORS["text"]
-        ).pack(anchor="w", padx=padx_form, pady=(40, 20))
+        ).pack(anchor="w", padx=padx_form, pady=(8 if self.is_compact else 24, 10))
 
         form_card = ctk.CTkFrame(
-            self.form_base, fg_color=COLORS["card"],
+            form_scroll, fg_color=COLORS["card"],
             corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
-        form_card.pack(fill="x", padx=padx_form, pady=10)
+        form_card.pack(fill="x", padx=padx_form, pady=6)
 
         ctk.CTkLabel(
             form_card, text=AppContext.t("Nombre de la Facultad"),
             font=self.font_small, text_color=COLORS["subtext"]
-        ).pack(anchor="w", padx=25, pady=(25, 5))
+        ).pack(anchor="w", padx=14 if self.is_compact else 20, pady=(10, 3))
         self.input_nombre = ctk.CTkEntry(
-            form_card, height=45, font=self.font_normal,
+            form_card, height=36 if self.is_compact else 40, font=self.font_normal,
             fg_color=COLORS["hover"], border_width=0, text_color=COLORS["text"]
         )
         self.input_nombre.insert(0, nombre_ini)
-        self.input_nombre.pack(fill="x", padx=25, pady=(0, 20))
+        self.input_nombre.pack(fill="x", padx=14 if self.is_compact else 20, pady=(0, 10))
 
         ctk.CTkLabel(
             form_card, text=AppContext.t("Estado"),
             font=self.font_small, text_color=COLORS["subtext"]
-        ).pack(anchor="w", padx=25, pady=(0, 5))
+        ).pack(anchor="w", padx=14 if self.is_compact else 20, pady=(0, 3))
         self.combo_estado = ctk.CTkOptionMenu(
             form_card,
             values=[AppContext.t("Activa"), AppContext.t("Inactiva")],
-            height=45, font=self.font_normal,
+            height=36 if self.is_compact else 40, font=self.font_normal,
             fg_color=COLORS["hover"], button_color=COLORS["border"],
             text_color=COLORS["text"]
         )
         self.combo_estado.set(estado_ini)
-        self.combo_estado.pack(fill="x", padx=25, pady=(0, 30))
+        self.combo_estado.pack(fill="x", padx=14 if self.is_compact else 20, pady=(0, 14))
 
-        btns = ctk.CTkFrame(self.form_base, fg_color="transparent")
-        btns.pack(fill="x", padx=padx_form, pady=30)
+        btns = ctk.CTkFrame(form_scroll, fg_color="transparent")
+        btns.pack(fill="x", padx=padx_form, pady=12)
 
         btn_cancelar = ctk.CTkButton(
             btns, text=AppContext.t("Cancelar"),
             font=self.font_sub, fg_color="#FEE2E2", text_color="#991B1B",
-            height=55, command=self.volver_a_tabla
+            height=38 if self.is_compact else 42, command=self.volver_a_tabla
         )
         btn_guardar = ctk.CTkButton(
             btns, text=AppContext.t("Guardar Facultad"),
             font=self.font_sub, fg_color="#10B981", text_color="white",
-            height=55, command=self.guardar_facultad
+            height=38 if self.is_compact else 42, command=self.guardar_facultad
         )
 
         if self.is_compact:

@@ -203,9 +203,10 @@ Estos archivos pueden contener datos biometricos, accesos, usuarios o informacio
 El archivo `app/config.py` permite ajustar hardware sin tocar codigo:
 
 ```text
-PIN_RELEVADOR=22
+PIN_RELEVADOR=17
 PIN_BUZZER=18
-PIN_PIR=17
+PIN_PIR=27
+RELE_ACTIVE_HIGH=1
 SIMULATE_HARDWARE=0
 UNLOCK_TIMEOUT=2.0
 ```
@@ -227,7 +228,9 @@ Usa `UNLOCK_TIMEOUT=none` solo si quieres mantener la cerradura abierta sin cier
 - No alimentes la cerradura desde la Raspberry Pi.
 - Usa una fuente externa adecuada para la cerradura.
 - Conecta la cerradura en serie con COM/NO del rele.
-- Conecta `IN` del rele al GPIO configurado, por defecto `PIN_RELEVADOR=22`.
+- Conecta `IN` del rele al GPIO configurado, por defecto `PIN_RELEVADOR=17`
+  (pin fisico 11).
+- Si el modulo se activa con nivel bajo, usa `RELE_ACTIVE_HIGH=0`.
 - Comparte GND entre Raspberry Pi y fuente externa.
 
 ### Buzzer
@@ -237,7 +240,7 @@ Usa `UNLOCK_TIMEOUT=none` solo si quieres mantener la cerradura abierta sin cier
 
 ### PIR
 
-- Pin por defecto: `PIN_PIR=17`.
+- Pin por defecto: `PIN_PIR=27`.
 - Conecta VCC, GND y salida al GPIO configurado.
 
 ### Seguridad electrica

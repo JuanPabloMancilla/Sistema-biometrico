@@ -10,6 +10,7 @@ from app.views.app_context import AppContext
 from app.camara.camara import iniciar_camara, liberar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
 from app.services.usuario_service import usuario_activo
+from app.services.asistencia_service import registrar_marcaje
 from app.database.database import get_connection
 from datetime import datetime
 from app.hardware.cerradura import Cerradura
@@ -52,6 +53,26 @@ TEMAS = {
         "st_color": ACCENT_GREEN,
         "name":     "",
         "b_color":  ACCENT_GREEN,
+    },
+    "entrada": {
+        "border":   ACCENT_GREEN,
+        "bar":      ACCENT_GREEN,
+        "banner":   "#0F2E2B",
+        "dot":      ACCENT_GREEN,
+        "status":   "BIENVENIDO",
+        "st_color": ACCENT_GREEN,
+        "name":     "",
+        "b_color":  ACCENT_GREEN,
+    },
+    "salida": {
+        "border":   ACCENT_CYAN,
+        "bar":      ACCENT_CYAN,
+        "banner":   "#10213F",
+        "dot":      ACCENT_CYAN,
+        "status":   "QUE LE VAYA BIEN",
+        "st_color": ACCENT_CYAN,
+        "name":     "",
+        "b_color":  ACCENT_CYAN,
     },
     "negado": {
         "border":   ACCENT_RED,
@@ -192,6 +213,7 @@ class TerminalView(ctk.CTkFrame):
         self._haar_frame_count = 0
         self._last_faces = []
         self.esperando_reset = False
+        self.requiere_retirar_rostro = False
         self.inicio_espera_reset = 0.0
         self.encodings_conocidos, self.ids_conocidos = cargar_encodings()
 
@@ -408,6 +430,10 @@ class TerminalView(ctk.CTkFrame):
         nombre = AppContext.t(t["name"])
         if estado == "autorizado":
             nombre = f"{AppContext.t('BIENVENIDO')}:  {usuario}" if usuario else AppContext.t("ACCESO CONCEDIDO")
+        elif estado == "entrada":
+            nombre = f"{usuario}\nESTADO: TRABAJANDO" if usuario else "ESTADO: TRABAJANDO"
+        elif estado == "salida":
+            nombre = usuario
         elif estado == "inactivo":
             nombre = f"{usuario}\n{AppContext.t('USUARIO INACTIVO')}" if usuario else AppContext.t("USUARIO INACTIVO")
 
@@ -555,7 +581,11 @@ class TerminalView(ctk.CTkFrame):
         ahora     = time.time()
 
         # -- Reset tras 4 s ---------------------------------------------------
-        if self.esperando_reset and ahora - self.inicio_espera_reset > 4.0:
+        if (
+            self.esperando_reset
+            and not self.requiere_retirar_rostro
+            and ahora - self.inicio_espera_reset > 4.0
+        ):
             self.esperando_reset = False
             self.escaneando = False
             self.face_box = None
@@ -711,15 +741,31 @@ class TerminalView(ctk.CTkFrame):
                                 self._activar_buzzer("denegado")
 
                             elif usuario_activo(usuario_id):
+                                marcaje = registrar_marcaje(usuario_id)
+                                if marcaje["tipo"] == "entrada":
+                                    estado_marcaje = "entrada"
+                                    detalle_marcaje = self.usuario_detectado
+                                    motivo_marcaje = "Entrada - Trabajando"
+                                else:
+                                    estado_marcaje = "salida"
+                                    detalle_marcaje = (
+                                        f"{self.usuario_detectado}\n"
+                                        f"TIEMPO TRABAJADO: {marcaje['duracion_texto']}"
+                                    )
+                                    motivo_marcaje = (
+                                        "Salida - Tiempo trabajado: "
+                                        f"{marcaje['duracion_texto']}"
+                                    )
 
-                                self.aplicar_estilo_visual("autorizado", usuario=self.usuario_detectado)
+                                self.aplicar_estilo_visual(estado_marcaje, usuario=detalle_marcaje)
+                                self.requiere_retirar_rostro = True
                                 if self.cerradura:
                                     apertura_enviada = self.cerradura.desbloquear_temporal()
                                     print(
-                                        "ACCESO AUTORIZADO: "
+                                        f"MARCAJE {marcaje['tipo'].upper()}: "
                                         f"usuario={usuario_id}, apertura_enviada={apertura_enviada}"
                                     )
-                                self.registrar_acceso_bd(usuario_id, 1, None, "Acceso autorizado")
+                                self.registrar_acceso_bd(usuario_id, 1, None, motivo_marcaje)
                                 self._activar_buzzer("autorizado")
 
                             else:
@@ -734,13 +780,26 @@ class TerminalView(ctk.CTkFrame):
                 fx, fy, fw, fh = self.face_box
                 color_esq = (
                     ACCENT_AMBER if self.escaneando else
-                    ACCENT_GREEN if self.estado_actual == "autorizado" else
+                    ACCENT_GREEN if self.estado_actual in ("autorizado", "entrada") else
+                    ACCENT_CYAN  if self.estado_actual == "salida"     else
                     ACCENT_RED   if self.estado_actual == "negado"     else
                     ACCENT_PURPLE
                 )
                 self._dibujar_esquinas(frame_dibujado, fx, fy, fw, fh, color_esq)
 
         else:
+            if (
+                self.esperando_reset
+                and self.requiere_retirar_rostro
+                and ahora - self.ultimo_rostro_visto > 0.8
+            ):
+                self.requiere_retirar_rostro = False
+                self.esperando_reset = False
+                self.escaneando = False
+                self.face_box = None
+                self.estado_actual = None
+                self.aplicar_estilo_visual("vacio")
+
             if not self.escaneando and not self.esperando_reset:
                 if ahora - self.ultimo_rostro_visto > 0.8:
                     if self.estado_actual != "vacio":

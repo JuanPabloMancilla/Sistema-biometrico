@@ -61,6 +61,20 @@ CREATE TABLE IF NOT EXISTS "registro_acceso" (
     FOREIGN KEY("id_usuario") REFERENCES "usuario"("id_usuario")
 );
 
+-- 7. JORNADAS DE TRABAJO
+CREATE TABLE IF NOT EXISTS "jornada_laboral" (
+    "id_jornada" INTEGER PRIMARY KEY AUTOINCREMENT,
+    "id_usuario" INTEGER NOT NULL,
+    "fecha_entrada" TEXT NOT NULL,
+    "fecha_salida" TEXT,
+    "duracion_segundos" INTEGER,
+    "estado" TEXT NOT NULL DEFAULT 'trabajando',
+    FOREIGN KEY("id_usuario") REFERENCES "usuario"("id_usuario")
+);
+
+CREATE INDEX IF NOT EXISTS "idx_jornada_usuario_estado"
+ON "jornada_laboral" ("id_usuario", "estado");
+
 -- -----------------------
 -- DATOS (SIN DUPLICADOS)
 -- -----------------------

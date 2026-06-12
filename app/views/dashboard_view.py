@@ -562,6 +562,26 @@ class DashboardView(ctk.CTkFrame):
             motivo_txt = motivo if motivo else (
                 AppContext.t("Acceso autorizado") if ok else AppContext.t("Acceso denegado")
             )
+            es_entrada = ok and motivo_txt.startswith("Entrada")
+            es_salida = ok and motivo_txt.startswith("Salida")
+            texto_badge = (
+                "TRABAJANDO" if es_entrada else
+                "SALIDA" if es_salida else
+                AppContext.t("AUTORIZADO") if ok else
+                AppContext.t("DENEGADO")
+            )
+            color_badge = (
+                "#D1FAE5" if es_entrada else
+                "#DBEAFE" if es_salida else
+                "#D1FAE5" if ok else
+                "#FEE2E2"
+            )
+            color_texto_badge = (
+                "#065F46" if es_entrada else
+                "#1E40AF" if es_salida else
+                "#065F46" if ok else
+                "#991B1B"
+            )
 
             card = ctk.CTkFrame(
                 self.contenedor_tabla, fg_color=row_color,
@@ -586,13 +606,13 @@ class DashboardView(ctk.CTkFrame):
                 font=("Inter", 11), text_color=subtext_color, anchor="w"
             ).pack(anchor="w", fill="x")
 
-            badge = ctk.CTkFrame(top, fg_color="#D1FAE5" if ok else "#FEE2E2", corner_radius=16)
+            badge = ctk.CTkFrame(top, fg_color=color_badge, corner_radius=16)
             badge.pack(side="right")
             ctk.CTkLabel(
                 badge,
-                text=AppContext.t("AUTORIZADO") if ok else AppContext.t("DENEGADO"),
+                text=texto_badge,
                 font=("Inter", 9, "bold"),
-                text_color="#065F46" if ok else "#991B1B"
+                text_color=color_texto_badge
             ).pack(padx=10, pady=4)
 
             bottom = ctk.CTkFrame(card, fg_color="transparent")

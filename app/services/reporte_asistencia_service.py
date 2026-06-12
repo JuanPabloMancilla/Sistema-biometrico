@@ -2,7 +2,11 @@ import csv
 from datetime import datetime
 
 from app.database.database import get_connection
-from app.services.asistencia_service import formatear_duracion
+from app.services.asistencia_service import (
+    calcular_metricas_jornada,
+    formatear_duracion,
+    obtener_configuracion_asistencia,
+)
 
 
 def obtener_reporte_asistencia(fecha_inicio, fecha_fin, ahora=None):
@@ -17,45 +21,62 @@ def obtener_reporte_asistencia(fecha_inicio, fecha_fin, ahora=None):
             u.a_paterno,
             u.a_materno,
             u.cuenta,
-            COUNT(j.id_jornada) AS jornadas,
-            MIN(j.fecha_entrada) AS primera_entrada,
-            MAX(j.fecha_salida) AS ultima_salida,
-            SUM(CASE WHEN j.estado = 'trabajando' THEN 1 ELSE 0 END) AS abiertas,
-            SUM(COALESCE(j.duracion_segundos, 0)) AS segundos_cerrados,
-            MIN(CASE WHEN j.estado = 'trabajando' THEN j.fecha_entrada END) AS entrada_abierta
+            j.id_jornada,
+            j.fecha_entrada,
+            j.fecha_salida,
+            j.duracion_segundos,
+            j.estado
         FROM usuario u
         JOIN jornada_laboral j ON j.id_usuario = u.id_usuario
         WHERE DATE(j.fecha_entrada) BETWEEN ? AND ?
-        GROUP BY u.id_usuario, u.nombre, u.a_paterno, u.a_materno, u.cuenta
-        ORDER BY u.a_paterno, u.a_materno, u.nombre
+        ORDER BY u.a_paterno, u.a_materno, u.nombre, j.fecha_entrada
         """,
         (fecha_inicio, fecha_fin),
     )
     filas = cursor.fetchall()
     conn.close()
 
-    reporte = []
+    configuracion = obtener_configuracion_asistencia()
+    acumulado = {}
     for fila in filas:
         (
-            id_usuario, nombre, ap, am, cuenta, jornadas, primera_entrada,
-            ultima_salida, abiertas, segundos_cerrados, entrada_abierta,
+            id_usuario, nombre, ap, am, cuenta, id_jornada, fecha_entrada,
+            fecha_salida, duracion_segundos, estado,
         ) = fila
-        segundos = int(segundos_cerrados or 0)
-        if entrada_abierta:
-            entrada = datetime.strptime(entrada_abierta, "%Y-%m-%d %H:%M:%S")
-            segundos += max(0, int((ahora - entrada).total_seconds()))
+        if estado == "trabajando":
+            entrada = datetime.strptime(fecha_entrada, "%Y-%m-%d %H:%M:%S")
+            segundos = max(0, int((ahora - entrada).total_seconds()))
+        else:
+            segundos = int(duracion_segundos or 0)
+        metricas = calcular_metricas_jornada(fecha_entrada, segundos, configuracion)
 
-        reporte.append({
+        item = acumulado.setdefault(id_usuario, {
             "id_usuario": id_usuario,
             "nombre": f"{nombre or ''} {ap or ''} {am or ''}".strip(),
             "cuenta": cuenta or "",
-            "jornadas": int(jornadas or 0),
-            "primera_entrada": primera_entrada or "",
-            "ultima_salida": ultima_salida or "",
-            "estado": "Trabajando" if int(abiertas or 0) > 0 else "Fuera",
-            "segundos_trabajados": segundos,
-            "tiempo_trabajado": formatear_duracion(segundos),
+            "jornadas": 0,
+            "primera_entrada": fecha_entrada,
+            "ultima_salida": "",
+            "estado": "Fuera",
+            "segundos_trabajados": 0,
+            "retardo_segundos": 0,
+            "extra_segundos": 0,
         })
+        item["jornadas"] += 1
+        item["primera_entrada"] = min(item["primera_entrada"], fecha_entrada)
+        if fecha_salida:
+            item["ultima_salida"] = max(item["ultima_salida"], fecha_salida)
+        if estado == "trabajando":
+            item["estado"] = "Trabajando"
+        item["segundos_trabajados"] += metricas["segundos_netos"]
+        item["retardo_segundos"] += metricas["retardo_segundos"]
+        item["extra_segundos"] += metricas["extra_segundos"]
+
+    reporte = list(acumulado.values())
+    for item in reporte:
+        item["tiempo_trabajado"] = formatear_duracion(item["segundos_trabajados"])
+        item["retardo"] = formatear_duracion(item["retardo_segundos"])
+        item["horas_extra"] = formatear_duracion(item["extra_segundos"])
 
     return reporte
 
@@ -63,7 +84,7 @@ def obtener_reporte_asistencia(fecha_inicio, fecha_fin, ahora=None):
 def exportar_reporte_csv(ruta, reporte):
     columnas = [
         "id_usuario", "nombre", "cuenta", "jornadas", "primera_entrada",
-        "ultima_salida", "estado", "tiempo_trabajado",
+        "ultima_salida", "estado", "tiempo_trabajado", "retardo", "horas_extra",
     ]
     with open(ruta, "w", newline="", encoding="utf-8-sig") as archivo:
         escritor = csv.DictWriter(archivo, fieldnames=columnas)

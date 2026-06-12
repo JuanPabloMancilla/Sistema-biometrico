@@ -27,6 +27,16 @@ class AsistenciaServiceTest(unittest.TestCase):
             )
             """
         )
+        conn.execute(
+            """
+            CREATE TABLE configuracion_asistencia (
+                id_configuracion INTEGER PRIMARY KEY,
+                hora_entrada TEXT, tolerancia_minutos INTEGER,
+                jornada_objetivo_minutos INTEGER, descanso_minutos INTEGER
+            )
+            """
+        )
+        conn.execute("INSERT INTO configuracion_asistencia VALUES (1, '08:00', 10, 480, 30)")
         conn.commit()
         conn.close()
 
@@ -47,6 +57,26 @@ class AsistenciaServiceTest(unittest.TestCase):
         self.assertEqual(salida["tipo"], "salida")
         self.assertEqual(salida["duracion_segundos"], 30665)
         self.assertEqual(salida["duracion_texto"], "8 h 31 min")
+
+    def test_calcula_retardo_extra_y_descanso(self):
+        config = asistencia_service.obtener_configuracion_asistencia()
+        metricas = asistencia_service.calcular_metricas_jornada(
+            "2026-06-12 08:25:00", 9 * 3600, config
+        )
+        self.assertEqual(metricas["retardo_segundos"], 15 * 60)
+        self.assertEqual(metricas["segundos_netos"], 8 * 3600 + 30 * 60)
+        self.assertEqual(metricas["extra_segundos"], 30 * 60)
+
+    def test_corrige_jornada(self):
+        asistencia_service.registrar_marcaje(7, datetime(2026, 6, 12, 8, 0, 0))
+        jornada = asistencia_service.obtener_ultima_jornada_usuario(7, "2026-06-01", "2026-06-30")
+        asistencia_service.corregir_jornada(
+            jornada[0], "2026-06-12 08:15:00", "2026-06-12 16:15:00"
+        )
+        corregida = asistencia_service.obtener_ultima_jornada_usuario(7, "2026-06-01", "2026-06-30")
+        self.assertEqual(corregida[1], "2026-06-12 08:15:00")
+        self.assertEqual(corregida[2], "2026-06-12 16:15:00")
+        self.assertEqual(corregida[3], "finalizada")
 
 
 if __name__ == "__main__":

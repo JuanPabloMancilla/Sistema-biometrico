@@ -29,6 +29,12 @@ class ReporteAsistenciaServiceTest(unittest.TestCase):
                 duracion_segundos INTEGER,
                 estado TEXT
             );
+            CREATE TABLE configuracion_asistencia (
+                id_configuracion INTEGER PRIMARY KEY,
+                hora_entrada TEXT, tolerancia_minutos INTEGER,
+                jornada_objetivo_minutos INTEGER, descanso_minutos INTEGER
+            );
+            INSERT INTO configuracion_asistencia VALUES (1, '08:00', 10, 480, 0);
             INSERT INTO usuario VALUES (1, 'Ana', 'Lopez', '', 'A-1');
             INSERT INTO jornada_laboral VALUES
                 (1, 1, '2026-06-10 08:00:00', '2026-06-10 16:00:00', 28800, 'finalizada'),
@@ -52,6 +58,8 @@ class ReporteAsistenciaServiceTest(unittest.TestCase):
         self.assertEqual(filas[0]["estado"], "Trabajando")
         self.assertEqual(filas[0]["segundos_trabajados"], 43200)
         self.assertEqual(filas[0]["tiempo_trabajado"], "12 h 0 min")
+        self.assertEqual(filas[0]["retardo"], "0 s")
+        self.assertEqual(filas[0]["horas_extra"], "0 s")
 
     def test_exporta_csv(self):
         filas = reporte_asistencia_service.obtener_reporte_asistencia(

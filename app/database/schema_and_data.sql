@@ -75,6 +75,20 @@ CREATE TABLE IF NOT EXISTS "jornada_laboral" (
 CREATE INDEX IF NOT EXISTS "idx_jornada_usuario_estado"
 ON "jornada_laboral" ("id_usuario", "estado");
 
+-- 8. CONFIGURACION DE ASISTENCIA
+CREATE TABLE IF NOT EXISTS "configuracion_asistencia" (
+    "id_configuracion" INTEGER PRIMARY KEY CHECK ("id_configuracion" = 1),
+    "hora_entrada" TEXT NOT NULL DEFAULT '09:00',
+    "tolerancia_minutos" INTEGER NOT NULL DEFAULT 10,
+    "jornada_objetivo_minutos" INTEGER NOT NULL DEFAULT 480,
+    "descanso_minutos" INTEGER NOT NULL DEFAULT 0
+);
+
+INSERT OR IGNORE INTO "configuracion_asistencia"
+    ("id_configuracion", "hora_entrada", "tolerancia_minutos",
+     "jornada_objetivo_minutos", "descanso_minutos")
+VALUES (1, '09:00', 10, 480, 0);
+
 -- -----------------------
 -- DATOS (SIN DUPLICADOS)
 -- -----------------------

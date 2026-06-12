@@ -353,6 +353,8 @@ TRADUCCIONES_UTF8 = {
     "Entradas y salidas por hora": {"en": "Entries and exits by hour"},
     "Entradas": {"en": "Entries"},
     "Salidas": {"en": "Exits"},
+    "PRUEBA DE VIDA": {"en": "LIVENESS CHECK"},
+    "PARPADEE UNA VEZ": {"en": "BLINK ONCE"},
     "Sin cuenta": {"en": "No account"},
     "Sin correo": {"en": "No email"},
     "Acceso autorizado": {"en": "Access authorized"},

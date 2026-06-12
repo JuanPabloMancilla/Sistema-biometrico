@@ -11,6 +11,7 @@ from app.camara.camara import iniciar_camara, liberar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
 from app.services.usuario_service import usuario_activo
 from app.services.asistencia_service import registrar_marcaje
+from app.services.liveness_service import DetectorParpadeo
 from app.database.database import get_connection
 from datetime import datetime
 from app.hardware.cerradura import Cerradura
@@ -31,7 +32,7 @@ TEXT_SECONDARY = "#CBD5E1"
 TEXT_MUTED     = "#94A3B8"
 
 BANNER_H = 76
-SCAN_DURATION = 1.2
+SCAN_DURATION = 3.0
 
 TEMAS = {
     "escaneando": {
@@ -43,6 +44,16 @@ TEMAS = {
         "st_color": ACCENT_AMBER,
         "name":     "ANALIZANDO RASGOS BIOMETRICOS",
         "b_color":  ACCENT_AMBER,
+    },
+    "parpadeo": {
+        "border":   ACCENT_CYAN,
+        "bar":      ACCENT_CYAN,
+        "banner":   "#10213F",
+        "dot":      ACCENT_CYAN,
+        "status":   "PRUEBA DE VIDA",
+        "st_color": ACCENT_CYAN,
+        "name":     "PARPADEE UNA VEZ",
+        "b_color":  ACCENT_CYAN,
     },
     "autorizado": {
         "border":   ACCENT_GREEN,
@@ -208,6 +219,7 @@ class TerminalView(ctk.CTkFrame):
         self.subiendo = False
         self.usuario_detectado = ""
         self.ids_detectados_escaneo = []
+        self.detector_parpadeo = DetectorParpadeo()
         self.ultimo_rostro_visto = 0.0
         self.face_box = None
         self._haar_frame_count = 0
@@ -573,7 +585,7 @@ class TerminalView(ctk.CTkFrame):
             self.loop_id = self.after(33, self.actualizar_video)
             return
 
-        frame_dibujado, face_encoding, mensaje, usuario_id = procesar_frame(frame)
+        frame_dibujado, face_encoding, mensaje, usuario_id, ojos_cerrados = procesar_frame(frame)
         fh_orig, fw_orig = frame_dibujado.shape[:2]
 
         faces     = self.detectar_rostros(frame_dibujado)
@@ -638,7 +650,8 @@ class TerminalView(ctk.CTkFrame):
                     self.inicio_escaneo = ahora
                     self.usuario_detectado = ""
                     self.ids_detectados_escaneo = []
-                    self.aplicar_estilo_visual("escaneando")
+                    self.detector_parpadeo.reiniciar()
+                    self.aplicar_estilo_visual("parpadeo" if self.modo != "registro" else "escaneando")
 
             if self.escaneando and self.face_box is not None:
                 fx, fy, fw, fh = self.face_box
@@ -654,6 +667,10 @@ class TerminalView(ctk.CTkFrame):
                     self.usuario_detectado = msg_actual
                 if face_encoding is not None:
                     self.ids_detectados_escaneo.append(usuario_id)
+                if self.modo != "registro":
+                    parpadeo_confirmado = self.detector_parpadeo.actualizar(ojos_cerrados)
+                    if parpadeo_confirmado and self.estado_actual == "parpadeo":
+                        self.aplicar_estilo_visual("escaneando")
 
                 if ahora - self.inicio_escaneo > SCAN_DURATION:
                     self.escaneando = False
@@ -736,6 +753,14 @@ class TerminalView(ctk.CTkFrame):
 
                                 self.aplicar_estilo_visual("negado")
                                 self.registrar_acceso_bd(None, 0, None, "Identidad no confirmada")
+                                if self.cerradura:
+                                    self.cerradura.bloquear()
+                                self._activar_buzzer("denegado")
+
+                            elif not self.detector_parpadeo.parpadeo_confirmado:
+
+                                self.aplicar_estilo_visual("negado")
+                                self.registrar_acceso_bd(usuario_id, 0, None, "Prueba de vida no superada")
                                 if self.cerradura:
                                     self.cerradura.bloquear()
                                 self._activar_buzzer("denegado")

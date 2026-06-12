@@ -60,6 +60,7 @@ encodings_db, usuarios_db = cargar_encodings()
 ultimo_resultado = (None, "ESCANEANDO...")
 ultimo_encoding = None
 ultimo_usuario_id = None
+ultimo_ojos_cerrados = None
 frame_count = 0
 PROCESAR_CADA_N_FRAMES = 6
 UMBRAL_ACCESO = 0.42
@@ -99,6 +100,35 @@ def registrar_acceso():
 def _centro_puntos(puntos):
     arr = np.array(puntos, dtype=np.float32)
     return float(np.mean(arr[:, 0])), float(np.mean(arr[:, 1]))
+
+def _relacion_aspecto_ojo(puntos):
+    puntos = np.array(puntos, dtype=np.float32)
+    if len(puntos) != 6:
+        return None
+
+    vertical_1 = np.linalg.norm(puntos[1] - puntos[5])
+    vertical_2 = np.linalg.norm(puntos[2] - puntos[4])
+    horizontal = np.linalg.norm(puntos[0] - puntos[3])
+    if horizontal <= 0:
+        return None
+    return float((vertical_1 + vertical_2) / (2.0 * horizontal))
+
+def detectar_ojos_cerrados(rgb_frame, face_location, threshold=0.20):
+    try:
+        landmarks = face_recognition.face_landmarks(rgb_frame, [face_location])
+    except Exception:
+        return None
+
+    if not landmarks:
+        return None
+
+    puntos = landmarks[0]
+    ear_izq = _relacion_aspecto_ojo(puntos.get("left_eye", []))
+    ear_der = _relacion_aspecto_ojo(puntos.get("right_eye", []))
+    if ear_izq is None or ear_der is None:
+        return None
+
+    return ((ear_izq + ear_der) / 2.0) < threshold
 
 def _rgb_uint8(frame):
     if frame is None:
@@ -223,7 +253,8 @@ def _validar_postura_ligera(rgb_small, face_location, frame_shape):
     return True, "ROSTRO LISTO"
 
 def procesar_frame(frame):
-    global encodings_db, usuarios_db, ultimo_resultado, ultimo_encoding, ultimo_usuario_id, frame_count
+    global encodings_db, usuarios_db, ultimo_resultado, ultimo_encoding
+    global ultimo_usuario_id, ultimo_ojos_cerrados, frame_count
     
     frame_count += 1
     # OPTIMIZACION: el encoding facial es pesado; entre ciclos se reutiliza
@@ -231,7 +262,7 @@ def procesar_frame(frame):
     if frame_count % PROCESAR_CADA_N_FRAMES != 0 and ultimo_resultado[0] is not None:
         top, right, bottom, left = ultimo_resultado[0]
         cv2.rectangle(frame, (left, top), (right, bottom), (10, 185, 129), 2)
-        return frame, ultimo_encoding, ultimo_resultado[1], ultimo_usuario_id
+        return frame, ultimo_encoding, ultimo_resultado[1], ultimo_usuario_id, ultimo_ojos_cerrados
 
     # 1. Reducir imagen para detecciÃ³n rÃ¡pida (Escala 1/4)
     frame = np.ascontiguousarray(frame, dtype=np.uint8)
@@ -245,12 +276,14 @@ def procesar_frame(frame):
         ultimo_resultado = (None, "No se detectÃ³ ninguna cara")
         ultimo_encoding = None
         ultimo_usuario_id = None
-        return frame, None, "No se detectÃ³ ninguna cara", None
+        ultimo_ojos_cerrados = None
+        return frame, None, "No se detectÃ³ ninguna cara", None, None
 
     if len(face_locations) > 1:
         ultimo_encoding = None
         ultimo_usuario_id = None
-        return frame, None, "Se detectaron mÃºltiples caras", None
+        ultimo_ojos_cerrados = None
+        return frame, None, "Se detectaron mÃºltiples caras", None, None
 
     if detector_ligero:
         postura_ok, mensaje_postura = _validar_postura_ligera(rgb_small, face_locations[0], frame.shape)
@@ -267,8 +300,9 @@ def procesar_frame(frame):
         ultimo_resultado = ((top, right, bottom, left), mensaje_postura)
         ultimo_encoding = None
         ultimo_usuario_id = None
+        ultimo_ojos_cerrados = None
         cv2.rectangle(frame, (left, top), (right, bottom), (217, 119, 6), 2)
-        return frame, None, mensaje_postura, None
+        return frame, None, mensaje_postura, None, None
     
     # 4. Extraer encoding (esta es la parte pesada, se hace sobre el frame original)
     rgb_frame = _rgb_uint8(frame)
@@ -278,17 +312,20 @@ def procesar_frame(frame):
         ultimo_resultado = ((top, right, bottom, left), "MIRE AL FRENTE")
         ultimo_encoding = None
         ultimo_usuario_id = None
+        ultimo_ojos_cerrados = None
         print(f"Error generando encoding facial: {e}")
         cv2.rectangle(frame, (left, top), (right, bottom), (217, 119, 6), 2)
-        return frame, None, "MIRE AL FRENTE", None
+        return frame, None, "MIRE AL FRENTE", None, None
     if not encodings:
         ultimo_resultado = ((top, right, bottom, left), "MIRE AL FRENTE")
         ultimo_encoding = None
         ultimo_usuario_id = None
+        ultimo_ojos_cerrados = None
         cv2.rectangle(frame, (left, top), (right, bottom), (217, 119, 6), 2)
-        return frame, None, "MIRE AL FRENTE", None
+        return frame, None, "MIRE AL FRENTE", None, None
 
     face_encoding = encodings[0]
+    ojos_cerrados = detectar_ojos_cerrados(rgb_frame, (top, right, bottom, left))
     
     nombre_detectado = "DESCONOCIDO"
     usuario_id = None
@@ -302,12 +339,13 @@ def procesar_frame(frame):
     ultimo_resultado = ((top, right, bottom, left), nombre_detectado)
     ultimo_encoding = face_encoding
     ultimo_usuario_id = usuario_id
+    ultimo_ojos_cerrados = ojos_cerrados
 
     # 5. Dibujo limpio (Solo el rectÃ¡ngulo)
     color = (16, 185, 129) if nombre_detectado != "DESCONOCIDO" else (239, 68, 68)
     cv2.rectangle(frame, (left, top), (right, bottom), color, 2)
 
-    return frame, face_encoding, nombre_detectado, usuario_id
+    return frame, face_encoding, nombre_detectado, usuario_id, ojos_cerrados
     
 def find_best_match(
     face_encoding,

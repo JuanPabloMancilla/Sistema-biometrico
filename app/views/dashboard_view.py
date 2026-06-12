@@ -1,7 +1,5 @@
 ﻿import os
 import customtkinter as ctk
-import numpy as np
-from scipy.interpolate import make_interp_spline
 from matplotlib.figure import Figure
 from matplotlib.ticker import MaxNLocator
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -11,7 +9,7 @@ from app.views.area_management_view import AreaManagementView
 from app.views.puesto_management_view import PuestoManagementView
 from app.services.theme import COLORS
 from app.views.app_context import AppContext
-from datetime import datetime
+from datetime import datetime, time
 from tkcalendar import DateEntry
 from app.detection.detector_rostro import logs_accesos
 from app.database.database import get_connection
@@ -243,22 +241,49 @@ class DashboardView(ctk.CTkFrame):
     def obtener_estadisticas_dashboard(self):
         conn = get_connection()
         cursor = conn.cursor()
-        hoy = datetime.now().strftime("%Y-%m-%d")
+        ahora = datetime.now()
+        hoy = ahora.strftime("%Y-%m-%d")
+        inicio_hoy = datetime.combine(ahora.date(), time.min)
 
         cursor.execute("SELECT COUNT(*) FROM usuario")
-        total_registros = cursor.fetchone()[0]
+        personal = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM registro_acceso WHERE DATE(fecha_hora) = ?", (hoy,))
-        accesos_hoy = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM jornada_laboral WHERE DATE(fecha_entrada) = ?", (hoy,))
+        entradas = cursor.fetchone()[0]
 
-        cursor.execute("SELECT COUNT(*) FROM registro_acceso WHERE DATE(fecha_hora) = ? AND resultado = 1", (hoy,))
-        autorizados = cursor.fetchone()[0]
+        cursor.execute("SELECT COUNT(*) FROM jornada_laboral WHERE DATE(fecha_salida) = ?", (hoy,))
+        salidas = cursor.fetchone()[0]
+
+        cursor.execute("SELECT COUNT(*) FROM jornada_laboral WHERE estado = 'trabajando'")
+        trabajando = cursor.fetchone()[0]
+
+        cursor.execute(
+            """
+            SELECT fecha_entrada, fecha_salida
+            FROM jornada_laboral
+            WHERE fecha_entrada < ?
+              AND (fecha_salida IS NULL OR fecha_salida >= ?)
+            """,
+            (ahora.strftime("%Y-%m-%d %H:%M:%S"), hoy),
+        )
+        segundos_trabajados = 0
+        for fecha_entrada, fecha_salida in cursor.fetchall():
+            entrada = max(datetime.strptime(fecha_entrada, "%Y-%m-%d %H:%M:%S"), inicio_hoy)
+            salida = datetime.strptime(fecha_salida, "%Y-%m-%d %H:%M:%S") if fecha_salida else ahora
+            segundos_trabajados += max(0, int((salida - entrada).total_seconds()))
 
         cursor.execute("SELECT COUNT(*) FROM registro_acceso WHERE DATE(fecha_hora) = ? AND resultado = 0", (hoy,))
-        denegados = cursor.fetchone()[0]
+        alertas = cursor.fetchone()[0]
 
         conn.close()
-        return total_registros, accesos_hoy, autorizados, denegados
+        return {
+            "personal": personal,
+            "entradas": entradas,
+            "salidas": salidas,
+            "trabajando": trabajando,
+            "horas": segundos_trabajados / 3600,
+            "alertas": alertas,
+        }
     
     def render_dashboard_principal(self):
         padx_main = 6 if self.is_compact else 18
@@ -266,8 +291,7 @@ class DashboardView(ctk.CTkFrame):
         main_scroll = ctk.CTkScrollableFrame(self.content_container, fg_color="transparent")
         main_scroll.pack(fill="both", expand=True)
 
-        total_registros, accesos_hoy, autorizados, denegados = self.obtener_estadisticas_dashboard()
-        tasa = 0 if accesos_hoy == 0 else int((autorizados / max(accesos_hoy, 1)) * 100)
+        estadisticas = self.obtener_estadisticas_dashboard()
 
         header = ctk.CTkFrame(main_scroll, fg_color="transparent")
         header.pack(fill="x", padx=padx_main, pady=(8 if self.is_compact else 14, 5))
@@ -297,7 +321,7 @@ class DashboardView(ctk.CTkFrame):
             fg_color=COLORS["sidebar"],
             corner_radius=8,
             width=270,
-            height=280 if self.is_compact else 430,
+            height=335 if self.is_compact else 465,
             border_width=1,
             border_color="#22304A",
         )
@@ -318,13 +342,13 @@ class DashboardView(ctk.CTkFrame):
         ).pack(anchor="w")
         ctk.CTkLabel(
             left_body,
-            text=f"{tasa}%",
+            text=str(estadisticas["trabajando"]),
             font=("Inter", 38 if not self.is_compact else 30, "bold"),
             text_color="#FFFFFF",
         ).pack(anchor="w", pady=(6, 0))
         ctk.CTkLabel(
             left_body,
-            text=AppContext.t("Tasa de accesos autorizados hoy"),
+            text=AppContext.t("Personal trabajando ahora"),
             font=("Inter", 12),
             text_color=COLORS["sidebar_muted"],
             wraplength=250,
@@ -332,10 +356,11 @@ class DashboardView(ctk.CTkFrame):
         ).pack(anchor="w", pady=(0, 10))
 
         metricas = [
-            (AppContext.t("Personal"), total_registros, COLORS["primary"]),
-            (AppContext.t("Eventos"), accesos_hoy, COLORS["info"]),
-            (AppContext.t("Validos"), autorizados, COLORS["success"]),
-            (AppContext.t("Alertas"), denegados, COLORS["danger"]),
+            (AppContext.t("Entradas hoy"), estadisticas["entradas"], COLORS["success"]),
+            (AppContext.t("Salidas hoy"), estadisticas["salidas"], COLORS["info"]),
+            (AppContext.t("Horas trabajadas"), f"{estadisticas['horas']:.1f} h", COLORS["accent"]),
+            (AppContext.t("Personal"), estadisticas["personal"], COLORS["primary"]),
+            (AppContext.t("Alertas"), estadisticas["alertas"], COLORS["danger"]),
         ]
         for titulo, valor, color in metricas:
             row = ctk.CTkFrame(left_body, fg_color="#111C31", corner_radius=8)
@@ -375,7 +400,7 @@ class DashboardView(ctk.CTkFrame):
         graph_header.pack(fill="x", padx=12 if self.is_compact else 18, pady=(10, 4))
         ctk.CTkLabel(
             graph_header,
-            text=AppContext.t("Radar horario"),
+            text=AppContext.t("Entradas y salidas por hora"),
             font=("Inter", 14 if self.is_compact else 18, "bold"),
             text_color=COLORS["text"],
         ).pack(side="left", anchor="w")
@@ -443,24 +468,35 @@ class DashboardView(ctk.CTkFrame):
         conn = get_connection()
         cursor = conn.cursor()
         cursor.execute("""
-            SELECT CAST(strftime('%H', fecha_hora) AS INTEGER) AS hora, COUNT(*) AS total
-            FROM registro_acceso
-            WHERE DATE(fecha_hora) = ?
-            GROUP BY hora ORDER BY hora
+            SELECT CAST(strftime('%H', fecha_entrada) AS INTEGER), COUNT(*)
+            FROM jornada_laboral
+            WHERE DATE(fecha_entrada) = ?
+            GROUP BY strftime('%H', fecha_entrada)
         """, (fecha,))
-        filas = cursor.fetchall()
+        filas_entrada = cursor.fetchall()
+        cursor.execute("""
+            SELECT CAST(strftime('%H', fecha_salida) AS INTEGER), COUNT(*)
+            FROM jornada_laboral
+            WHERE DATE(fecha_salida) = ?
+            GROUP BY strftime('%H', fecha_salida)
+        """, (fecha,))
+        filas_salida = cursor.fetchall()
         conn.close()
 
         horas  = list(range(24))
-        conteo = [0] * 24
-        for fila in filas:
-            conteo[int(fila[0])] = int(fila[1])
+        entradas = [0] * 24
+        salidas = [0] * 24
+        for fila in filas_entrada:
+            entradas[int(fila[0])] = int(fila[1])
+        for fila in filas_salida:
+            salidas[int(fila[0])] = int(fila[1])
 
         mode       = ctk.get_appearance_mode()
         bg_color   = "#1E293B" if mode == "Dark" else "#FFFFFF"
         text_color = "#F8FAFC" if mode == "Dark" else "#0F172A"
         grid_color = "#334155" if mode == "Dark" else "#E2E8F0"
-        line_color = "#3B82F6"
+        entrada_color = "#10B981"
+        salida_color = "#3B82F6"
 
         fig = Figure(figsize=(7, 3.2), dpi=100)
         ax  = fig.add_subplot(111)
@@ -468,27 +504,25 @@ class DashboardView(ctk.CTkFrame):
         fig.patch.set_facecolor(bg_color)
         ax.set_facecolor(bg_color)
 
-        x = np.array(horas)
-        y = np.array(conteo)
-
-        if sum(conteo) > 0:
-            x_smooth = np.linspace(x.min(), x.max(), 300)
-            spl      = make_interp_spline(x, y, k=3)
-            y_smooth = np.clip(spl(x_smooth), 0, None)
-            ax.fill_between(x_smooth, y_smooth, color=line_color, alpha=0.22)
-            ax.plot(x_smooth, y_smooth, color=line_color, linewidth=2.8)
-            ax.scatter(x, y, s=28, color=line_color, edgecolors=bg_color, linewidths=1.2, zorder=3)
+        if sum(entradas) + sum(salidas) > 0:
+            ax.plot(horas, entradas, color=entrada_color, linewidth=2.5, marker="o", label=AppContext.t("Entradas"))
+            ax.plot(horas, salidas, color=salida_color, linewidth=2.5, marker="o", label=AppContext.t("Salidas"))
+            ax.fill_between(horas, entradas, color=entrada_color, alpha=0.10)
+            ax.fill_between(horas, salidas, color=salida_color, alpha=0.10)
+            legend = ax.legend(frameon=False, loc="upper left", fontsize=9)
+            for texto in legend.get_texts():
+                texto.set_color(text_color)
         else:
-            ax.plot(horas, conteo, color=line_color, linewidth=2.5, alpha=0.6)
+            ax.plot(horas, entradas, color=entrada_color, linewidth=2.5, alpha=0.6)
             ax.text(
                 0.5, 0.5,
-                AppContext.t("Sin accesos registrados en esta fecha"),
+                AppContext.t("Sin jornadas registradas en esta fecha"),
                 transform=ax.transAxes, ha="center", va="center",
                 fontsize=11, color=text_color, alpha=0.7
             )
 
         ax.set_xlim(0, 23)
-        max_y = max(conteo) if conteo else 0
+        max_y = max(entradas + salidas) if entradas or salidas else 0
         ax.set_ylim(0, max(3, max_y + 1))
         ax.set_xticks([0, 3, 6, 9, 12, 15, 18, 21, 23])
         ax.set_xticklabels(

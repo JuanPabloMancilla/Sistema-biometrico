@@ -33,6 +33,7 @@ TEXT_MUTED     = "#94A3B8"
 
 BANNER_H = 76
 SCAN_DURATION = 3.0
+MUESTRAS_BIOMETRICAS = 3
 
 TEMAS = {
     "escaneando": {
@@ -220,6 +221,7 @@ class TerminalView(ctk.CTkFrame):
         self.usuario_detectado = ""
         self.ids_detectados_escaneo = []
         self.detector_parpadeo = DetectorParpadeo()
+        self.muestras_registro = []
         self.ultimo_rostro_visto = 0.0
         self.face_box = None
         self._haar_frame_count = 0
@@ -537,6 +539,12 @@ class TerminalView(ctk.CTkFrame):
         cv2.line(frame, (fx, y - 1), (fx + fw, y - 1), c, 1)
         cv2.line(frame, (fx, y + 1), (fx + fw, y + 1), c, 1)
 
+    @staticmethod
+    def _calidad_captura(brillo, area_relativa):
+        brillo_score = max(0, 100 - abs(brillo - 125) * 0.8)
+        area_score = min(100, max(0, area_relativa / 0.18 * 100))
+        return int((brillo_score * 0.55) + (area_score * 0.45))
+
     def _aplicar_vignette(self, frame):
         if frame.ndim == 2:
             frame = cv2.cvtColor(frame, cv2.COLOR_GRAY2BGR)
@@ -626,6 +634,7 @@ class TerminalView(ctk.CTkFrame):
             fx0, fy0, fw0, fh0 = self.face_box
             area_cara  = fw0 * fh0
             area_frame = frame_dibujado.shape[0] * frame_dibujado.shape[1]
+            area_relativa = area_cara / max(area_frame, 1)
             muy_lejos  = (area_cara / area_frame) < 0.04
             estado_postura = self._estado_postura_desde_mensaje(mensaje)
 
@@ -652,6 +661,11 @@ class TerminalView(ctk.CTkFrame):
                     self.ids_detectados_escaneo = []
                     self.detector_parpadeo.reiniciar()
                     self.aplicar_estilo_visual("parpadeo" if self.modo != "registro" else "escaneando")
+                    if self.modo == "registro":
+                        self.lbl_nombre.configure(
+                            text=f"MUESTRA {len(self.muestras_registro) + 1} DE {MUESTRAS_BIOMETRICAS}",
+                            text_color=ACCENT_AMBER,
+                        )
 
             if self.escaneando and self.face_box is not None:
                 fx, fy, fw, fh = self.face_box
@@ -671,6 +685,23 @@ class TerminalView(ctk.CTkFrame):
                     parpadeo_confirmado = self.detector_parpadeo.actualizar(ojos_cerrados)
                     if parpadeo_confirmado and self.estado_actual == "parpadeo":
                         self.aplicar_estilo_visual("escaneando")
+                    elif self.estado_actual == "parpadeo":
+                        if self.detector_parpadeo.vio_cerrados:
+                            instruccion = AppContext.t("ABRA LOS OJOS")
+                        elif self.detector_parpadeo.vio_abiertos:
+                            instruccion = AppContext.t("PARPADEE AHORA")
+                        else:
+                            instruccion = AppContext.t("MIRE A LA CAMARA")
+                        self.lbl_nombre.configure(text=instruccion, text_color=ACCENT_CYAN)
+                elif face_encoding is not None:
+                    calidad_actual = self._calidad_captura(brillo_medio, area_relativa)
+                    self.lbl_nombre.configure(
+                        text=(
+                            f"MUESTRA {len(self.muestras_registro) + 1} DE {MUESTRAS_BIOMETRICAS}"
+                            f"  |  CALIDAD {calidad_actual}%"
+                        ),
+                        text_color=ACCENT_AMBER,
+                    )
 
                 if ahora - self.inicio_escaneo > SCAN_DURATION:
                     self.escaneando = False
@@ -706,11 +737,27 @@ class TerminalView(ctk.CTkFrame):
                                 self.loop_id = self.after(1500, self.actualizar_video)
                                 return
 
+                            calidad = self._calidad_captura(brillo_medio, area_relativa)
+                            self.muestras_registro.append(face_encoding)
+                            if len(self.muestras_registro) < MUESTRAS_BIOMETRICAS:
+                                self.requiere_retirar_rostro = True
+                                self.status_label.configure(
+                                    text=f"MUESTRA GUARDADA - CALIDAD {calidad}%",
+                                    text_color=ACCENT_GREEN,
+                                )
+                                self.lbl_nombre.configure(
+                                    text=AppContext.t("RETIRE EL ROSTRO PARA CONTINUAR"),
+                                    text_color=ACCENT_GREEN,
+                                )
+                                return
+
                             self.running = False
-
+                            self.status_label.configure(
+                                text="BIOMETRIA COMPLETA",
+                                text_color=ACCENT_GREEN,
+                            )
                             if self.on_capture:
-                                self.on_capture(face_encoding)
-
+                                self.on_capture(self.muestras_registro)
                             return
 
                     else:

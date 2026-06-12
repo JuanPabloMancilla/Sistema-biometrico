@@ -8,7 +8,8 @@ SecureWork es una aplicacion de escritorio en Python para control de acceso medi
 - Deteccion facial acelerada con MediaPipe y OpenCV.
 - Reconocimiento facial con `face-recognition` y `dlib`.
 - Prueba de vida mediante parpadeo antes de autorizar entradas y salidas.
-- Captura y actualizacion de biometria para usuarios.
+- Indicaciones visuales en vivo para completar la prueba de parpadeo.
+- Registro guiado de tres muestras biometricas con indicador de calidad.
 - Dashboard con metricas, grafica por hora y ultimos accesos.
 - Reportes de asistencia por rango de fechas con exportacion CSV.
 - Reglas configurables de horario, tolerancia, descanso y horas extra.

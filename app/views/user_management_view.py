@@ -1155,12 +1155,12 @@ class UserManagementView(ctk.CTkFrame):
             )
 
     def recibir_biometria(self, encoding):
-        print("OK: Captura recibida")
+        print("OK: Muestras biometricas recibidas")
         self.biometria_temp = encoding
 
         if hasattr(self, "btn_biometria"):
             self.btn_biometria.configure(
-                text=AppContext.t("BiometrÃ­a registrada"),
+                text=f"{len(encoding)} muestras biometricas registradas",
                 fg_color="#10B981",
                 hover_color="#059669"
             )

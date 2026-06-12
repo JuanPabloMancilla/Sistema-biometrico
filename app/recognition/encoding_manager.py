@@ -88,19 +88,15 @@ def guardar_encoding(
             "error": "No hay encoding facial"
         }
 
-    encoding = np.array(encoding)
+    muestras = encoding if isinstance(encoding, (list, tuple)) else [encoding]
+    muestras = [np.array(muestra) for muestra in muestras]
 
-    if len(encoding) != 128:
+    if not muestras or any(len(muestra) != 128 for muestra in muestras):
 
         return {
             "ok": False,
             "error": "Encoding inválido"
         }
-
-    datos_usuario = {
-        "usuario": usuario,
-        "encoding": encoding.tolist()
-    }
 
     if os.path.exists(archivo):
 
@@ -138,35 +134,20 @@ def guardar_encoding(
             str(existente["usuario"]) == str(usuario)
         )
 
-        print("USUARIO ACTUAL:", usuario)
-        print("EXISTENTE:", existente["usuario"])
-
         # ? IGNORAR SU PROPIO ROSTRO
         if mismo_usuario:
             continue
 
-        encoding_existente = np.array(
-            existente["encoding"]
-        )
-
-        distancia = face_recognition.face_distance(
-            [encoding_existente],
-            encoding
-        )[0]
-
-        print(
-            f"Comparando con {existente['usuario']} "
-            f"-> distancia: {distancia}"
-        )
-
-        if distancia < 0.45:
-
-            return {
-                "ok": False,
-                "error": "rostro_duplicado",
-                "usuario_duplicado": existente["usuario"],
-                "distancia": float(distancia)
-            }
+        encoding_existente = np.array(existente["encoding"])
+        for muestra in muestras:
+            distancia = face_recognition.face_distance([encoding_existente], muestra)[0]
+            if distancia < 0.45:
+                return {
+                    "ok": False,
+                    "error": "rostro_duplicado",
+                    "usuario_duplicado": existente["usuario"],
+                    "distancia": float(distancia)
+                }
 
     # ============================================
     # REEMPLAZAR BIOMETR�A
@@ -179,15 +160,17 @@ def guardar_encoding(
             if str(u["usuario"]) != str(usuario)
         ]
 
-    datos.append(datos_usuario)
+    datos.extend({
+        "usuario": usuario,
+        "encoding": muestra.tolist()
+    } for muestra in muestras)
 
     with open(archivo, "w") as f:
         json.dump(datos, f, indent=4)
 
-    print(f"? Encoding guardado como usuario {usuario}")
-
     return {
-        "ok": True
+        "ok": True,
+        "muestras": len(muestras)
     }
 
 def comparar_encodings(encoding_guardado, encoding_actual):

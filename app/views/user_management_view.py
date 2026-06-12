@@ -1129,7 +1129,7 @@ class UserManagementView(ctk.CTkFrame):
 
         self.terminal_view = TerminalView(
             self.terminal_container,
-            user_id=None,
+            user_id=self.usuario_editando_id,
             on_back=self.cerrar_terminal_biometrica,
             on_capture=self.recibir_biometria,
             modo="registro"

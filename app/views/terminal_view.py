@@ -719,7 +719,13 @@ class TerminalView(ctk.CTkFrame):
                                 self.ids_conocidos
                             )
 
-                            if match_id is not None and distancia < UMBRAL_ACCESO:
+                            rostro_de_otro_usuario = (
+                                match_id is not None
+                                and distancia < UMBRAL_ACCESO
+                                and str(match_id) != str(self.user_id)
+                            )
+
+                            if rostro_de_otro_usuario:
 
                                 self.status_label.configure(
                                     text=AppContext.t("USUARIO YA REGISTRADO"),

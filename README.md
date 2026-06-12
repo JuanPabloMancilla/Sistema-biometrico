@@ -10,6 +10,7 @@ SecureWork es una aplicacion de escritorio en Python para control de acceso medi
 - Prueba de vida mediante parpadeo antes de autorizar entradas y salidas.
 - Captura y actualizacion de biometria para usuarios.
 - Dashboard con metricas, grafica por hora y ultimos accesos.
+- Reportes de asistencia por rango de fechas con exportacion CSV.
 - Gestion de personal, areas y puestos.
 - Perfil administrativo con foto e idioma.
 - Soporte para tema claro/oscuro e idioma ES/EN.

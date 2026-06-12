@@ -7,6 +7,7 @@ from app.views.user_management_view import UserManagementView
 from app.views.account_view import AccountView, _cargar_datos
 from app.views.area_management_view import AreaManagementView
 from app.views.puesto_management_view import PuestoManagementView
+from app.views.attendance_report_view import AttendanceReportView
 from app.services.theme import COLORS
 from app.views.app_context import AppContext
 from datetime import datetime, time
@@ -26,6 +27,7 @@ class DashboardView(ctk.CTkFrame):
         self.btn_users      = None
         self.btn_areas = None
         self.btn_puestos   = None
+        self.btn_reportes  = None
         self.btn_account    = None
         self.bind("<Configure>", self._on_resize)
         self.on_back = on_back
@@ -83,6 +85,7 @@ class DashboardView(ctk.CTkFrame):
         self.crear_btn_overlay(parent, AppContext.t("GestiÃ³n de Usuarios"),   self.mostrar_gestion_usuarios)
         self.crear_btn_overlay(parent, AppContext.t("GestiÃ³n de Facultades"), self.mostrar_gestion_areas)
         self.crear_btn_overlay(parent, AppContext.t("GestiÃ³n de Carreras"),   self.mostrar_gestion_puestos)
+        self.crear_btn_overlay(parent, AppContext.t("Reportes"),                self.mostrar_reportes)
         self.crear_btn_overlay(parent, AppContext.t("ConfiguraciÃ³n"),         self.mostrar_cuenta)
 
         ctk.CTkButton(
@@ -151,6 +154,7 @@ class DashboardView(ctk.CTkFrame):
         self.btn_users      = None
         self.btn_areas = None
         self.btn_puestos   = None
+        self.btn_reportes  = None
         self.btn_account    = None
 
         self.top_ctrl_area.configure(height=self._topbar_height())
@@ -180,7 +184,7 @@ class DashboardView(ctk.CTkFrame):
                 widget.destroy()
 
     def actualizar_navegacion(self, btn_act):
-        btns = [self.btn_panel, self.btn_users, self.btn_areas, self.btn_puestos, self.btn_account]
+        btns = [self.btn_panel, self.btn_users, self.btn_areas, self.btn_puestos, self.btn_reportes, self.btn_account]
         for b in btns:
             if not b or not b.winfo_exists():
                 continue
@@ -225,6 +229,12 @@ class DashboardView(ctk.CTkFrame):
             on_logout=self.on_back,
             on_profile_updated=self._refrescar_perfil_sidebar,  # ? NUEVO
         ).pack(fill="both", expand=True, padx=4 if self.is_compact else 20)
+
+    def mostrar_reportes(self):
+        self.vista_actual_func = self.mostrar_reportes
+        self.limpiar_derecha()
+        self.actualizar_navegacion(self.btn_reportes)
+        AttendanceReportView(self.content_container).pack(fill="both", expand=True)
 
     # -------------------------------------------------------------
     # ACTUALIZAR SIDEBAR CON PERFIL  ? NUEVO
@@ -748,6 +758,7 @@ class DashboardView(ctk.CTkFrame):
         self.btn_users      = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Personal"), self.mostrar_gestion_usuarios)
         self.btn_areas      = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Áreas"),    self.mostrar_gestion_areas)
         self.btn_puestos    = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Puestos"),  self.mostrar_gestion_puestos)
+        self.btn_reportes   = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Reportes"), self.mostrar_reportes)
         self.btn_account    = self.crear_btn_sidebar(self.sidebar_frame, AppContext.t("Ajustes"),  self.mostrar_cuenta)
 
         ctk.CTkButton(
@@ -922,6 +933,7 @@ class DashboardView(ctk.CTkFrame):
         self.btn_users = self._crear_btn_topnav(nav, AppContext.t("Personal"), self.mostrar_gestion_usuarios)
         self.btn_areas = self._crear_btn_topnav(nav, AppContext.t("Areas"), self.mostrar_gestion_areas)
         self.btn_puestos = self._crear_btn_topnav(nav, AppContext.t("Puestos"), self.mostrar_gestion_puestos)
+        self.btn_reportes = self._crear_btn_topnav(nav, AppContext.t("Reportes"), self.mostrar_reportes)
         self.btn_account = self._crear_btn_topnav(nav, AppContext.t("Ajustes"), self.mostrar_cuenta)
 
         if hasattr(self, "vista_actual_func"):
@@ -930,6 +942,7 @@ class DashboardView(ctk.CTkFrame):
                 self.mostrar_gestion_usuarios: self.btn_users,
                 self.mostrar_gestion_areas: self.btn_areas,
                 self.mostrar_gestion_puestos: self.btn_puestos,
+                self.mostrar_reportes: self.btn_reportes,
                 self.mostrar_cuenta: self.btn_account,
             }.get(self.vista_actual_func)
             if actual:

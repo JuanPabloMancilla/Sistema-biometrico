@@ -144,6 +144,8 @@ Recomendaciones:
 - Usar buena iluminacion frontal.
 - Mantener una sola cara visible.
 - Evitar actualizar `numpy` y OpenCV fuera de las versiones del `requirements.txt`.
+- Si la Raspberry Pi necesita mayor fluidez, aumentar el intervalo del
+  reconocimiento pesado, por ejemplo: `FACE_RECOGNITION_INTERVAL=12`.
 
 ## Datos sensibles
 

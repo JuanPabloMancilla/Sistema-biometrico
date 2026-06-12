@@ -62,7 +62,9 @@ ultimo_encoding = None
 ultimo_usuario_id = None
 ultimo_ojos_cerrados = None
 frame_count = 0
-PROCESAR_CADA_N_FRAMES = 6
+PROCESAR_CADA_N_FRAMES = max(
+    6, int(os.environ.get("FACE_RECOGNITION_INTERVAL", "10"))
+)
 UMBRAL_ACCESO = 0.42
 MARGEN_MINIMO_COINCIDENCIA = 0.04
 mp_face_detector = None
@@ -129,6 +131,19 @@ def detectar_ojos_cerrados(rgb_frame, face_location, threshold=0.20):
         return None
 
     return ((ear_izq + ear_der) / 2.0) < threshold
+
+def _ojos_cerrados_en_frame_reducido(frame, face_location_original):
+    if frame is None or face_location_original is None:
+        return None
+
+    small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+    rgb_small = _rgb_uint8(small_frame)
+    top, right, bottom, left = face_location_original
+    ubicacion_small = _limitar_ubicacion(
+        [top // 4, right // 4, bottom // 4, left // 4],
+        small_frame.shape,
+    )
+    return detectar_ojos_cerrados(rgb_small, ubicacion_small)
 
 def _rgb_uint8(frame):
     if frame is None:
@@ -258,9 +273,14 @@ def procesar_frame(frame):
     
     frame_count += 1
     # OPTIMIZACION: el encoding facial es pesado; entre ciclos se reutiliza
-    # el ultimo resultado para mantener el video fluido.
+    # el ultimo resultado y solo se revisa el parpadeo sobre una imagen reducida.
     if frame_count % PROCESAR_CADA_N_FRAMES != 0 and ultimo_resultado[0] is not None:
         top, right, bottom, left = ultimo_resultado[0]
+        ojos_cerrados = _ojos_cerrados_en_frame_reducido(
+            frame, (top, right, bottom, left)
+        )
+        if ojos_cerrados is not None:
+            ultimo_ojos_cerrados = ojos_cerrados
         cv2.rectangle(frame, (left, top), (right, bottom), (10, 185, 129), 2)
         return frame, ultimo_encoding, ultimo_resultado[1], ultimo_usuario_id, ultimo_ojos_cerrados
 
@@ -325,7 +345,7 @@ def procesar_frame(frame):
         return frame, None, "MIRE AL FRENTE", None, None
 
     face_encoding = encodings[0]
-    ojos_cerrados = detectar_ojos_cerrados(rgb_frame, (top, right, bottom, left))
+    ojos_cerrados = detectar_ojos_cerrados(rgb_small, face_locations[0])
     
     nombre_detectado = "DESCONOCIDO"
     usuario_id = None

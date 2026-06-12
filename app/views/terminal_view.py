@@ -471,7 +471,7 @@ class TerminalView(ctk.CTkFrame):
 
     def detectar_rostros(self, frame):
         self._haar_frame_count += 1
-        if self._haar_frame_count % 3 != 0:
+        if self._haar_frame_count % 5 != 0:
             return self._last_faces
 
         small = cv2.resize(frame, (0, 0), fx=0.5, fy=0.5)

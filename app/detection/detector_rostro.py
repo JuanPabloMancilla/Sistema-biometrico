@@ -82,6 +82,16 @@ cargar_logs()
 ultimo_registro = 0
 TIEMPO_ESPERA = 10  # segundos
 
+def reiniciar_cache_deteccion():
+    global ultimo_resultado, ultimo_encoding, ultimo_usuario_id
+    global ultimo_ojos_cerrados, frame_count
+    ultimo_resultado = (None, "ESCANEANDO...")
+    ultimo_encoding = None
+    ultimo_usuario_id = None
+    ultimo_ojos_cerrados = None
+    frame_count = 0
+
+
 def registrar_acceso():
     global ultimo_registro
 

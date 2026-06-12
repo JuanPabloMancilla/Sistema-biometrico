@@ -5,7 +5,11 @@ from PIL import Image
 import time
 from app.hardware import buzzer
 from app.recognition.encoding_manager import cargar_encodings
-from app.detection.detector_rostro import find_best_match, UMBRAL_ACCESO
+from app.detection.detector_rostro import (
+    find_best_match,
+    reiniciar_cache_deteccion,
+    UMBRAL_ACCESO,
+)
 from app.views.app_context import AppContext
 from app.camara.camara import iniciar_camara, liberar_camara, obtener_frame
 from app.detection.detector_rostro import procesar_frame
@@ -747,6 +751,9 @@ class TerminalView(ctk.CTkFrame):
                             self.muestras_registro.append(face_encoding)
                             if len(self.muestras_registro) < MUESTRAS_BIOMETRICAS:
                                 self.requiere_retirar_rostro = True
+                                self._last_faces = []
+                                self.face_box = None
+                                reiniciar_cache_deteccion()
                                 self.status_label.configure(
                                     text=f"MUESTRA GUARDADA - CALIDAD {calidad}%",
                                     text_color=ACCENT_GREEN,
@@ -755,16 +762,15 @@ class TerminalView(ctk.CTkFrame):
                                     text=AppContext.t("RETIRE EL ROSTRO PARA CONTINUAR"),
                                     text_color=ACCENT_GREEN,
                                 )
+                            else:
+                                self.running = False
+                                self.status_label.configure(
+                                    text="BIOMETRIA COMPLETA",
+                                    text_color=ACCENT_GREEN,
+                                )
+                                if self.on_capture:
+                                    self.on_capture(self.muestras_registro)
                                 return
-
-                            self.running = False
-                            self.status_label.configure(
-                                text="BIOMETRIA COMPLETA",
-                                text_color=ACCENT_GREEN,
-                            )
-                            if self.on_capture:
-                                self.on_capture(self.muestras_registro)
-                            return
 
                     else:
                         ids_validos = [

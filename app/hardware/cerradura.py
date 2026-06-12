@@ -3,7 +3,7 @@ from time import sleep
 import logging
 
 from .gpio_backend import BackendOutputDevice, get_backend_info
-from app.config import PIN_RELEVADOR, UNLOCK_TIMEOUT
+from app.config import PIN_RELEVADOR, RELE_ACTIVE_HIGH, UNLOCK_TIMEOUT
 
 
 logger = logging.getLogger(__name__)
@@ -20,25 +20,42 @@ class Cerradura:
         try:
             self.rele = BackendOutputDevice(
                 PIN_RELEVADOR,
-                active_high=True,
+                active_high=RELE_ACTIVE_HIGH,
                 initial_value=False,
             )
             self.bloquear()
 
             modo = "GPIO real" if info.get("gpio_ok") else "simulación/mock"
-            logger.info("Cerradura lista (%s) en pin %s", modo, PIN_RELEVADOR)
+            logger.info(
+                "Cerradura lista (%s) en pin %s, active_high=%s",
+                modo,
+                PIN_RELEVADOR,
+                RELE_ACTIVE_HIGH,
+            )
+            if not info.get("gpio_ok"):
+                logger.warning(
+                    "La cerradura no enviara señal fisica. Backend GPIO: %s",
+                    info.get("error") or "no disponible",
+                )
         except Exception:
             logger.exception("Error iniciando dispositivo para cerradura")
 
     def desbloquear(self):
 
-        if self.rele:
-            try:
-                self.rele.on()
-            except Exception:
-                logger.exception("Error al activar rele")
+        if not self.rele:
+            logger.error("No se puede abrir: rele GPIO no disponible")
+            print("ERROR CERRADURA: rele GPIO no disponible")
+            return False
 
-        logger.info("Cerradura: desbloqueada")
+        try:
+            self.rele.on()
+            logger.info("Cerradura: desbloqueada")
+            print(f"CERRADURA: señal de apertura enviada a GPIO {PIN_RELEVADOR}")
+            return True
+        except Exception:
+            logger.exception("Error al activar rele")
+            print(f"ERROR CERRADURA: no se pudo activar GPIO {PIN_RELEVADOR}")
+            return False
 
     def bloquear(self):
 
@@ -54,21 +71,21 @@ class Cerradura:
         self._desbloqueo_id += 1
         desbloqueo_id = self._desbloqueo_id
 
+        if not self.desbloquear():
+            return False
+
         if segundos is None:
-            self.desbloquear()
             logger.warning("Cerradura desbloqueada sin temporizador")
-            return
+            return True
 
         def tarea():
-
-            self.desbloquear()
-
             sleep(segundos)
 
             if desbloqueo_id == self._desbloqueo_id:
                 self.bloquear()
 
         Thread(target=tarea, daemon=True).start()
+        return True
 
     def cerrar(self):
         if not self.rele:

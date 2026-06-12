@@ -20,10 +20,11 @@ def _env_optional_float(name, default):
     return float(raw)
 
 
-# Hardware pins (default values)
-PIN_RELEVADOR = int(os.getenv("PIN_RELEVADOR", "22"))
+# Hardware pins using BCM numbering (GPIO17 is physical pin 11)
+PIN_RELEVADOR = int(os.getenv("PIN_RELEVADOR", "17"))
 PIN_BUZZER = int(os.getenv("PIN_BUZZER", "18"))
-PIN_PIR = int(os.getenv("PIN_PIR", "17"))
+PIN_PIR = int(os.getenv("PIN_PIR", "27"))
+RELE_ACTIVE_HIGH = _env_bool("RELE_ACTIVE_HIGH", True)
 
 # Simulation flag: set SIMULATE_HARDWARE=1 to force mock backends
 SIMULATE_HARDWARE = _env_bool("SIMULATE_HARDWARE", False)

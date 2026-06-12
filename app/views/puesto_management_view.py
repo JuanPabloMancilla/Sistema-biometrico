@@ -18,10 +18,10 @@ class PuestoManagementView(ctk.CTkFrame):
         self.controller = controller
         self.usuario_editando_id = None
 
-        self.font_header = ("Inter", 28, "bold")
-        self.font_sub    = ("Inter", 16, "bold")
-        self.font_normal = ("Inter", 13)
-        self.font_small  = ("Inter", 11, "bold")
+        self.font_header = ("Inter", 24, "bold")
+        self.font_sub    = ("Inter", 14, "bold")
+        self.font_normal = ("Inter", 12)
+        self.font_small  = ("Inter", 12, "bold")
 
         self.modo_edicion      = False
         self.carrera_actual_id = None
@@ -38,7 +38,7 @@ class PuestoManagementView(ctk.CTkFrame):
             self.vista_tabla, fg_color=COLORS["card"],
             corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
-        self.main_card.pack(fill="both", expand=True, padx=40, pady=(0, 40))
+        self.main_card.pack(fill="both", expand=True, padx=20, pady=(0, 20))
 
         self.render_table_content()
 
@@ -110,10 +110,10 @@ class PuestoManagementView(ctk.CTkFrame):
                     scroll, fg_color=COLORS["card"],
                     corner_radius=8, border_width=1, border_color=COLORS["border"]
                 )
-                card.pack(fill="x", padx=2, pady=8)
+                card.pack(fill="x", padx=2, pady=5)
 
                 top = ctk.CTkFrame(card, fg_color="transparent")
-                top.pack(fill="x", padx=14, pady=(14, 8))
+                top.pack(fill="x", padx=10, pady=(8, 5))
 
                 ctk.CTkLabel(top, text="", font=("Inter", 26)).pack(side="left", padx=(0, 10))
 
@@ -147,10 +147,10 @@ class PuestoManagementView(ctk.CTkFrame):
                 ).pack(padx=10, pady=4)
 
                 actions = ctk.CTkFrame(card, fg_color="transparent")
-                actions.pack(fill="x", padx=14, pady=(0, 14))
+                actions.pack(fill="x", padx=10, pady=(0, 8))
 
                 ctk.CTkButton(
-                    actions, text="✎", height=36,
+                    actions, text="✎", height=30,
                     fg_color=COLORS["hover"], text_color=COLORS["text"],
                     font=("Segoe UI Symbol", 14, "bold"),
                     command=lambda cid=c["id"]: self.abrir_formulario(cid)
@@ -158,14 +158,14 @@ class PuestoManagementView(ctk.CTkFrame):
 
                 if es_activa:
                     ctk.CTkButton(
-                        actions, text="⊘", height=36,
+                        actions, text="⊘", height=30,
                         fg_color="#FFF1F2", text_color="#E11D48",
                         font=("Segoe UI Symbol", 14, "bold"),
                         command=lambda cid=c["id"], n=c["nombre"]: self.confirmar_cambio_estado(cid, n, desactivar=True)
                     ).pack(side="left", expand=True, fill="x", padx=(6, 0))
                 else:
                     ctk.CTkButton(
-                        actions, text="✓", height=36,
+                        actions, text="✓", height=30,
                         fg_color="#10B981", text_color="white",
                         font=("Segoe UI Symbol", 14, "bold"),
                         command=lambda cid=c["id"], n=c["nombre"]: self.confirmar_cambio_estado(cid, n, desactivar=False)
@@ -356,67 +356,75 @@ class PuestoManagementView(ctk.CTkFrame):
         self.form_base = ctk.CTkFrame(self, fg_color=COLORS["bg"])
         self.form_base.pack(fill="both", expand=True)
         padx_form = 12 if self.is_compact else 60
+        form_scroll = ctk.CTkScrollableFrame(self.form_base, fg_color="transparent")
+        form_scroll.pack(fill="both", expand=True)
 
         ctk.CTkLabel(
-            self.form_base, text=titulo,
+            form_scroll, text=titulo,
             font=self.font_header, text_color=COLORS["text"]
-        ).pack(anchor="w", padx=padx_form, pady=(40, 20))
+        ).pack(anchor="w", padx=padx_form, pady=(8 if self.is_compact else 24, 10))
 
         form_card = ctk.CTkFrame(
-            self.form_base, fg_color=COLORS["card"],
+            form_scroll, fg_color=COLORS["card"],
             corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
-        form_card.pack(fill="x", padx=padx_form, pady=10)
+        form_card.pack(fill="x", padx=padx_form, pady=6)
 
         ctk.CTkLabel(
             form_card, text=AppContext.t("Nombre de la Carrera"),
             font=self.font_small, text_color=COLORS["subtext"]
-        ).pack(anchor="w", padx=25, pady=(25, 5))
+        ).pack(anchor="w", padx=14 if self.is_compact else 20, pady=(10, 3))
         self.input_nombre = ctk.CTkEntry(
-            form_card, height=45, font=self.font_normal,
+            form_card, height=36 if self.is_compact else 40, font=self.font_normal,
             fg_color=COLORS["hover"], border_width=0, text_color=COLORS["text"]
         )
         self.input_nombre.insert(0, nombre_ini)
-        self.input_nombre.pack(fill="x", padx=25, pady=(0, 20))
+        self.input_nombre.pack(fill="x", padx=14 if self.is_compact else 20, pady=(0, 10))
 
         ctk.CTkLabel(
             form_card, text=AppContext.t("Facultad"),
             font=self.font_small, text_color=COLORS["subtext"]
-        ).pack(anchor="w", padx=25, pady=(0, 5))
+        ).pack(anchor="w", padx=14 if self.is_compact else 20, pady=(0, 3))
         self.combo_facultad = ctk.CTkOptionMenu(
-            form_card, values=facultades_lista, height=45,
+            form_card, values=facultades_lista, height=36 if self.is_compact else 40,
             font=self.font_normal, fg_color=COLORS["hover"],
             button_color=COLORS["border"], text_color=COLORS["text"]
         )
         self.combo_facultad.set(fac_nombre_ini)
-        self.combo_facultad.pack(fill="x", padx=25, pady=(0, 20))
+        self.combo_facultad.pack(fill="x", padx=14 if self.is_compact else 20, pady=(0, 10))
 
         ctk.CTkLabel(
             form_card, text=AppContext.t("Estado"),
             font=self.font_small, text_color=COLORS["subtext"]
-        ).pack(anchor="w", padx=25, pady=(0, 5))
+        ).pack(anchor="w", padx=14 if self.is_compact else 20, pady=(0, 3))
         self.combo_estado = ctk.CTkOptionMenu(
             form_card,
             values=[AppContext.t("Activa"), AppContext.t("Inactiva")],
-            height=45, font=self.font_normal,
+            height=36 if self.is_compact else 40, font=self.font_normal,
             fg_color=COLORS["hover"], button_color=COLORS["border"],
             text_color=COLORS["text"]
         )
         self.combo_estado.set(estado_ini)
-        self.combo_estado.pack(fill="x", padx=25, pady=(0, 30))
+        self.combo_estado.pack(fill="x", padx=14 if self.is_compact else 20, pady=(0, 14))
 
-        btns = ctk.CTkFrame(self.form_base, fg_color="transparent")
-        btns.pack(fill="x", padx=padx_form, pady=30)
-        ctk.CTkButton(
+        btns = ctk.CTkFrame(form_scroll, fg_color="transparent")
+        btns.pack(fill="x", padx=padx_form, pady=12)
+        btn_cancelar = ctk.CTkButton(
             btns, text=AppContext.t("Cancelar"),
             font=self.font_sub, fg_color="#FEE2E2", text_color="#991B1B",
-            height=55, command=self.volver_a_tabla
-        ).pack(side="left", expand=True, fill="x", padx=(0, 10))
-        ctk.CTkButton(
+            height=38 if self.is_compact else 42, command=self.volver_a_tabla
+        )
+        btn_guardar = ctk.CTkButton(
             btns, text=AppContext.t("Guardar Carrera"),
             font=self.font_sub, fg_color="#D1FAE5", text_color="#065F46",
-            height=55, command=self.guardar_carrera
-        ).pack(side="left", expand=True, fill="x", padx=(10, 0))
+            height=38 if self.is_compact else 42, command=self.guardar_carrera
+        )
+        if self.is_compact:
+            btn_cancelar.pack(fill="x", pady=(0, 10))
+            btn_guardar.pack(fill="x")
+        else:
+            btn_cancelar.pack(side="left", expand=True, fill="x", padx=(0, 10))
+            btn_guardar.pack(side="left", expand=True, fill="x", padx=(10, 0))
 
     # â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     # HELPERS
@@ -471,12 +479,12 @@ class PuestoManagementView(ctk.CTkFrame):
         if self.is_compact:
             ctk.CTkLabel(
                 h, text=AppContext.t("Puestos"),
-                font=("Inter", 22, "bold"), text_color=COLORS["text"]
+                font=("Inter", 20, "bold"), text_color=COLORS["text"]
             ).pack(anchor="center", pady=(0, 8))
             ctk.CTkButton(
                 h, text=AppContext.t("Nuevo puesto"),
                 font=self.font_sub, fg_color=COLORS["primary"],
-                height=40, corner_radius=8,
+                height=36, corner_radius=8,
                 command=self.abrir_formulario
             ).pack(fill="x", padx=4)
         else:
@@ -487,7 +495,7 @@ class PuestoManagementView(ctk.CTkFrame):
             ctk.CTkButton(
                 h, text=AppContext.t("Nuevo puesto"),
                 font=self.font_sub, fg_color=COLORS["primary"],
-                height=50, corner_radius=8,
+                height=40, corner_radius=8,
                 command=self.abrir_formulario
             ).pack(side="right")
 
@@ -498,7 +506,7 @@ class PuestoManagementView(ctk.CTkFrame):
         self.entry_busqueda = ctk.CTkEntry(
             bar,
             placeholder_text=AppContext.t("Buscar carrera por nombre..."),
-            height=42, corner_radius=10,
+            height=36 if self.is_compact else 40, corner_radius=8,
             fg_color=COLORS["hover"], border_width=1,
             text_color=COLORS["text"]
         )

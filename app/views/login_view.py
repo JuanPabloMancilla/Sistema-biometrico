@@ -11,7 +11,9 @@ class LoginView(ctk.CTkFrame):
         self.master = master
         self.on_login_success = on_login_success
         self.password_visible = False
-        self.is_compact = True
+        self.is_compact = (
+            self.winfo_screenwidth() < 900 or self.winfo_screenheight() < 650
+        )
 
         # --- BARRA SUPERIOR ---
         self.top_bar = ctk.CTkFrame(self, fg_color="transparent", height=58)
@@ -75,10 +77,13 @@ class LoginView(ctk.CTkFrame):
 
         # --- TARJETA DE LOGIN CENTRAL ---
         self.card = ctk.CTkFrame(
-            self, fg_color=COLORS["card"], width=390, height=440,
+            self,
+            fg_color=COLORS["card"],
+            width=min(390, self.winfo_screenwidth() - 24),
+            height=390 if self.is_compact else 440,
             corner_radius=8, border_width=1, border_color=COLORS["border"]
         )
-        self.card.place(relx=0.5, rely=0.55, anchor="center")
+        self.card.place(relx=0.5, rely=0.56 if self.is_compact else 0.55, anchor="center")
         self.card.pack_propagate(False)
         self.create_form()
 
@@ -105,7 +110,7 @@ class LoginView(ctk.CTkFrame):
         if os.path.exists(assets_path):
             try:
                 pil_image_original = Image.open(assets_path)
-                tamanio_logo = (60, 60)
+                tamanio_logo = (44, 44) if self.is_compact else (60, 60)
                 pil_image_circular = self.hacer_imagen_circular(pil_image_original, tamanio_logo)
                 self.logo_image = ctk.CTkImage(
                     light_image=pil_image_circular,
@@ -113,7 +118,7 @@ class LoginView(ctk.CTkFrame):
                     size=tamanio_logo
                 )
                 self.logo_label = ctk.CTkLabel(self.card, text="", image=self.logo_image)
-                self.logo_label.pack(pady=(12, 0))
+                self.logo_label.pack(pady=(6 if self.is_compact else 12, 0))
                 print("DEBUG: Imagen cargada con exito!")
             except Exception as e:
                 print(f"ERROR: {e}")
@@ -123,14 +128,15 @@ class LoginView(ctk.CTkFrame):
         ctk.CTkLabel(
             self.card,
             text=AppContext.t("Acceso administrativo"),
-            font=("Inter", 22, "bold"), text_color=COLORS["text"], justify="center"
-        ).pack(pady=(6, 4))
+            font=("Inter", 19 if self.is_compact else 22, "bold"),
+            text_color=COLORS["text"], justify="center"
+        ).pack(pady=(4 if self.is_compact else 6, 3))
 
         ctk.CTkLabel(
             self.card,
             text=AppContext.t("Verifica tu identidad para continuar"),
             font=("Inter", 11), text_color="#8E8E93"
-        ).pack(pady=(0, 14))
+        ).pack(pady=(0, 8 if self.is_compact else 14))
 
         self.create_input_group(AppContext.t("CORREO CORPORATIVO"), AppContext.t("Escribe tu correo"))
         self.user_entry = self.last_entry
@@ -147,7 +153,7 @@ class LoginView(ctk.CTkFrame):
             width=292, height=42, corner_radius=8,
             font=("Inter", 13, "bold"), command=self.validar_login
         )
-        self.login_btn.pack(pady=(8, 10))
+        self.login_btn.pack(pady=(5 if self.is_compact else 8, 8))
 
     def _sincronizar_botones_idioma(self):
         """Pinta el botÃ³n activo segÃºn AppContext.idioma_actual."""
@@ -184,7 +190,7 @@ class LoginView(ctk.CTkFrame):
 
     def create_input_group(self, label_text, placeholder, is_password=False):
         group_frame = ctk.CTkFrame(self.card, fg_color="transparent")
-        group_frame.pack(fill="x", padx=34, pady=4)
+        group_frame.pack(fill="x", padx=24 if self.is_compact else 34, pady=3 if self.is_compact else 4)
         lbl = ctk.CTkLabel(group_frame, text=label_text, font=("Inter", 10, "bold"), text_color=COLORS["text"])
         lbl.pack(side="top", anchor="w")
         input_container = ctk.CTkFrame(group_frame, fg_color=COLORS["card_alt"], height=40, corner_radius=8, border_width=1, border_color=COLORS["border"])

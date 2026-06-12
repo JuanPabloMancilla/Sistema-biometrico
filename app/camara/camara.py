@@ -9,6 +9,9 @@ import numpy as np
 
 ES_RASPBERRY = platform.system() == "Linux"
 PICAMERA2_DISPONIBLE = False
+MODO_ESPEJO = os.environ.get("CAMERA_MIRROR", "1").strip().lower() not in (
+    "0", "false", "no", "off"
+)
 DMA_HEAP_VIDEO = "/dev/dma_heap/vidbuf_cached"
 PICAMERA2_BRIDGE_PYTHON = os.environ.get(
     "PICAMERA2_BRIDGE_PYTHON", "/usr/bin/python3"
@@ -24,6 +27,12 @@ if ES_RASPBERRY:
         print(f"Picamera2 no disponible en este entorno: {error}")
 
 picam2 = None
+
+
+def _aplicar_modo_espejo(frame):
+    if frame is None or not MODO_ESPEJO:
+        return frame
+    return cv2.flip(frame, 1)
 
 
 class Picamera2BridgeCamera:
@@ -287,7 +296,7 @@ def obtener_frame(cap):
 
             frame = cv2.rotate(frame, cv2.ROTATE_180)
 
-            return frame
+            return _aplicar_modo_espejo(frame)
 
         except Exception as e:
             print(f"Error capturando frame Raspberry: {e}")
@@ -299,7 +308,7 @@ def obtener_frame(cap):
         print("No se pudo leer frame")
         return None
 
-    return frame
+    return _aplicar_modo_espejo(frame)
 
 
 def liberar_camara(cap=None):
